@@ -1,0 +1,34 @@
+set(TARGET_NAME jmchess)
+
+set(HDR_FILES
+  board.h
+  board8x8.h
+  engine.h
+  evaluation.h
+  fen.h
+  game.h
+  search.h
+  move.h
+  move_list.h
+  perft.h
+  string_utilities.h
+  timer.h
+)
+
+set(SRC_FILES
+  board8x8.cpp
+  engine.cpp
+  evaluation.cpp
+  fen.cpp
+  game.cpp
+  search.cpp
+  move.cpp
+  move_list.cpp
+  perft.cpp
+  string_utilities.cpp
+  timer.cpp
+)
+
+add_library(${TARGET_NAME} STATIC ${HDR_FILES} ${SRC_FILES})
+
+target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

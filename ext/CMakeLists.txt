@@ -1,0 +1,4 @@
+if (NOT TARGET gtest::gtest)
+  set(gtest_force_shared_crt on)
+  add_subdirectory(googletest-1.17.0)
+endif()

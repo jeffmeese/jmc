@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 3.8)
+
+project(jmchess CXX)
+
+# Set some global options
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
+# Set default build type
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE RELEASE)
+endif()
+
+# Set some MSVC specific options
+if (MSVC)
+  # Get rid of those pesky manifest files
+  set(CMAKE_SHARED_LINKER_FLAGS /MANIFEST:NO)
+  set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+endif()
+
+# Set output directories
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_BINARY_DIR}/lib)
+
+add_subdirectory(ext)
+add_subdirectory(src)
+add_subdirectory(tools)
+add_subdirectory(test)
