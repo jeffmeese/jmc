@@ -52,7 +52,7 @@ public:
    *
    * \param perftDepth The perft level to use
    */
-  void divide(int32_t perftDepth);
+  void divide(std::uint32_t perftDepth);
 
   /*!
    * \brief Executes the perft
@@ -67,7 +67,7 @@ public:
    *
    * \return The number of moves generated
    */
-  uint64_t execute(int32_t perftDepth);
+  std::uint64_t execute(std::uint32_t perftDepth);
 
 private:
   /*!
@@ -79,7 +79,7 @@ private:
    *
    * \return The number of moves found
    */
-  uint64_t executePerft(int32_t perftDepth);
+  std::uint64_t executePerft(std::uint32_t perftDepth);
 
   Board * mBoard;
 };

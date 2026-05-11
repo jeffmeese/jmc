@@ -21,7 +21,7 @@ Perft::Perft(Board * board)
 {
 }
 
-void Perft::divide(int32_t perftDepth)
+void Perft::divide(std::uint32_t perftDepth)
 {
   BoardState boardState = mBoard->getBoardState();
   Color sideToMove = boardState.sideToMove;
@@ -29,19 +29,19 @@ void Perft::divide(int32_t perftDepth)
 
   MoveList moveList;
   mBoard->generateMoves(moveList);
-  uint64_t validMoves = 0;
-  uint64_t totalNodes = 0;
+  std::uint64_t validMoves = 0;
+  std::uint64_t totalNodes = 0;
   for (std::int32_t i = 0; i < moveList.totalMoves(); i++)
   {
     const Move & move = moveList.getMove(i);
 
     mBoard->makeMove(move);
-    uint8_t kingRow = mBoard->getKingRow(sideToMove);
-    uint8_t kingCol = mBoard->getKingColumn(sideToMove);
+    std::int8_t kingRow = mBoard->getKingRow(sideToMove);
+    std::int8_t kingCol = mBoard->getKingColumn(sideToMove);
     bool attacked = mBoard->isCellAttacked(kingRow, kingCol, oppositeColor);
     if (!attacked)
     {
-      uint64_t nodes = executePerft(perftDepth - 1);
+      std::uint64_t nodes = executePerft(perftDepth - 1);
       std::string moveString = move.toSmithNotation();
       std::cout << moveString << ": " << nodes << "\n";
       totalNodes += nodes;
@@ -55,15 +55,14 @@ void Perft::divide(int32_t perftDepth)
   std::cout << "Moves: " << validMoves << "\n";
   std::cout << "Nodes: " << totalNodes << "\n";
   std::cout << std::endl;
-  //std::cout << "Total time elapsed  : " << timer.get_elapsed_ms() << " milliseconds" << std::endl;
 }
 
-uint64_t Perft::execute(int32_t perftDepth)
+std::uint64_t Perft::execute(std::uint32_t perftDepth)
 {
   return executePerft(perftDepth);
 }
 
-uint64_t Perft::executePerft(int32_t perftDepth)
+std::uint64_t Perft::executePerft(std::uint32_t perftDepth)
 {
   if (perftDepth == 0)
   {
@@ -77,14 +76,14 @@ uint64_t Perft::executePerft(int32_t perftDepth)
   MoveList moveList;
   mBoard->generateMoves(moveList);
 
-  uint64_t totalNodes = 0;
+  std::uint64_t totalNodes = 0;
   for (std::int32_t i = 0; i < moveList.totalMoves(); i++)
   {
     const Move & move = moveList.getMove(i);
 
     mBoard->makeMove(move);
-    uint8_t kingRow = mBoard->getKingRow(sideToMove);
-    uint8_t kingCol = mBoard->getKingColumn(sideToMove);
+    std::int8_t kingRow = mBoard->getKingRow(sideToMove);
+    std::int8_t kingCol = mBoard->getKingColumn(sideToMove);
     bool attacked = mBoard->isCellAttacked(kingRow, kingCol, oppositeColor);
     if (!attacked)
     {
