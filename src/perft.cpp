@@ -16,16 +16,18 @@
 namespace jmchess
 {
 
-Perft::Perft(Board * board)
+Perft::Perft(
+  Board * board)
   : mBoard(board)
 {
 }
 
-void Perft::divide(std::uint32_t perftDepth)
+void Perft::divide(
+  std::uint32_t perftDepth)
 {
   BoardState boardState = mBoard->getBoardState();
-  Color sideToMove = boardState.sideToMove;
-  Color oppositeColor = (sideToMove == Color::White) ? Color::Black : Color::White;
+  Color sideToMove      = boardState.sideToMove;
+  Color oppositeColor   = (sideToMove == Color::White) ? Color::Black : Color::White;
 
   MoveList moveList;
   mBoard->generateMoves(moveList);
@@ -36,12 +38,10 @@ void Perft::divide(std::uint32_t perftDepth)
     const Move & move = moveList.getMove(i);
 
     mBoard->makeMove(move);
-    std::int8_t kingRow = mBoard->getKingRow(sideToMove);
-    std::int8_t kingCol = mBoard->getKingColumn(sideToMove);
-    bool attacked = mBoard->isCellAttacked(kingRow, kingCol, oppositeColor);
+    bool attacked = mBoard->isKingInCheck(sideToMove);
     if (!attacked)
     {
-      std::uint64_t nodes = executePerft(perftDepth - 1);
+      std::uint64_t nodes    = executePerft(perftDepth - 1);
       std::string moveString = move.toSmithNotation();
       std::cout << moveString << ": " << nodes << "\n";
       totalNodes += nodes;
@@ -57,12 +57,14 @@ void Perft::divide(std::uint32_t perftDepth)
   std::cout << std::endl;
 }
 
-std::uint64_t Perft::execute(std::uint32_t perftDepth)
+std::uint64_t Perft::execute(
+  std::uint32_t perftDepth)
 {
   return executePerft(perftDepth);
 }
 
-std::uint64_t Perft::executePerft(std::uint32_t perftDepth)
+std::uint64_t Perft::executePerft(
+  std::uint32_t perftDepth)
 {
   if (perftDepth == 0)
   {
@@ -70,8 +72,8 @@ std::uint64_t Perft::executePerft(std::uint32_t perftDepth)
   }
 
   BoardState boardState = mBoard->getBoardState();
-  Color sideToMove = boardState.sideToMove;
-  Color oppositeColor = (sideToMove == Color::White) ? Color::Black : Color::White;
+  Color sideToMove      = boardState.sideToMove;
+  Color oppositeColor   = (sideToMove == Color::White) ? Color::Black : Color::White;
 
   MoveList moveList;
   mBoard->generateMoves(moveList);
@@ -82,12 +84,10 @@ std::uint64_t Perft::executePerft(std::uint32_t perftDepth)
     const Move & move = moveList.getMove(i);
 
     mBoard->makeMove(move);
-    std::int8_t kingRow = mBoard->getKingRow(sideToMove);
-    std::int8_t kingCol = mBoard->getKingColumn(sideToMove);
-    bool attacked = mBoard->isCellAttacked(kingRow, kingCol, oppositeColor);
+    bool attacked = mBoard->isKingInCheck(sideToMove);
     if (!attacked)
     {
-      totalNodes += executePerft(perftDepth-1);
+      totalNodes += executePerft(perftDepth - 1);
     }
     mBoard->unmakeMove(move);
   }
@@ -95,4 +95,4 @@ std::uint64_t Perft::executePerft(std::uint32_t perftDepth)
   return totalNodes;
 }
 
-}
+} // namespace jmchess

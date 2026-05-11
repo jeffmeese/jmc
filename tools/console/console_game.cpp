@@ -327,9 +327,7 @@ void ConsoleGame::handleShowCommand()
     bool validMove             = false;
 
     board->makeMove(move);
-    std::uint8_t kingRow = board->getKingRow(sideToMove);
-    std::uint8_t kingCol = board->getKingColumn(sideToMove);
-    bool attacked        = board->isCellAttacked(kingRow, kingCol, otherColor);
+    bool attacked = board->isKingInCheck(sideToMove);
     if (!attacked)
     {
       totalMoves++;
@@ -342,12 +340,6 @@ void ConsoleGame::handleShowCommand()
       std::cout << move.toSmithNotation() << "\n";
     }
   }
-
-  // for (std::int32_t i = 0; i < moveList.totalMoves(); i++)
-  // {
-  //   const jmchess::Move * move = moveList.getMove(i);
-  //   std::cout << move->toSmithNotation() << "\n";
-  // }
 
   std::cout << std::endl;
   std::cout << "Total Moves: " << totalMoves << std::endl;
