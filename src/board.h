@@ -11,16 +11,16 @@
 namespace jmchess
 {
 
-constexpr std::uint8_t CASTLE_NONE              = 0x00;
-constexpr std::uint8_t CASTLE_WHITE_KING        = 0x01;
-constexpr std::uint8_t CASTLE_WHITE_QUEEN       = 0x02;
-constexpr std::uint8_t CASTLE_BLACK_KING        = 0x04;
-constexpr std::uint8_t CASTLE_BLACK_QUEEN       = 0x08;
-constexpr std::uint8_t WHITE_PROMOTION_ROW      = 7;
-constexpr std::uint8_t BLACK_PROMOTION_ROW      = 0;
-constexpr std::uint8_t INVALID_ENPASSANT_COLUMN = 8;
-constexpr std::uint8_t WHITE_ENPASSANT_ROW      = 4;
-constexpr std::uint8_t BLACK_ENPASSANT_ROW      = 3;
+constexpr std::int8_t CASTLE_NONE              = 0x00;
+constexpr std::int8_t CASTLE_WHITE_KING        = 0x01;
+constexpr std::int8_t CASTLE_WHITE_QUEEN       = 0x02;
+constexpr std::int8_t CASTLE_BLACK_KING        = 0x04;
+constexpr std::int8_t CASTLE_BLACK_QUEEN       = 0x08;
+constexpr std::int8_t WHITE_PROMOTION_ROW      = 7;
+constexpr std::int8_t BLACK_PROMOTION_ROW      = 0;
+constexpr std::int8_t INVALID_ENPASSANT_COLUMN = 8;
+constexpr std::int8_t WHITE_ENPASSANT_ROW      = 4;
+constexpr std::int8_t BLACK_ENPASSANT_ROW      = 3;
 
 class Board
 {
@@ -28,23 +28,23 @@ public:
   virtual void generateMoves(MoveList & moveList) const = 0;
 
   virtual void generateMoves(
-    std::uint8_t row,
-    std::uint8_t col,
+    std::int8_t row,
+    std::int8_t col,
     MoveList & moveList) const = 0;
 
   virtual BoardState getBoardState() const = 0;
 
-  virtual std::uint8_t getKingColumn(Color color) const = 0;
+  virtual std::int8_t getKingColumn(Color color) const = 0;
 
-  virtual std::uint8_t getKingRow(Color color) const = 0;
+  virtual std::int8_t getKingRow(Color color) const = 0;
   
   virtual PieceType getPieceType(
-    std::uint8_t row,
-    std::uint8_t col) const = 0;
+    std::int8_t row,
+    std::int8_t col) const = 0;
 
   virtual bool isCellAttacked(
-    std::uint8_t row,
-    std::uint8_t col,
+    std::int8_t row,
+    std::int8_t col,
     Color attackingColor) const = 0;
 
   virtual void makeMove(const Move & move) = 0;

@@ -10,10 +10,10 @@ namespace jmchess
 
 MoveList::MoveList()
 {
-  mMoves.resize(MAX_MOVES);
+  mMoves.reserve(MAX_MOVES);
 }
 
-void MoveList::addMove(std::unique_ptr<Move> move)
+void MoveList::addMove(const Move & move)
 {
   if (mIndex >= MAX_MOVES)
   {
@@ -22,33 +22,35 @@ void MoveList::addMove(std::unique_ptr<Move> move)
     throw std::runtime_error(oss.str());
   } 
 
-  mMoves[mIndex] = std::move(move);
+  mMoves.push_back(move);
   mIndex++;
 }
 
 void MoveList::clear()
 {
   mIndex = 0;
+  mMoves.clear();
+  mMoves.reserve(MAX_MOVES);
 }
 
-const Move * MoveList::getMove(std::int32_t index) const
+const Move & MoveList::getMove(std::int32_t index) const
 {
-  if (index >= mIndex)
+  if (index < 0 || index >= mIndex)
   {
     std::ostringstream oss;
     oss << "Requested move index is beyond stored moves";
     throw std::runtime_error(oss.str());
   }
 
-  return mMoves[index].get();
+  return mMoves[index];
 }
 
-std::int32_t MoveList::getMoveIndex(const Move * move) const
+std::int32_t MoveList::getMoveIndex(const Move & move) const
 {
   for (std::int32_t i = 0; i <= mIndex; i++)
   {
-    const Move * thisMove = mMoves[i].get();
-    if (*thisMove == *move)
+    const Move & thisMove = mMoves[i];
+    if (thisMove == move)
     {
       return i;
     }

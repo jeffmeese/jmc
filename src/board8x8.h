@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <stack>
 #include <string>
 
 #include "board.h"
@@ -22,23 +21,23 @@ public:
   void generateMoves(MoveList & moveList) const override;
 
   void generateMoves(
-    std::uint8_t row,
-    std::uint8_t col,
+    std::int8_t row,
+    std::int8_t col,
     MoveList & moveList) const override;
 
   BoardState getBoardState() const override;
 
-  std::uint8_t getKingColumn(Color color) const;
+  std::int8_t getKingColumn(Color color) const;
 
-  std::uint8_t getKingRow(Color color) const;
+  std::int8_t getKingRow(Color color) const;
 
   PieceType getPieceType(
-    std::uint8_t row,
-    std::uint8_t col) const override;
+    std::int8_t row,
+    std::int8_t col) const override;
 
   bool isCellAttacked(
-    std::uint8_t row,
-    std::uint8_t col,
+    std::int8_t row,
+    std::int8_t col,
     Color attackingColor) const override;
 
   void makeMove(const Move & move) override;
@@ -51,14 +50,14 @@ public:
 
 private:
   bool checkJumpAttacks(
-    std::uint8_t index,
+    std::int8_t index,
     std::int8_t rowIncrement,
     std::int8_t columnIncrement,
     Piece piece,
     Color attackColor) const;
 
   bool checkSliderAttacks(
-    std::uint8_t index,
+    std::int8_t index,
     std::int8_t rowIncrement,
     std::int8_t columnIncrement,
     Piece piece,
@@ -69,7 +68,7 @@ private:
     MoveList & moveList) const;
 
   void generateJumpMoves(
-    std::uint8_t index,
+    std::int8_t index,
     std::int8_t rowIncrement,
     std::int8_t columnIncrement,
     Piece piece,
@@ -77,16 +76,16 @@ private:
     MoveList & moveList) const;
 
   void generateMoves(
-    std::uint8_t index,
+    std::int8_t index,
     MoveList & moveList) const;
 
   void generatePawnMoves(
-    std::uint8_t index,
+    std::int8_t index,
     Color sideToMove,
     MoveList & moveList) const;
 
   void generateSlidingMoves(
-    std::uint8_t index,
+    std::int8_t index,
     std::int8_t rowIncrement,
     std::int8_t columnIncrement,
     Piece piece,
@@ -94,12 +93,12 @@ private:
     MoveList & moveList) const;
 
   bool isCellAttacked(
-    std::uint8_t index,
+    std::int8_t index,
     Color attackingColor) const;
 
   void pushMove(
-    uint8_t fromIndex,
-    uint8_t toIndex,
+    std::int8_t fromIndex,
+    std::int8_t toIndex,
     Piece piece,
     Piece capturePiece,
     Piece promotionPiece,
@@ -111,7 +110,6 @@ private:
   Color mColors[64];
   Square mBlackKingSquare;
   Square mWhiteKingSquare;
-  std::stack<BoardState> mStateStack;
 };
 
 } // namespace jmchess

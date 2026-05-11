@@ -96,11 +96,11 @@ void ConsoleGame::handleHelpCommand() const
   std::cout << "print................Prints the current board position\n";
   std::cout << "disp.................Same as print\n";
   std::cout << "new..................Start a new game\n";
-  //std::cout << "eval.................Evaluation the current board position\n";
-  //std::cout << "move <smith>.........Performs a move\n";
+  // std::cout << "eval.................Evaluation the current board position\n";
+  // std::cout << "move <smith>.........Performs a move\n";
   std::cout << "perft <level>........Counts the total number of nodes to depth <level>\n";
-  //std::cout << "divide <level>.......Displays the number of child moves\n";
-  //std::cout << "table <level>........Displays a table of all perft results from 1 to <level>\n";
+  // std::cout << "divide <level>.......Displays the number of child moves\n";
+  // std::cout << "table <level>........Displays a table of all perft results from 1 to <level>\n";
   std::cout << "setboard <fen>.......Sets the board position to <fen>\n";
   std::cout << "testmovegen..........Tests the move generator\n";
   std::cout << "undo.................Undoes the last move\n";
@@ -135,9 +135,9 @@ void ConsoleGame::handleMoveCommand(
   std::int32_t moveIndex = -1;
   for (uint8_t i = 0; i < moveList.totalMoves(); i++)
   {
-    const jmchess::Move * move   = moveList.getMove(i);
-    jmchess::Square sourceSquare = move->getSourceSquare();
-    jmchess::Square destSquare   = move->getDestinationSquare();
+    const jmchess::Move & move   = moveList.getMove(i);
+    jmchess::Square sourceSquare = move.getSourceSquare();
+    jmchess::Square destSquare   = move.getDestinationSquare();
 
     if (
       sourceSquare.row == sourceRow && destSquare.row == destinationRow && sourceSquare.col == sourceColumn &&
@@ -155,9 +155,9 @@ void ConsoleGame::handleMoveCommand(
     return;
   }
 
-  const jmchess::Move * selectedMove = moveList.getMove(moveIndex);
+  const jmchess::Move & selectedMove = moveList.getMove(moveIndex);
 
-  makeMove(*selectedMove);
+  makeMove(selectedMove);
 }
 
 void ConsoleGame::handleNewCommand()
@@ -165,7 +165,8 @@ void ConsoleGame::handleNewCommand()
   startNew();
 }
 
-void ConsoleGame::handlePerftCommand(std::istream & input)
+void ConsoleGame::handlePerftCommand(
+  std::istream & input)
 {
   int32_t perftLevel = 0;
   input >> perftLevel;
@@ -184,12 +185,12 @@ void ConsoleGame::handlePerftCommand(std::istream & input)
   jmchess::Board * board = this->getBoard();
   jmchess::Perft perft(board);
 
-  //jmchess::Timer timer;
-  //timer.start();
+  // jmchess::Timer timer;
+  // timer.start();
   uint64_t totalNodes = perft.execute(perftLevel);
   std::cout << "Total Nodes: " << totalNodes << std::endl;
-  //timer.stop();
-  //std::cout << "Total Nodes: " << totalNodes << " Time: " << timer.elapsed()/1e3 << " milliseconds\n";
+  // timer.stop();
+  // std::cout << "Total Nodes: " << totalNodes << " Time: " << timer.elapsed()/1e3 << " milliseconds\n";
 }
 
 void ConsoleGame::handlePrintCommand()
@@ -277,7 +278,7 @@ void ConsoleGame::handleSetBoardCommand(
 {
   std::string fenString;
   std::getline(input, fenString);
-  if (fenString.empty()) 
+  if (fenString.empty())
   {
     std::cout << "A fen string must be provided\n";
     return;
@@ -288,7 +289,7 @@ void ConsoleGame::handleSetBoardCommand(
 
 void ConsoleGame::handleShowCommand()
 {
-  jmchess::Board * board = this->getBoard();
+  jmchess::Board * board    = this->getBoard();
   jmchess::Color sideToMove = board->getBoardState().sideToMove;
   jmchess::Color otherColor = (sideToMove == jmchess::Color::White) ? jmchess::Color::Black : jmchess::Color::White;
 
@@ -298,23 +299,23 @@ void ConsoleGame::handleShowCommand()
   std::int32_t totalMoves = 0;
   for (std::uint8_t i = 0; i < moveList.totalMoves(); i++)
   {
-    const jmchess::Move * move = moveList.getMove(i);
-    bool validMove = false;
+    const jmchess::Move & move = moveList.getMove(i);
+    bool validMove             = false;
 
-    board->makeMove(*move);
+    board->makeMove(move);
     std::uint8_t kingRow = board->getKingRow(sideToMove);
     std::uint8_t kingCol = board->getKingColumn(sideToMove);
-    bool attacked = board->isCellAttacked(kingRow, kingCol, otherColor);
+    bool attacked        = board->isCellAttacked(kingRow, kingCol, otherColor);
     if (!attacked)
     {
       totalMoves++;
       validMove = true;
     }
-    board->unmakeMove(*move);
+    board->unmakeMove(move);
 
     if (validMove)
     {
-      std::cout << move->toSmithNotation() << "\n";
+      std::cout << move.toSmithNotation() << "\n";
     }
   }
 
@@ -374,22 +375,22 @@ void ConsoleGame::handleTestMoveGen()
       std::string nodesString = perftTokens.at(1);
 
       int32_t depthLevel = atoi(depthString.substr(1).c_str());
-      uint64_t numNodes = atoi(nodesString.c_str());
+      uint64_t numNodes  = atoi(nodesString.c_str());
 
-      //jcl::Timer timer;
+      // jcl::Timer timer;
       jmchess::Perft perft(getBoard());
 
-      //timer.start();
+      // timer.start();
       uint64_t totalNodes = perft.execute(depthLevel);
-      //timer.stop();
+      // timer.stop();
 
       bool success = (totalNodes == numNodes);
       std::cout << "Perft (" << static_cast<int>(depthLevel) << "): " << totalNodes << " nodes, ";
-      //std::cout << "Time: " << timer.elapsed()/1e6 << " s, [" << static_cast<int>(numNodes) << "], ";
+      // std::cout << "Time: " << timer.elapsed()/1e6 << " s, [" << static_cast<int>(numNodes) << "], ";
       std::cout << (success ? "OK" : "FAIL") << "\n";
 
-      //if (!success)
-      //  return;
+      // if (!success)
+      //   return;
     }
   }
 }

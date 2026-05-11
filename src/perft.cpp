@@ -33,22 +33,22 @@ void Perft::divide(int32_t perftDepth)
   uint64_t totalNodes = 0;
   for (std::int32_t i = 0; i < moveList.totalMoves(); i++)
   {
-    const Move * move = moveList.getMove(i);
+    const Move & move = moveList.getMove(i);
 
-    mBoard->makeMove(*move);
+    mBoard->makeMove(move);
     uint8_t kingRow = mBoard->getKingRow(sideToMove);
     uint8_t kingCol = mBoard->getKingColumn(sideToMove);
     bool attacked = mBoard->isCellAttacked(kingRow, kingCol, oppositeColor);
     if (!attacked)
     {
       uint64_t nodes = executePerft(perftDepth - 1);
-      std::string moveString = move->toSmithNotation();
+      std::string moveString = move.toSmithNotation();
       std::cout << moveString << ": " << nodes << "\n";
       totalNodes += nodes;
       validMoves++;
     }
 
-    mBoard->unmakeMove(*move);
+    mBoard->unmakeMove(move);
   }
 
   std::cout << "\n";
@@ -80,9 +80,9 @@ uint64_t Perft::executePerft(int32_t perftDepth)
   uint64_t totalNodes = 0;
   for (std::int32_t i = 0; i < moveList.totalMoves(); i++)
   {
-    const Move * move = moveList.getMove(i);
+    const Move & move = moveList.getMove(i);
 
-    mBoard->makeMove(*move);
+    mBoard->makeMove(move);
     uint8_t kingRow = mBoard->getKingRow(sideToMove);
     uint8_t kingCol = mBoard->getKingColumn(sideToMove);
     bool attacked = mBoard->isCellAttacked(kingRow, kingCol, oppositeColor);
@@ -90,7 +90,7 @@ uint64_t Perft::executePerft(int32_t perftDepth)
     {
       totalNodes += executePerft(perftDepth-1);
     }
-    mBoard->unmakeMove(*move);
+    mBoard->unmakeMove(move);
   }
 
   return totalNodes;

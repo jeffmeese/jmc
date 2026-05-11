@@ -13,6 +13,7 @@ Move::Move(
   const Square & source,
   const Square & desination,
   Piece piece,
+  BoardState boardState,
   Type type,
   Piece capturePiece,
   Piece promotedPiece)
@@ -20,9 +21,15 @@ Move::Move(
   mSource        = source;
   mDestination   = desination;
   mPiece         = piece;
+  mBoardState    = boardState;
   mCapturedPiece = capturePiece;
   mPromotedPiece = promotedPiece;
   mType          = type;
+}
+
+BoardState Move::getBoardState() const
+{
+  return mBoardState;
 }
 
 Piece Move::getCapturedPiece() const
@@ -103,7 +110,9 @@ std::string Move::toSmithNotation() const
   return oss.str();
 }
 
-bool operator==(const Move & move1, const Move & move2)
+bool operator==(
+  const Move & move1,
+  const Move & move2)
 {
   if (move1.mType != move2.mType)
   {
