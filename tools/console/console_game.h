@@ -10,6 +10,7 @@ public:
   void execute();
 
 private:
+  void handleDivideCommand(std::istream & input);
   void handleHelpCommand() const;
   void handleMoveCommand(std::istream & input);
   void handleNewCommand();
@@ -26,4 +27,6 @@ private:
     uint8_t & srcCol,
     uint8_t & dstRow,
     uint8_t & dstCol) const;
+
+  int32_t readLevel(std::istream & iss) const;
 };

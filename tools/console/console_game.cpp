@@ -11,6 +11,15 @@
 #include "fen.h"
 #include "perft.h"
 #include "string_utilities.h"
+#include "timer.h"
+
+template <typename T>
+T readValue(std::istream & iss)
+{
+  T value = T();
+  iss >> value;
+  return value;
+}
 
 void ConsoleGame::execute()
 {
@@ -31,8 +40,10 @@ void ConsoleGame::execute()
     {
       break;
     }
-    // else if (commandString == "divide")
-    //   handleDivide(iss);
+    else if (commandString == "divide")
+    {
+      handleDivideCommand(iss);
+    }
     else if (commandString == "help")
     {
       handleHelpCommand();
@@ -87,6 +98,20 @@ void ConsoleGame::execute()
       std::cout << "Type help to show command list\n";
     }
   }
+}
+
+void ConsoleGame::handleDivideCommand(std::istream & input)
+{
+  const jmchess::Board * board = this->getBoard();
+
+  std::int32_t perftLevel = readLevel(input);
+  if (perftLevel == 0)
+  {
+    return;
+  }
+
+  jmchess::Perft perft(getBoard());
+  perft.divide(perftLevel);
 }
 
 void ConsoleGame::handleHelpCommand() const
@@ -185,12 +210,11 @@ void ConsoleGame::handlePerftCommand(
   jmchess::Board * board = this->getBoard();
   jmchess::Perft perft(board);
 
-  // jmchess::Timer timer;
-  // timer.start();
-  uint64_t totalNodes = perft.execute(perftLevel);
-  std::cout << "Total Nodes: " << totalNodes << std::endl;
-  // timer.stop();
-  // std::cout << "Total Nodes: " << totalNodes << " Time: " << timer.elapsed()/1e3 << " milliseconds\n";
+  jmchess::Timer timer;
+  timer.start();
+  std::uint64_t totalNodes = perft.execute(perftLevel);
+  timer.stop();
+  std::cout << "Total Nodes: " << totalNodes << " Time: " << timer.elapsed()/1e3 << " milliseconds\n";
 }
 
 void ConsoleGame::handlePrintCommand()
@@ -377,16 +401,16 @@ void ConsoleGame::handleTestMoveGen()
       int32_t depthLevel = atoi(depthString.substr(1).c_str());
       uint64_t numNodes  = atoi(nodesString.c_str());
 
-      // jcl::Timer timer;
+      jmchess::Timer timer;
       jmchess::Perft perft(getBoard());
 
-      // timer.start();
+      timer.start();
       uint64_t totalNodes = perft.execute(depthLevel);
-      // timer.stop();
+      timer.stop();
 
       bool success = (totalNodes == numNodes);
       std::cout << "Perft (" << static_cast<int>(depthLevel) << "): " << totalNodes << " nodes, ";
-      // std::cout << "Time: " << timer.elapsed()/1e6 << " s, [" << static_cast<int>(numNodes) << "], ";
+      std::cout << "Time: " << timer.elapsed()/1e6 << " s, [" << static_cast<int>(numNodes) << "], ";
       std::cout << (success ? "OK" : "FAIL") << "\n";
 
       // if (!success)
@@ -450,4 +474,15 @@ bool ConsoleGame::parseMovePos(
   dstRow = rowMap[moveString.at(3)];
 
   return true;
+}
+
+int32_t ConsoleGame::readLevel(std::istream & iss) const
+{
+  int32_t perftLevel = readValue<int32_t>(iss);
+  if (iss.fail()) 
+  {
+    std::cout << "Invalid perft level\n";
+    return 0;
+  }
+  return perftLevel;
 }
