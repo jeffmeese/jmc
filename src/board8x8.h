@@ -40,6 +40,8 @@ public:
     std::int8_t col,
     Color attackingColor) const override;
 
+  bool isKingInCheck(Color color) const override;
+
   void makeMove(const Move & move) override;
 
   void reset() override;
@@ -49,6 +51,12 @@ public:
   void unmakeMove(const Move & move) override;
 
 private:
+  struct Cell
+  {
+    Piece piece;
+    Color color;
+  };
+
   bool checkJumpAttacks(
     std::int8_t index,
     std::int8_t rowIncrement,
@@ -60,7 +68,8 @@ private:
     std::int8_t index,
     std::int8_t rowIncrement,
     std::int8_t columnIncrement,
-    Piece piece,
+    Piece piece1,
+    Piece piece2,
     Color attackColor) const;
 
   void generateCastlingMoves(
@@ -105,9 +114,17 @@ private:
     Move::Type type,
     MoveList & moveList) const;
 
+  static constexpr std::int8_t PAWN_ROW_INCREMENTS[2]        = {1, 1};
+  static constexpr std::int8_t PAWN_COLUMN_INCREMENTS[2]     = {1, -1};
+  static constexpr std::int8_t KNIGHT_ROW_INCREMENTS[8]      = {1, 2, 2, 1, -1, -2, -2, -1};
+  static constexpr std::int8_t KNIGHT_COLUMN_INCREMENTS[8]   = {-2, -1, 1, 2, 2, 1, -1, -2};
+  static constexpr std::int8_t STRAIGHT_ROW_INCREMENTS[4]    = {1, -1, 0, 0};
+  static constexpr std::int8_t STRAIGHT_COLUMN_INCREMENTS[4] = {0, 0, 1, -1};
+  static constexpr std::int8_t DIAGONAL_ROW_INCREMENTS[4]    = {1, 1, -1, -1};
+  static constexpr std::int8_t DIAGONAL_COLUMN_INCREMENTS[4] = {-1, 1, 1, -1};
+
   BoardState mBoardState;
-  Piece mPieces[64];
-  Color mColors[64];
+  Cell mCells[64];
   Square mBlackKingSquare;
   Square mWhiteKingSquare;
 };

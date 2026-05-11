@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <cstdint>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include "board.h"
@@ -38,74 +40,22 @@ static constexpr std::int8_t NORTH = 8;
 static constexpr std::int8_t SOUTH = -8;
 static constexpr std::int8_t EAST  = 1;
 static constexpr std::int8_t WEST  = -1;
-
-enum BoardSquare
-{
-  A1 = 0,
-  B1,
-  C1,
-  D1,
-  E1,
-  F1,
-  G1,
-  H1,
-  A2 = 8,
-  B2,
-  C2,
-  D2,
-  E2,
-  F2,
-  G2,
-  H2,
-  A3 = 16,
-  B3,
-  C3,
-  D3,
-  E3,
-  F3,
-  G3,
-  H3,
-  A4 = 24,
-  B4,
-  C4,
-  D4,
-  E4,
-  F4,
-  G4,
-  H4,
-  A5 = 32,
-  B5,
-  C5,
-  D5,
-  E5,
-  F5,
-  G5,
-  H5,
-  A6 = 40,
-  B6,
-  C6,
-  D6,
-  E6,
-  F6,
-  G6,
-  H6,
-  A7 = 48,
-  B7,
-  C7,
-  D7,
-  E7,
-  F7,
-  G7,
-  H7,
-  A8 = 56,
-  B8,
-  C8,
-  D8,
-  E8,
-  F8,
-  G8,
-  H8
-};
+static constexpr std::int8_t A1    = 0;
+static constexpr std::int8_t B1    = 1;
+static constexpr std::int8_t C1    = 2;
+static constexpr std::int8_t D1    = 3;
+static constexpr std::int8_t E1    = 4;
+static constexpr std::int8_t F1    = 5;
+static constexpr std::int8_t G1    = 6;
+static constexpr std::int8_t H1    = 7;
+static constexpr std::int8_t A8    = 56;
+static constexpr std::int8_t B8    = 57;
+static constexpr std::int8_t C8    = 58;
+static constexpr std::int8_t D8    = 59;
+static constexpr std::int8_t E8    = 60;
+static constexpr std::int8_t F8    = 61;
+static constexpr std::int8_t G8    = 62;
+static constexpr std::int8_t H8    = 63;
 
 Board8x8::Board8x8()
 {
@@ -130,8 +80,8 @@ bool Board8x8::checkJumpAttacks(
   }
 
   std::int8_t attackIndex = getIndex(attackRow, attackColumn);
-  Piece attackPiece       = mPieces[attackIndex];
-  Color attackPieceColor  = mColors[attackIndex];
+  Piece attackPiece       = mCells[attackIndex].piece;
+  Color attackPieceColor  = mCells[attackIndex].color;
 
   return (attackPiece == piece && attackPieceColor == attackColor);
 }
@@ -140,7 +90,8 @@ bool Board8x8::checkSliderAttacks(
   std::int8_t index,
   std::int8_t rowIncrement,
   std::int8_t columnIncrement,
-  Piece piece,
+  Piece piece1,
+  Piece piece2,
   Color attackColor) const
 {
   std::int8_t row          = getRow(index);
@@ -157,12 +108,12 @@ bool Board8x8::checkSliderAttacks(
     }
 
     std::int8_t attackIndex = getIndex(attackRow, attackColumn);
-    Piece attackPiece       = mPieces[attackIndex];
-    Color attackPieceColor  = mColors[attackIndex];
+    Piece attackPiece       = mCells[attackIndex].piece;
+    Color attackPieceColor  = mCells[attackIndex].color;
 
     if (attackPiece != Piece::None)
     {
-      if (attackPieceColor == attackColor && attackPiece == piece)
+      if (attackPieceColor == attackColor && (attackPiece == piece1 || attackPiece == piece2))
       {
         return true;
       }
@@ -187,8 +138,8 @@ void Board8x8::generateCastlingMoves(
     Color attackColor = Color::Black;
     if (castlingRights & CASTLE_WHITE_KING)
     {
-      bool f1Empty = (mPieces[F1] == Piece::None);
-      bool g1Empty = (mPieces[G1] == Piece::None);
+      bool f1Empty = (mCells[F1].piece == Piece::None);
+      bool g1Empty = (mCells[G1].piece == Piece::None);
       if (f1Empty && g1Empty)
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(F1, attackColor) && !isCellAttacked(G1, attackColor))
@@ -200,9 +151,9 @@ void Board8x8::generateCastlingMoves(
 
     if (castlingRights & CASTLE_WHITE_QUEEN)
     {
-      bool d1Empty = (mPieces[D1] == Piece::None);
-      bool c1Empty = (mPieces[C1] == Piece::None);
-      bool b1Empty = (mPieces[B1] == Piece::None);
+      bool d1Empty = (mCells[D1].piece == Piece::None);
+      bool c1Empty = (mCells[C1].piece == Piece::None);
+      bool b1Empty = (mCells[B1].piece == Piece::None);
       if (d1Empty && c1Empty && b1Empty)
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(D1, attackColor) && !isCellAttacked(C1, attackColor))
@@ -217,8 +168,8 @@ void Board8x8::generateCastlingMoves(
     Color attackColor = Color::White;
     if (castlingRights & CASTLE_BLACK_KING)
     {
-      bool f8Empty = (mPieces[F8] == Piece::None);
-      bool g8Empty = (mPieces[G8] == Piece::None);
+      bool f8Empty = (mCells[F8].piece == Piece::None);
+      bool g8Empty = (mCells[G8].piece == Piece::None);
       if (f8Empty && g8Empty)
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(F8, attackColor) && !isCellAttacked(G8, attackColor))
@@ -230,9 +181,9 @@ void Board8x8::generateCastlingMoves(
 
     if (castlingRights & CASTLE_BLACK_QUEEN)
     {
-      bool d8Empty = (mPieces[D8] == Piece::None);
-      bool c8Empty = (mPieces[C8] == Piece::None);
-      bool b8Empty = (mPieces[B8] == Piece::None);
+      bool d8Empty = (mCells[D8].piece == Piece::None);
+      bool c8Empty = (mCells[C8].piece == Piece::None);
+      bool b8Empty = (mCells[B8].piece == Piece::None);
       if (d8Empty && c8Empty && b8Empty)
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(D8, attackColor) && !isCellAttacked(C8, attackColor))
@@ -264,8 +215,8 @@ void Board8x8::generateJumpMoves(
   }
 
   std::int8_t destIndex = getIndex(destRow, destColumn);
-  Piece otherPiece      = mPieces[destIndex];
-  Color otherColor      = mColors[destIndex];
+  Piece otherPiece      = mCells[destIndex].piece;
+  Color otherColor      = mCells[destIndex].color;
   if (otherColor == Color::None)
   {
     pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
@@ -294,9 +245,16 @@ void Board8x8::generateMoves(
   std::int8_t index,
   MoveList & moveList) const
 {
+  if (index < 0 || index > 63)
+  {
+    std::ostringstream oss;
+    oss << "Invalid index value in generateMoves: " << index;
+    throw std::invalid_argument(oss.str());
+  }
+
   Color sideToMove = mBoardState.sideToMove;
-  Piece piece      = mPieces[index];
-  Color color      = mColors[index];
+  Piece piece      = mCells[index].piece;
+  Color color      = mCells[index].color;
 
   if (piece == Piece::None || (color != sideToMove))
   {
@@ -355,13 +313,27 @@ void Board8x8::generateMoves(
 
 void Board8x8::generateMoves(
   std::int8_t row,
-  std::int8_t col,
+  std::int8_t column,
   MoveList & moveList) const
 {
-  std::int8_t index = getIndex(row, col);
+  if (row < 0 || row > 7)
+  {
+    std::ostringstream oss;
+    oss << "Invalid row value in generateMoves: " << row;
+    throw std::invalid_argument(oss.str());
+  }
+
+  if (column < 0 || column > 7)
+  {
+    std::ostringstream oss;
+    oss << "Invalid column value in generateMoves: " << column;
+    throw std::invalid_argument(oss.str());
+  }
+
+  std::int8_t index = getIndex(row, column);
   Color sideToMove  = mBoardState.sideToMove;
-  Piece piece       = mPieces[index];
-  Color color       = mColors[index];
+  Piece piece       = mCells[index].piece;
+  Color color       = mCells[index].color;
   if (piece == Piece::None || (color != sideToMove))
   {
     return;
@@ -405,7 +377,7 @@ void Board8x8::generatePawnMoves(
   if (pushSquare >= 0 && pushSquare <= 63)
   {
     // Generate non-capture moves
-    if (mPieces[pushSquare] == Piece::None)
+    if (mCells[pushSquare].piece == Piece::None)
     {
       std::int8_t destRow = getRow(pushSquare);
       if (destRow == WHITE_PROMOTION_ROW || destRow == BLACK_PROMOTION_ROW)
@@ -422,7 +394,7 @@ void Board8x8::generatePawnMoves(
 
       if (doublePushSquare >= 0 && doublePushSquare <= 63)
       {
-        if (sourceRow == startRow && mPieces[doublePushSquare] == Piece::None)
+        if (sourceRow == startRow && mCells[doublePushSquare].piece == Piece::None)
         {
           pushMove(index, doublePushSquare, Piece::Pawn, Piece::None, Piece::None, Move::Type::EnpassantPush, moveList);
         }
@@ -441,8 +413,8 @@ void Board8x8::generatePawnMoves(
       if (destRow >= 0 && destRow < 8)
       {
         std::int8_t destIndex = getIndex(destRow, destColumn);
-        Piece capturePiece    = mPieces[destIndex];
-        Color otherColor      = mColors[destIndex];
+        Piece capturePiece    = mCells[destIndex].piece;
+        Color otherColor      = mCells[destIndex].color;
         if (capturePiece != Piece::None && isOppositeColor(pieceColor, otherColor))
         {
           if (pieceColor == Color::White && destRow == WHITE_PROMOTION_ROW)
@@ -483,7 +455,7 @@ void Board8x8::generatePawnMoves(
       {
         std::int8_t destIndex    = getIndex(destRow, destColumn);
         std::int8_t captureIndex = destIndex - indexIncrement;
-        if (mPieces[captureIndex] == Piece::Pawn && mColors[captureIndex] == otherColor)
+        if (mCells[captureIndex].piece == Piece::Pawn && mCells[captureIndex].color == otherColor)
         {
           pushMove(index, destIndex, Piece::Pawn, Piece::Pawn, Piece::None, Move::Type::EnpassantCapture, moveList);
         }
@@ -513,8 +485,8 @@ void Board8x8::generateSlidingMoves(
     }
 
     std::int8_t destIndex = getIndex(destRow, destColumn);
-    Piece otherPiece      = mPieces[destIndex];
-    Color otherColor      = mColors[destIndex];
+    Piece otherPiece      = mCells[destIndex].piece;
+    Color otherColor      = mCells[destIndex].color;
 
     // Check for friendly pieces
     if (isSameColor(pieceColor, otherColor))
@@ -563,8 +535,8 @@ PieceType Board8x8::getPieceType(
 {
   std::int8_t index = getIndex(row, col);
 
-  Piece piece = mPieces[index];
-  Color color = mColors[index];
+  Piece piece = mCells[index].piece;
+  Color color = mCells[index].color;
 
   PieceType pieceType = PieceType::None;
   if (piece != Piece::None)
@@ -638,27 +610,11 @@ bool Board8x8::isCellAttacked(
   std::int8_t index,
   Color attackingColor) const
 {
-  constexpr std::int8_t pawnRowIncrements[2]        = {1, 1};
-  constexpr std::int8_t pawnColumnIncrements[2]     = {1, -1};
-  constexpr std::int8_t knightRowIncrements[8]      = {1, 2, 2, 1, -1, -2, -2, -1};
-  constexpr std::int8_t knightColumnIncrements[8]   = {-2, -1, 1, 2, 2, 1, -1, -2};
-  constexpr std::int8_t straightRowIncrements[4]    = {1, -1, 0, 0};
-  constexpr std::int8_t straightColumnIncrements[4] = {0, 0, 1, -1};
-  constexpr std::int8_t diagonalRowIncrements[4]    = {1, 1, -1, -1};
-  constexpr std::int8_t diagonalColumnIncrements[4] = {-1, 1, 1, -1};
-
   // Check for pawn attacks
   for (std::int8_t i = 0; i < 2; i++)
   {
-    std::int8_t rowIncrement    = pawnRowIncrements[i];
-    std::int8_t columnIncrement = pawnColumnIncrements[i];
-
-    // White attacks in the opposite row direction
-    if (attackingColor == Color::White)
-    {
-      rowIncrement = -rowIncrement;
-    }
-
+    std::int8_t rowIncrement    = (attackingColor == Color::Black) ? PAWN_ROW_INCREMENTS[i] : -PAWN_ROW_INCREMENTS[i];
+    std::int8_t columnIncrement = PAWN_COLUMN_INCREMENTS[i];
     if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::Pawn, attackingColor))
     {
       return true;
@@ -668,8 +624,8 @@ bool Board8x8::isCellAttacked(
   // Check for knight attacks
   for (std::int8_t i = 0; i < 8; i++)
   {
-    std::int8_t rowIncrement    = knightRowIncrements[i];
-    std::int8_t columnIncrement = knightColumnIncrements[i];
+    std::int8_t rowIncrement    = KNIGHT_ROW_INCREMENTS[i];
+    std::int8_t columnIncrement = KNIGHT_COLUMN_INCREMENTS[i];
     if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::Knight, attackingColor))
     {
       return true;
@@ -679,15 +635,10 @@ bool Board8x8::isCellAttacked(
   // Check for diagonal sliding attacks
   for (std::int8_t i = 0; i < 4; i++)
   {
-    std::int8_t rowIncrement    = diagonalRowIncrements[i];
-    std::int8_t columnIncrement = diagonalColumnIncrements[i];
+    std::int8_t rowIncrement    = DIAGONAL_ROW_INCREMENTS[i];
+    std::int8_t columnIncrement = DIAGONAL_COLUMN_INCREMENTS[i];
 
-    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Bishop, attackingColor))
-    {
-      return true;
-    }
-
-    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Queen, attackingColor))
+    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Bishop, Piece::Queen, attackingColor))
     {
       return true;
     }
@@ -696,15 +647,10 @@ bool Board8x8::isCellAttacked(
   // Check for straight sliding attacks
   for (std::int8_t i = 0; i < 4; i++)
   {
-    std::int8_t rowIncrement    = straightRowIncrements[i];
-    std::int8_t columnIncrement = straightColumnIncrements[i];
+    std::int8_t rowIncrement    = STRAIGHT_ROW_INCREMENTS[i];
+    std::int8_t columnIncrement = STRAIGHT_COLUMN_INCREMENTS[i];
 
-    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Rook, attackingColor))
-    {
-      return true;
-    }
-
-    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Queen, attackingColor))
+    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Rook, Piece::Queen, attackingColor))
     {
       return true;
     }
@@ -713,8 +659,8 @@ bool Board8x8::isCellAttacked(
   // Check for king diagonal attacks
   for (std::int8_t i = 0; i < 4; i++)
   {
-    std::int8_t rowIncrement    = diagonalRowIncrements[i];
-    std::int8_t columnIncrement = diagonalColumnIncrements[i];
+    std::int8_t rowIncrement    = DIAGONAL_ROW_INCREMENTS[i];
+    std::int8_t columnIncrement = DIAGONAL_COLUMN_INCREMENTS[i];
     if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::King, attackingColor))
     {
       return true;
@@ -724,8 +670,8 @@ bool Board8x8::isCellAttacked(
   // Check for king straight attacks
   for (std::int8_t i = 0; i < 4; i++)
   {
-    std::int8_t rowIncrement    = straightRowIncrements[i];
-    std::int8_t columnIncrement = straightColumnIncrements[i];
+    std::int8_t rowIncrement    = STRAIGHT_ROW_INCREMENTS[i];
+    std::int8_t columnIncrement = STRAIGHT_COLUMN_INCREMENTS[i];
     if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::King, attackingColor))
     {
       return true;
@@ -733,6 +679,17 @@ bool Board8x8::isCellAttacked(
   }
 
   return false;
+}
+
+bool Board8x8::isKingInCheck(
+  Color color) const
+{
+  std::int8_t row    = (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
+  std::int8_t column = (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
+  Color attackColor  = (color == Color::White) ? Color::Black : Color::White;
+  std::int8_t index  = getIndex(row, column);
+
+  return isCellAttacked(index, attackColor);
 }
 
 void Board8x8::makeMove(
@@ -749,10 +706,10 @@ void Board8x8::makeMove(
   mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
 
   // Do basic update
-  mPieces[sourceIndex] = Piece::None;
-  mColors[sourceIndex] = Color::None;
-  mPieces[destIndex]   = movedPiece;
-  mColors[destIndex]   = sideToMove;
+  mCells[sourceIndex].piece = Piece::None;
+  mCells[sourceIndex].color = Color::None;
+  mCells[destIndex].piece   = movedPiece;
+  mCells[destIndex].color   = sideToMove;
 
   // Handle double pawn pushes
   if (move.isEnpassantPush())
@@ -763,8 +720,8 @@ void Board8x8::makeMove(
   // Handle promotion moves
   if (move.isPromotion())
   {
-    Piece promotedPiece = move.getPromotedPiece();
-    mPieces[destIndex]  = promotedPiece;
+    Piece promotedPiece     = move.getPromotedPiece();
+    mCells[destIndex].piece = promotedPiece;
   }
 
   // Handle castle moves
@@ -773,28 +730,28 @@ void Board8x8::makeMove(
     switch (destIndex)
     {
     case C1:
-      mPieces[A1] = Piece::None;
-      mColors[A1] = Color::None;
-      mPieces[D1] = Piece::Rook;
-      mColors[D1] = Color::White;
+      mCells[A1].piece = Piece::None;
+      mCells[A1].color = Color::None;
+      mCells[D1].piece = Piece::Rook;
+      mCells[D1].color = Color::White;
       break;
     case G1:
-      mPieces[F1] = Piece::Rook;
-      mColors[F1] = Color::White;
-      mPieces[H1] = Piece::None;
-      mColors[H1] = Color::None;
+      mCells[F1].piece = Piece::Rook;
+      mCells[F1].color = Color::White;
+      mCells[H1].piece = Piece::None;
+      mCells[H1].color = Color::None;
       break;
     case C8:
-      mPieces[A8] = Piece::None;
-      mColors[A8] = Color::None;
-      mPieces[D8] = Piece::Rook;
-      mColors[D8] = Color::Black;
+      mCells[A8].piece = Piece::None;
+      mCells[A8].color = Color::None;
+      mCells[D8].piece = Piece::Rook;
+      mCells[D8].color = Color::Black;
       break;
     case G8:
-      mPieces[F8] = Piece::Rook;
-      mColors[F8] = Color::Black;
-      mPieces[H8] = Piece::None;
-      mColors[H8] = Color::None;
+      mCells[F8].piece = Piece::Rook;
+      mCells[F8].color = Color::Black;
+      mCells[H8].piece = Piece::None;
+      mCells[H8].color = Color::None;
       break;
     }
   }
@@ -815,10 +772,10 @@ void Board8x8::makeMove(
   // Handle en-passant captures
   if (move.isEnpassantCapture())
   {
-    std::int8_t dir            = (sideToMove == Color::White ? -1 : +1);
-    std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
-    mPieces[enPassantIndex]    = Piece::None;
-    mColors[enPassantIndex]    = Color::None;
+    std::int8_t dir              = (sideToMove == Color::White ? -1 : +1);
+    std::int8_t enPassantIndex   = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+    mCells[enPassantIndex].piece = Piece::None;
+    mCells[enPassantIndex].color = Color::None;
   }
 
   // Update castling rights
@@ -913,23 +870,20 @@ void Board8x8::reset()
 
   for (std::int8_t i = 0; i < 64; i++)
   {
-    mPieces[i] = Piece::None;
-    mColors[i] = Color::None;
+    mCells[i].piece = Piece::None;
+    mCells[i].color = Color::None;
   }
 
   for (std::int8_t col = 0; col < 8; col++)
   {
-    mPieces[getIndex(1, col)] = Piece::Pawn;
-    mColors[getIndex(1, col)] = Color::White;
-
-    mPieces[getIndex(0, col)] = pieces[col];
-    mColors[getIndex(0, col)] = Color::White;
-
-    mPieces[getIndex(6, col)] = Piece::Pawn;
-    mColors[getIndex(6, col)] = Color::Black;
-
-    mPieces[getIndex(7, col)] = pieces[col];
-    mColors[getIndex(7, col)] = Color::Black;
+    mCells[getIndex(1, col)].piece = Piece::Pawn;
+    mCells[getIndex(1, col)].color = Color::White;
+    mCells[getIndex(0, col)].piece = pieces[col];
+    mCells[getIndex(0, col)].color = Color::White;
+    mCells[getIndex(6, col)].piece = Piece::Pawn;
+    mCells[getIndex(6, col)].color = Color::Black;
+    mCells[getIndex(7, col)].piece = pieces[col];
+    mCells[getIndex(7, col)].color = Color::Black;
   }
 
   mWhiteKingSquare = {0, 4};
@@ -956,66 +910,66 @@ void Board8x8::setPosition(
   {
     for (std::int8_t j = 0; j < 8; j++)
     {
-      std::int8_t index = getIndex(i, j);
-      mPieces[index]    = Piece::None;
-      mColors[index]    = Color::None;
+      std::int8_t index   = getIndex(i, j);
+      mCells[index].piece = Piece::None;
+      mCells[index].color = Color::None;
 
       PieceType pieceType = fenData.getPieceType(i, j);
       switch (pieceType)
       {
       case PieceType::WhitePawn:
-        mPieces[index] = Piece::Pawn;
-        mColors[index] = Color::White;
+        mCells[index].piece = Piece::Pawn;
+        mCells[index].color = Color::White;
         break;
       case PieceType::WhiteRook:
-        mPieces[index] = Piece::Rook;
-        mColors[index] = Color::White;
+        mCells[index].piece = Piece::Rook;
+        mCells[index].color = Color::White;
         break;
       case PieceType::WhiteKnight:
-        mPieces[index] = Piece::Knight;
-        mColors[index] = Color::White;
+        mCells[index].piece = Piece::Knight;
+        mCells[index].color = Color::White;
         break;
       case PieceType::WhiteBishop:
-        mPieces[index] = Piece::Bishop;
-        mColors[index] = Color::White;
+        mCells[index].piece = Piece::Bishop;
+        mCells[index].color = Color::White;
         break;
       case PieceType::WhiteQueen:
-        mPieces[index] = Piece::Queen;
-        mColors[index] = Color::White;
+        mCells[index].piece = Piece::Queen;
+        mCells[index].color = Color::White;
         break;
       case PieceType::WhiteKing:
-        mPieces[index]   = Piece::King;
-        mColors[index]   = Color::White;
-        mWhiteKingSquare = Square{i, j};
+        mCells[index].piece = Piece::King;
+        mCells[index].color = Color::White;
+        mWhiteKingSquare    = Square{i, j};
         break;
       case PieceType::BlackPawn:
-        mPieces[index] = Piece::Pawn;
-        mColors[index] = Color::Black;
+        mCells[index].piece = Piece::Pawn;
+        mCells[index].color = Color::Black;
         break;
       case PieceType::BlackRook:
-        mPieces[index] = Piece::Rook;
-        mColors[index] = Color::Black;
+        mCells[index].piece = Piece::Rook;
+        mCells[index].color = Color::Black;
         break;
       case PieceType::BlackKnight:
-        mPieces[index] = Piece::Knight;
-        mColors[index] = Color::Black;
+        mCells[index].piece = Piece::Knight;
+        mCells[index].color = Color::Black;
         break;
       case PieceType::BlackBishop:
-        mPieces[index] = Piece::Bishop;
-        mColors[index] = Color::Black;
+        mCells[index].piece = Piece::Bishop;
+        mCells[index].color = Color::Black;
         break;
       case PieceType::BlackQueen:
-        mPieces[index] = Piece::Queen;
-        mColors[index] = Color::Black;
+        mCells[index].piece = Piece::Queen;
+        mCells[index].color = Color::Black;
         break;
       case PieceType::BlackKing:
-        mPieces[index]   = Piece::King;
-        mColors[index]   = Color::Black;
-        mBlackKingSquare = Square{i, j};
+        mCells[index].piece = Piece::King;
+        mCells[index].color = Color::Black;
+        mBlackKingSquare    = Square{i, j};
         break;
       default:
-        mPieces[index] = Piece::None;
-        mColors[index] = Color::None;
+        mCells[index].piece = Piece::None;
+        mCells[index].color = Color::None;
         break;
       }
     }
@@ -1036,28 +990,28 @@ void Board8x8::unmakeMove(
   std::int8_t destIndex   = getIndex(destSquare.row, destSquare.col);
 
   // Do basic update
-  mBoardState          = boardState;
-  mPieces[sourceIndex] = movedPiece;
-  mColors[sourceIndex] = sideThatMoved;
-  mPieces[destIndex]   = Piece::None;
-  mColors[destIndex]   = Color::None;
+  mBoardState               = boardState;
+  mCells[sourceIndex].piece = movedPiece;
+  mCells[sourceIndex].color = sideThatMoved;
+  mCells[destIndex].piece   = Piece::None;
+  mCells[destIndex].color   = Color::None;
 
   // Handle capture moves (except enpassant captures)
   if (move.isStandardCapture() || move.isPromotionCapture())
   {
-    Piece capturePiece = move.getCapturedPiece();
-    mPieces[destIndex] = capturePiece;
-    mColors[destIndex] = otherSide;
+    Piece capturePiece      = move.getCapturedPiece();
+    mCells[destIndex].piece = capturePiece;
+    mCells[destIndex].color = otherSide;
   }
 
   // Handle enpassant capture
   if (move.isEnpassantCapture())
   {
-    std::int8_t dir          = (sideThatMoved == Color::White ? -1 : +1);
-    std::int8_t captureIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
-    Piece capturePiece       = move.getCapturedPiece();
-    mPieces[captureIndex]    = capturePiece;
-    mColors[captureIndex]    = otherSide;
+    std::int8_t dir            = (sideThatMoved == Color::White ? -1 : +1);
+    std::int8_t captureIndex   = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+    Piece capturePiece         = move.getCapturedPiece();
+    mCells[captureIndex].piece = capturePiece;
+    mCells[captureIndex].color = otherSide;
   }
 
   // Update king moves
@@ -1080,28 +1034,28 @@ void Board8x8::unmakeMove(
     switch (destIndex)
     {
     case C1:
-      mPieces[A1] = Piece::Rook;
-      mColors[A1] = Color::White;
-      mPieces[D1] = Piece::None;
-      mColors[D1] = Color::None;
+      mCells[A1].piece = Piece::Rook;
+      mCells[A1].color = Color::White;
+      mCells[D1].piece = Piece::None;
+      mCells[D1].color = Color::None;
       break;
     case G1:
-      mPieces[F1] = Piece::None;
-      mColors[F1] = Color::None;
-      mPieces[H1] = Piece::Rook;
-      mColors[H1] = Color::White;
+      mCells[F1].piece = Piece::None;
+      mCells[F1].color = Color::None;
+      mCells[H1].piece = Piece::Rook;
+      mCells[H1].color = Color::White;
       break;
     case C8:
-      mPieces[A8] = Piece::Rook;
-      mColors[A8] = Color::Black;
-      mPieces[D8] = Piece::None;
-      mColors[D8] = Color::None;
+      mCells[A8].piece = Piece::Rook;
+      mCells[A8].color = Color::Black;
+      mCells[D8].piece = Piece::None;
+      mCells[D8].color = Color::None;
       break;
     case G8:
-      mPieces[F8] = Piece::None;
-      mColors[F8] = Color::None;
-      mPieces[H8] = Piece::Rook;
-      mColors[H8] = Color::Black;
+      mCells[F8].piece = Piece::None;
+      mCells[F8].color = Color::None;
+      mCells[H8].piece = Piece::Rook;
+      mCells[H8].color = Color::Black;
       break;
     }
   }
