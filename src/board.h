@@ -47,6 +47,8 @@ public:
     std::int8_t col,
     Color attackingColor) const = 0;
 
+  virtual bool isKingInCheck(Color color) const = 0;
+
   virtual void makeMove(const Move & move) = 0;
 
   virtual void reset() = 0;
