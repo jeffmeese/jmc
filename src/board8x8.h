@@ -57,6 +57,20 @@ private:
     Color color;
   };
 
+  struct Attacks
+  {
+    std::int8_t northEastAttacks[8];
+    std::int8_t northWestAttacks[8];
+    std::int8_t southEastAttacks[8];
+    std::int8_t southWestAttacks[8];
+    std::int8_t northAttacks[8];
+    std::int8_t southAttacks[8];
+    std::int8_t eastAttacks[8];
+    std::int8_t westAttacks[8];
+    std::int8_t knightAttacks[8];
+    std::int8_t kingAttacks[8];
+  };
+
   bool checkJumpAttacks(
     std::int8_t index,
     std::int8_t rowIncrement,
@@ -95,8 +109,7 @@ private:
 
   void generateSlidingMoves(
     std::int8_t index,
-    std::int8_t rowIncrement,
-    std::int8_t columnIncrement,
+    const std::int8_t * attacks,
     Piece piece,
     Color sideToMove,
     MoveList & moveList) const;
@@ -104,6 +117,8 @@ private:
   bool isCellAttacked(
     std::int8_t index,
     Color attackingColor) const;
+
+  void initAttacks();
 
   void pushMove(
     std::int8_t fromIndex,
@@ -114,19 +129,22 @@ private:
     Move::Type type,
     MoveList & moveList) const;
 
-  static constexpr std::int8_t PAWN_ROW_INCREMENTS[2]        = {1, 1};
-  static constexpr std::int8_t PAWN_COLUMN_INCREMENTS[2]     = {1, -1};
-  static constexpr std::int8_t KNIGHT_ROW_INCREMENTS[8]      = {1, 2, 2, 1, -1, -2, -2, -1};
-  static constexpr std::int8_t KNIGHT_COLUMN_INCREMENTS[8]   = {-2, -1, 1, 2, 2, 1, -1, -2};
-  static constexpr std::int8_t STRAIGHT_ROW_INCREMENTS[4]    = {1, -1, 0, 0};
-  static constexpr std::int8_t STRAIGHT_COLUMN_INCREMENTS[4] = {0, 0, 1, -1};
-  static constexpr std::int8_t DIAGONAL_ROW_INCREMENTS[4]    = {1, 1, -1, -1};
-  static constexpr std::int8_t DIAGONAL_COLUMN_INCREMENTS[4] = {-1, 1, 1, -1};
+  static constexpr std::int8_t PAWN_ROW_INCREMENTS[2]        = {+1, +1};
+  static constexpr std::int8_t PAWN_COLUMN_INCREMENTS[2]     = {+1, -1};
+  static constexpr std::int8_t KNIGHT_ROW_INCREMENTS[8]      = {+1, +2, +2, +1, -1, -2, -2, -1};
+  static constexpr std::int8_t KNIGHT_COLUMN_INCREMENTS[8]   = {+2, +1, -1, -2, -2, -1, +1, +2};
+  static constexpr std::int8_t KING_ROW_INCREMENTS[8]        = {+1, -1, +0, +0, +1, +1, -1, -1};
+  static constexpr std::int8_t KING_COLUMN_INCREMENTS[8]     = {+0, +0, +1, -1, +1, -1, -1, +1};
+  static constexpr std::int8_t STRAIGHT_ROW_INCREMENTS[4]    = {+1, -1, +0, +0};
+  static constexpr std::int8_t STRAIGHT_COLUMN_INCREMENTS[4] = {+0, +0, +1, -1};
+  static constexpr std::int8_t DIAGONAL_ROW_INCREMENTS[4]    = {+1, +1, -1, -1};
+  static constexpr std::int8_t DIAGONAL_COLUMN_INCREMENTS[4] = {+1, -1, +1, -1};
 
   BoardState mBoardState;
-  Cell mCells[64];
   Square mBlackKingSquare;
   Square mWhiteKingSquare;
+  Cell mCells[64];
+  Attacks mAttacks[64];
 };
 
 } // namespace jmchess
