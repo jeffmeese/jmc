@@ -66,53 +66,53 @@ Board8x8::Board8x8()
 
 bool Board8x8::checkJumpAttacks(
   std::int8_t index,
-  std::int8_t rowIncrement,
-  std::int8_t columnIncrement,
+  const std::int8_t * attacks,
+  std::int8_t attacksSize,
   Piece piece,
   Color attackColor) const
 {
-  std::int8_t row          = getRow(index);
-  std::int8_t column       = getCol(index);
-  std::int8_t attackRow    = row + rowIncrement;
-  std::int8_t attackColumn = column + columnIncrement;
-
-  if (attackRow < 0 || attackRow > 7 || attackColumn < 0 || attackColumn > 7)
+  for (std::int8_t i = 0; i < attacksSize; i++)
   {
-    return false;
+    std::int8_t destIndex = attacks[i];
+
+    // Check to make sure we are still on the board
+    if (destIndex != INVALID_INDEX)
+    {
+      Piece attackPiece      = mCells[destIndex].piece;
+      Color attackPieceColor = mCells[destIndex].color;
+
+      if (attackPiece == piece && attackPieceColor == attackColor)
+      {
+        return true;
+      }
+    }
   }
 
-  std::int8_t attackIndex = getIndex(attackRow, attackColumn);
-  Piece attackPiece       = mCells[attackIndex].piece;
-  Color attackPieceColor  = mCells[attackIndex].color;
-
-  return (attackPiece == piece && attackPieceColor == attackColor);
+  return false;
 }
 
 bool Board8x8::checkSliderAttacks(
   std::int8_t index,
-  std::int8_t rowIncrement,
-  std::int8_t columnIncrement,
+  const std::int8_t * attacks,
+  std::int8_t attacksSize,
   Piece piece1,
   Piece piece2,
   Color attackColor) const
 {
-  std::int8_t row          = getRow(index);
-  std::int8_t column       = getCol(index);
-  std::int8_t attackRow    = row + rowIncrement;
-  std::int8_t attackColumn = column + columnIncrement;
-
-  while (true)
+  for (std::int8_t i = 0; i < attacksSize; i++)
   {
+    std::int8_t destIndex = attacks[i];
+
     // Check for off board
-    if (attackRow < 0 || attackRow > 7 || attackColumn < 0 || attackColumn > 7)
+    if (destIndex == INVALID_INDEX)
     {
       break;
     }
 
-    std::int8_t attackIndex = getIndex(attackRow, attackColumn);
-    Piece attackPiece       = mCells[attackIndex].piece;
-    Color attackPieceColor  = mCells[attackIndex].color;
+    Piece attackPiece      = mCells[destIndex].piece;
+    Color attackPieceColor = mCells[destIndex].color;
 
+    // Check if we have encountered a piece
     if (attackPiece != Piece::None)
     {
       if (attackPieceColor == attackColor && (attackPiece == piece1 || attackPiece == piece2))
@@ -122,9 +122,6 @@ bool Board8x8::checkSliderAttacks(
 
       break;
     }
-
-    attackRow += rowIncrement;
-    attackColumn += columnIncrement;
   }
 
   return false;
@@ -199,15 +196,16 @@ void Board8x8::generateCastlingMoves(
 
 void Board8x8::generateJumpMoves(
   std::int8_t index,
-  std::int8_t rowIncrement,
-  std::int8_t columnIncrement,
+  const std::int8_t * attacks,
   Piece piece,
   Color pieceColor,
   MoveList & moveList) const
 {
   for (std::size_t i = 0; i < 8; i++)
   {
-    std::int8_t destIndex = (piece == Piece::King) ? mAttacks[index].kingAttacks[i] : mAttacks[index].knightAttacks[i];
+    std::int8_t destIndex = attacks[i];
+
+    // Check for on board
     if (destIndex != INVALID_INDEX)
     {
       Piece otherPiece = mCells[destIndex].piece;
@@ -223,31 +221,6 @@ void Board8x8::generateJumpMoves(
       }
     }
   }
-
-  // std::int8_t row        = getRow(index);
-  // std::int8_t column     = getCol(index);
-  // std::int8_t destRow    = row + rowIncrement;
-  // std::int8_t destColumn = column + columnIncrement;
-
-  // // Check for off board moves
-  // if (destRow < 0 || destColumn < 0 || destRow > 7 || destColumn > 7)
-  // {
-  //   return;
-  // }
-
-  // std::int8_t destIndex = getIndex(destRow, destColumn);
-  // Piece otherPiece      = mCells[destIndex].piece;
-  // Color otherColor      = mCells[destIndex].color;
-  // if (otherColor == Color::None)
-  // {
-  //   pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
-  //   return;
-  // }
-
-  // if (isOppositeColor(pieceColor, otherColor))
-  // {
-  //   pushMove(index, destIndex, piece, otherPiece, Piece::None, Move::Type::Capture, moveList);
-  // }
 }
 
 void Board8x8::generateMoves(
@@ -282,39 +255,35 @@ void Board8x8::generateMoves(
     return;
   }
 
-  switch (piece)
+  if (piece == Piece::Pawn)
   {
-  case Piece::Pawn:
     generatePawnMoves(index, sideToMove, moveList);
-    break;
-  case Piece::Knight:
-    generateJumpMoves(index, 1, -2, piece, sideToMove, moveList);
-    break;
-  case Piece::Bishop:
-    generateSlidingMoves(index, mAttacks[index].northEastAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].northWestAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].southEastAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].southWestAttacks, piece, sideToMove, moveList);
-    break;
-  case Piece::Rook:
-    generateSlidingMoves(index, mAttacks[index].northAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].southAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].eastAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].westAttacks, piece, sideToMove, moveList);
-    break;
-  case Piece::Queen:
-    generateSlidingMoves(index, mAttacks[index].northAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].southAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].eastAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].westAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].northEastAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].northWestAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].southEastAttacks, piece, sideToMove, moveList);
-    generateSlidingMoves(index, mAttacks[index].southWestAttacks, piece, sideToMove, moveList);
-    break;
-  case Piece::King:
-    generateJumpMoves(index, 1, 0, piece, sideToMove, moveList);
-    break;
+  }
+  
+  if (piece == Piece::Knight)
+  {
+    generateJumpMoves(index, mAttacks[index].knightAttacks, piece, sideToMove, moveList);
+  }
+
+  if (piece == Piece::King)
+  {
+    generateJumpMoves(index, mAttacks[index].kingAttacks, piece, sideToMove, moveList);
+  }
+  
+  if (piece == Piece::Bishop || piece == Piece::Queen)
+  {
+    for (std::int8_t i = 0; i < 4; i++)
+    {
+      generateSlidingMoves(index, mAttacks[index].diagonalAttacks[i], piece, sideToMove, moveList);
+    }
+  }
+  
+  if (piece == Piece::Rook || piece == Piece::Queen)
+  {
+    for (std::int8_t i = 0; i < 4; i++)
+    {
+      generateSlidingMoves(index, mAttacks[index].straightAttacks[i], piece, sideToMove, moveList);
+    }
   }
 }
 
@@ -480,6 +449,7 @@ void Board8x8::generateSlidingMoves(
   {
     std::int8_t destIndex = attacks[i];
 
+    // Check for off board
     if (destIndex == INVALID_INDEX)
     {
       break;
@@ -488,11 +458,13 @@ void Board8x8::generateSlidingMoves(
     Piece otherPiece = mCells[destIndex].piece;
     Color otherColor = mCells[destIndex].color;
 
+    // Check for friendly pieces
     if (isSameColor(pieceColor, otherColor))
     {
       break;
     }
 
+    // Check for quiet move or capture
     if (otherColor == Color::None)
     {
       pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
@@ -507,145 +479,6 @@ void Board8x8::generateSlidingMoves(
       break;
     }
   }
-
-  // if (diagonal)
-  // {
-  //   for (std::int8_t i = 0; i < 4; i++)
-  //   {
-  //     for (std::int8_t j = 0; j < 8; j++)
-  //     {
-  //       std::int8_t destIndex = mAttacks[index].northEastAttacks[j];
-  //       if (i == 1)
-  //       {
-  //         destIndex = mAttacks[index].northWestAttacks[j];
-  //       }
-  //       else if (i == 2)
-  //       {
-  //         destIndex = mAttacks[index].southEastAttacks[j];
-  //       }
-  //       else if (i == 3)
-  //       {
-  //         destIndex = mAttacks[index].southWestAttacks[j];
-  //       }
-
-  //       if (destIndex == INVALID_INDEX)
-  //       {
-  //         break;
-  //       }
-
-  //       Piece otherPiece = mCells[destIndex].piece;
-  //       Color otherColor = mCells[destIndex].color;
-
-  //       if (isSameColor(pieceColor, otherColor))
-  //       {
-  //         break;
-  //       }
-
-  //       if (otherColor == Color::None)
-  //       {
-  //         pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
-  //       }
-  //       else
-  //       {
-  //         if (isOppositeColor(pieceColor, otherColor))
-  //         {
-  //           pushMove(index, destIndex, piece, otherPiece, Piece::None, Move::Type::Capture, moveList);
-  //         }
-
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // if (straight)
-  // {
-  //   for (std::int8_t i = 0; i < 4; i++)
-  //   {
-  //     for (std::int8_t j = 0; j < 8; j++)
-  //     {
-  //       std::int8_t destIndex = mAttacks[index].northAttacks[j];
-  //       if (i == 1)
-  //       {
-  //         destIndex = mAttacks[index].southAttacks[j];
-  //       }
-  //       else if (i == 2)
-  //       {
-  //         destIndex = mAttacks[index].eastAttacks[j];
-  //       }
-  //       else if (i == 3)
-  //       {
-  //         destIndex = mAttacks[index].westAttacks[j];
-  //       }
-
-  //       if (destIndex == INVALID_INDEX)
-  //       {
-  //         break;
-  //       }
-
-  //       Piece otherPiece = mCells[destIndex].piece;
-  //       Color otherColor = mCells[destIndex].color;
-
-  //       if (isSameColor(pieceColor, otherColor))
-  //       {
-  //         break;
-  //       }
-
-  //       if (otherColor == Color::None)
-  //       {
-  //         pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
-  //       }
-  //       else
-  //       {
-  //         if (isOppositeColor(pieceColor, otherColor))
-  //         {
-  //           pushMove(index, destIndex, piece, otherPiece, Piece::None, Move::Type::Capture, moveList);
-  //         }
-
-  //         break;
-  //       }
-  //     }
-  //   }
-  // }
-
-  // std::int8_t row        = getRow(index);
-  // std::int8_t column     = getCol(index);
-  // std::int8_t destRow    = row + rowIncrement;
-  // std::int8_t destColumn = column + columnIncrement;
-  // while (true)
-  // {
-  //   // Check to make sure we haven't gone off the board
-  //   if (destRow < 0 || destRow > 7 || destColumn < 0 || destColumn > 7)
-  //   {
-  //     break;
-  //   }
-
-  //   std::int8_t destIndex = getIndex(destRow, destColumn);
-  //   Piece otherPiece      = mCells[destIndex].piece;
-  //   Color otherColor      = mCells[destIndex].color;
-
-  //   // Check for friendly pieces
-  //   if (isSameColor(pieceColor, otherColor))
-  //   {
-  //     break;
-  //   }
-
-  //   // Check for quiet moves
-  //   if (otherColor == Color::None)
-  //   {
-  //     pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
-  //   }
-
-  //   // Check for capture moves
-  //   if (isOppositeColor(pieceColor, otherColor))
-  //   {
-  //     pushMove(index, destIndex, piece, otherPiece, Piece::None, Move::Type::Capture, moveList);
-  //     break;
-  //   }
-
-  //   destRow += rowIncrement;
-  //   destColumn += columnIncrement;
-  // }
 }
 
 BoardState Board8x8::getBoardState() const
@@ -742,18 +575,41 @@ void Board8x8::initAttacks()
     {
       mAttacks[index].knightAttacks[i]    = INVALID_INDEX;
       mAttacks[index].kingAttacks[i]      = INVALID_INDEX;
-      mAttacks[index].eastAttacks[i]      = INVALID_INDEX;
-      mAttacks[index].westAttacks[i]      = INVALID_INDEX;
-      mAttacks[index].northAttacks[i]     = INVALID_INDEX;
-      mAttacks[index].southAttacks[i]     = INVALID_INDEX;
-      mAttacks[index].northEastAttacks[i] = INVALID_INDEX;
-      mAttacks[index].northWestAttacks[i] = INVALID_INDEX;
-      mAttacks[index].southEastAttacks[i] = INVALID_INDEX;
-      mAttacks[index].southWestAttacks[i] = INVALID_INDEX;
+
+      for (std::int8_t j = 0; j < 4; j++)
+      {
+        mAttacks[index].diagonalAttacks[j][i] = INVALID_INDEX;
+        mAttacks[index].straightAttacks[j][i] = INVALID_INDEX;
+      }
+
+    }
+
+    for (std::int8_t i = 0; i < 2; i++)
+    {
+      mAttacks[index].whitePawnAttacks[i] = INVALID_INDEX;
+      mAttacks[index].blackPawnAttacks[i] = INVALID_INDEX;
     }
 
     std::int8_t row = getRow(index);
     std::int8_t col = getCol(index);
+
+    // Initialize pawn attacks
+    for (std::int8_t i = 0; i < 2; i++)
+    {
+      std::int8_t whiteDestRow = row - PAWN_ROW_INCREMENTS[i];
+      std::int8_t whiteDestCol = col + PAWN_COLUMN_INCREMENTS[i];
+      if (whiteDestRow >= 0 && whiteDestRow <= 7 && whiteDestCol >= 0 && whiteDestCol <= 7)
+      {
+        mAttacks[index].whitePawnAttacks[i] = getIndex(whiteDestRow, whiteDestCol);
+      }
+
+      std::int8_t blackDestRow = row + PAWN_ROW_INCREMENTS[i];
+      std::int8_t blackDestCol = col + PAWN_COLUMN_INCREMENTS[i];
+      if (blackDestRow >= 0 && blackDestRow <= 7 && blackDestCol >= 0 && blackDestCol <= 7)
+      {
+        mAttacks[index].blackPawnAttacks[i] = getIndex(blackDestRow, blackDestCol);
+      }
+    }
 
     // Initialize knight attacks
     for (std::int8_t i = 0; i < 8; i++)
@@ -787,22 +643,7 @@ void Board8x8::initAttacks()
       {
         if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7)
         {
-          if (i == 0)
-          {
-            mAttacks[index].northEastAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
-          else if (i == 1)
-          {
-            mAttacks[index].northWestAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
-          else if (i == 2)
-          {
-            mAttacks[index].southEastAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
-          else
-          {
-            mAttacks[index].southWestAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
+          mAttacks[index].diagonalAttacks[i][attackIndex] = getIndex(destRow, destCol);
 
           destRow += DIAGONAL_ROW_INCREMENTS[i];
           destCol += DIAGONAL_COLUMN_INCREMENTS[i];
@@ -825,22 +666,7 @@ void Board8x8::initAttacks()
       {
         if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7)
         {
-          if (i == 0)
-          {
-            mAttacks[index].northAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
-          else if (i == 1)
-          {
-            mAttacks[index].southAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
-          else if (i == 2)
-          {
-            mAttacks[index].eastAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
-          else
-          {
-            mAttacks[index].westAttacks[attackIndex] = getIndex(destRow, destCol);
-          }
+          mAttacks[index].straightAttacks[i][attackIndex] = getIndex(destRow, destCol);
 
           destRow += STRAIGHT_ROW_INCREMENTS[i];
           destCol += STRAIGHT_COLUMN_INCREMENTS[i];
@@ -867,78 +693,44 @@ bool Board8x8::isCellAttacked(
   std::int8_t index,
   Color attackingColor) const
 {
-  // constexpr std::int8_t pawnRowIncrements[2]        = {1, 1};
-  // constexpr std::int8_t pawnColumnIncrements[2]     = {1, -1};
-  // constexpr std::int8_t knightRowIncrements[8]      = {1, 2, 2, 1, -1, -2, -2, -1};
-  // constexpr std::int8_t knightColumnIncrements[8]   = {-2, -1, 1, 2, 2, 1, -1, -2};
-  // constexpr std::int8_t straightRowIncrements[4]    = {1, -1, 0, 0};
-  // constexpr std::int8_t straightColumnIncrements[4] = {0, 0, 1, -1};
-  // constexpr std::int8_t diagonalRowIncrements[4]    = {1, 1, -1, -1};
-  // constexpr std::int8_t diagonalColumnIncrements[4] = {-1, 1, 1, -1};
-
   // Check for pawn attacks
-  for (std::int8_t i = 0; i < 2; i++)
+  const std::int8_t * whitePawnAttacks = mAttacks[index].whitePawnAttacks;
+  const std::int8_t * blackPawnAttacks = mAttacks[index].blackPawnAttacks;
+  const std::int8_t * pawnAttacks = (attackingColor == Color::White) ? whitePawnAttacks : blackPawnAttacks;
+  if (checkJumpAttacks(index, pawnAttacks, 2, Piece::Pawn, attackingColor))
   {
-    std::int8_t rowIncrement    = (attackingColor == Color::Black) ? PAWN_ROW_INCREMENTS[i] : -PAWN_ROW_INCREMENTS[i];
-    std::int8_t columnIncrement = PAWN_COLUMN_INCREMENTS[i];
-    if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::Pawn, attackingColor))
-    {
-      return true;
-    }
+    return true;
   }
 
   // Check for knight attacks
-  for (std::int8_t i = 0; i < 8; i++)
+  const std::int8_t * knightAttacks = mAttacks[index].knightAttacks;
+  if (checkJumpAttacks(index, knightAttacks, 8, Piece::Knight, attackingColor))
   {
-    std::int8_t rowIncrement    = KNIGHT_ROW_INCREMENTS[i];
-    std::int8_t columnIncrement = KNIGHT_COLUMN_INCREMENTS[i];
-    if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::Knight, attackingColor))
+    return true;
+  }
+
+  // Check for king attacks
+  const std::int8_t * kingAttacks = mAttacks[index].kingAttacks;
+  if (checkJumpAttacks(index, kingAttacks, 8, Piece::King, attackingColor))
+  {
+    return true;
+  }
+
+  // Check for bishop/queen diagonal attacks
+  for (std::int8_t i = 0; i < 4; i++)
+  {
+    const std::int8_t * attacks = mAttacks[index].diagonalAttacks[i];
+    if (checkSliderAttacks(index, attacks, 8, Piece::Bishop, Piece::Queen, attackingColor))
     {
       return true;
     }
   }
 
-  // Check for diagonal sliding attacks
+  // Check for rook/queen straight attacks
   for (std::int8_t i = 0; i < 4; i++)
   {
-    std::int8_t rowIncrement    = DIAGONAL_ROW_INCREMENTS[i];
-    std::int8_t columnIncrement = DIAGONAL_COLUMN_INCREMENTS[i];
-
-    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Bishop, Piece::Queen, attackingColor))
-    {
-      return true;
-    }
-  }
-
-  // Check for straight sliding attacks
-  for (std::int8_t i = 0; i < 4; i++)
-  {
-    std::int8_t rowIncrement    = STRAIGHT_ROW_INCREMENTS[i];
-    std::int8_t columnIncrement = STRAIGHT_COLUMN_INCREMENTS[i];
-
-    if (checkSliderAttacks(index, rowIncrement, columnIncrement, Piece::Rook, Piece::Queen, attackingColor))
-    {
-      return true;
-    }
-  }
-
-  // Check for king diagonal attacks
-  for (std::int8_t i = 0; i < 4; i++)
-  {
-    std::int8_t rowIncrement    = DIAGONAL_ROW_INCREMENTS[i];
-    std::int8_t columnIncrement = DIAGONAL_COLUMN_INCREMENTS[i];
-    if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::King, attackingColor))
-    {
-      return true;
-    }
-  }
-
-  // Check for king straight attacks
-  for (std::int8_t i = 0; i < 4; i++)
-  {
-    std::int8_t rowIncrement    = STRAIGHT_ROW_INCREMENTS[i];
-    std::int8_t columnIncrement = STRAIGHT_COLUMN_INCREMENTS[i];
-    if (checkJumpAttacks(index, rowIncrement, columnIncrement, Piece::King, attackingColor))
+    const std::int8_t * attacks = mAttacks[index].straightAttacks[i];
+    if (checkSliderAttacks(index, attacks, 8, Piece::Rook, Piece::Queen, attackingColor))
     {
       return true;
     }

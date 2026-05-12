@@ -59,29 +59,25 @@ private:
 
   struct Attacks
   {
-    std::int8_t northEastAttacks[8];
-    std::int8_t northWestAttacks[8];
-    std::int8_t southEastAttacks[8];
-    std::int8_t southWestAttacks[8];
-    std::int8_t northAttacks[8];
-    std::int8_t southAttacks[8];
-    std::int8_t eastAttacks[8];
-    std::int8_t westAttacks[8];
+    std::int8_t diagonalAttacks[4][8];
+    std::int8_t straightAttacks[4][8];
     std::int8_t knightAttacks[8];
     std::int8_t kingAttacks[8];
+    std::int8_t whitePawnAttacks[2];
+    std::int8_t blackPawnAttacks[2];
   };
 
   bool checkJumpAttacks(
     std::int8_t index,
-    std::int8_t rowIncrement,
-    std::int8_t columnIncrement,
+    const std::int8_t * attacks,
+    std::int8_t attacksSize,
     Piece piece,
     Color attackColor) const;
 
   bool checkSliderAttacks(
     std::int8_t index,
-    std::int8_t rowIncrement,
-    std::int8_t columnIncrement,
+    const std::int8_t * attacks,
+    std::int8_t attacksSize,
     Piece piece1,
     Piece piece2,
     Color attackColor) const;
@@ -92,8 +88,7 @@ private:
 
   void generateJumpMoves(
     std::int8_t index,
-    std::int8_t rowIncrement,
-    std::int8_t columnIncrement,
+    const std::int8_t * attacks,
     Piece piece,
     Color sideToMove,
     MoveList & moveList) const;
