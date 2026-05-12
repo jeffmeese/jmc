@@ -1,0 +1,1 @@
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/perftsuite.epd ${CMAKE_BINARY_DIR}/bin/perftsuite.epd COPYONLY)
