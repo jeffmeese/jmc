@@ -11,8 +11,6 @@ namespace jmchess
 Game::Game()
 {
   mBoard.reset(new Board8x8);
-  mEvaluation.reset(new Evaluation);
-  mSearch.reset(new Search);
   mEngine.reset(new Engine);
 }
 
@@ -24,6 +22,16 @@ Board * Game::getBoard()
 const Board * Game::getBoard() const
 {
   return mBoard.get();
+}
+
+Engine * Game::getEngine()
+{
+  return mEngine.get();
+}
+
+const Engine * Game::getEngine() const
+{
+  return mEngine.get();
 }
 
 void Game::makeMove(const Move & move)

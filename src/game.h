@@ -5,8 +5,6 @@
 
 #include "board.h"
 #include "engine.h"
-#include "evaluation.h"
-#include "search.h"
 
 namespace jmchess
 {
@@ -19,14 +17,15 @@ public:
   Board * getBoard();
   const Board * getBoard() const;
 
+  Engine * getEngine();
+  const Engine * getEngine() const;
+
   void makeMove(const Move & move);
   void startNew();
   void undoLastMove();
 
 private:
   std::unique_ptr<Board> mBoard;
-  std::unique_ptr<Evaluation> mEvaluation;
-  std::unique_ptr<Search> mSearch;
   std::unique_ptr<Engine> mEngine;
   std::stack<Move> mMoves;
 };

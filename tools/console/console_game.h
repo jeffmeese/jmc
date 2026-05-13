@@ -11,6 +11,8 @@ public:
 
 private:
   void handleDivideCommand(std::istream & input);
+  void handleEngineCommand();
+  void handleEvalCommand();
   void handleHelpCommand() const;
   void handleMoveCommand(std::istream & input);
   void handleNewCommand();

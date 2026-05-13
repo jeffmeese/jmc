@@ -72,10 +72,14 @@ void ConsoleGame::execute()
     {
       handleTestMoveGen();
     }
-    // else if (commandString == "eval")
-    //   handleEval();
-    // else if (commandString == "engine")
-    //   handleEngine();
+    else if (commandString == "eval")
+    {
+      handleEvalCommand();
+    }
+    else if (commandString == "engine")
+    {
+      handleEngineCommand();
+    }
     else if (commandString == "new")
     {
       handleNewCommand();
@@ -114,6 +118,20 @@ void ConsoleGame::handleDivideCommand(std::istream & input)
   perft.divide(perftLevel);
 }
 
+void ConsoleGame::handleEngineCommand()
+{
+  jmchess::Move move = getEngine()->getMove(getBoard());
+  makeMove(move);
+}
+
+void ConsoleGame::handleEvalCommand()
+{
+  const jmchess::Board * board = this->getBoard();
+  jmchess::Evaluation evaluation;
+  double score = evaluation.evaluate(board);
+  std::cout << "Evaluation: " << score << "\n";
+}
+
 void ConsoleGame::handleHelpCommand() const
 {
   std::cout << "quit.................Quits the program\n";
@@ -121,10 +139,11 @@ void ConsoleGame::handleHelpCommand() const
   std::cout << "print................Prints the current board position\n";
   std::cout << "disp.................Same as print\n";
   std::cout << "new..................Start a new game\n";
-  // std::cout << "eval.................Evaluation the current board position\n";
-  // std::cout << "move <smith>.........Performs a move\n";
+  std::cout << "eval.................Evaluation the current board position\n";
+  std::cout << "move <smith>.........Performs a move\n";
   std::cout << "perft <level>........Counts the total number of nodes to depth <level>\n";
-  // std::cout << "divide <level>.......Displays the number of child moves\n";
+  std::cout << "divide <level>.......Displays the number of child moves\n";
+  std::cout << "engine...............Instructs the engine to make a move\n";
   // std::cout << "table <level>........Displays a table of all perft results from 1 to <level>\n";
   std::cout << "setboard <fen>.......Sets the board position to <fen>\n";
   std::cout << "testmovegen..........Tests the move generator\n";
