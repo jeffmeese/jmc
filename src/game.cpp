@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "bitboard.h"
 #include "board.h"
 #include "board8x8.h"
 
@@ -10,7 +11,8 @@ namespace jmchess
 
 Game::Game()
 {
-  mBoard.reset(new Board8x8);
+  //mBoard.reset(new Board8x8);
+  mBoard.reset(new BitBoard);
   mEngine.reset(new Engine);
 }
 

@@ -1,0 +1,171 @@
+#pragma once
+
+#include <cstdint>
+#include <ostream>
+#include <string>
+
+#include "board.h"
+#include "board_state.h"
+#include "cell.h"
+#include "color.h"
+#include "move.h"
+#include "move_list.h"
+#include "piece.h"
+#include "piece_type.h"
+#include "square.h"
+
+namespace jmchess
+{
+
+class BitBoard : public Board
+{
+public:
+  BitBoard();
+
+  void generateMoves(MoveList & moveList) const override;
+
+  void generateMoves(
+    std::int8_t row,
+    std::int8_t col,
+    MoveList & moveList) const override;
+
+  BoardState getBoardState() const override;
+
+  std::int8_t getKingColumn(Color color) const;
+
+  std::int8_t getKingRow(Color color) const;
+
+  PieceType getPieceType(
+    std::int8_t row,
+    std::int8_t col) const override;
+
+  bool isCellAttacked(
+    std::int8_t row,
+    std::int8_t col,
+    Color attackingColor) const override;
+
+  bool isKingInCheck(Color color) const override;
+
+  void makeMove(const Move & move) override;
+
+  void reset() override;
+
+  void setPosition(const std::string & fenString) override;
+
+  void unmakeMove(const Move & move) override;
+
+private:
+  struct Attacks
+  {
+    std::uint64_t diagonalAttacks[4];
+    std::uint64_t straightAttacks[4];
+    std::uint64_t knightAttacks;
+    std::uint64_t kingAttacks;
+    std::uint64_t whitePawnAttacks;
+    std::uint64_t blackPawnAttacks;
+  };
+
+  int bitScanForward(std::uint64_t bb) const;
+
+  int bitScanReverse(std::uint64_t bb) const;
+
+  void generateDiagonalMoves(
+    std::uint64_t pieces,
+    Piece pieceType,
+    std::uint64_t enemyPieces,
+    MoveList & moveList) const;
+
+  void generateKingMoves(
+    std::uint64_t kings,
+    std::uint64_t enemyPieces,
+    MoveList & moveList) const;
+
+  void generateKnightMoves(
+    std::uint64_t knights,
+    std::uint64_t enemyPieces,
+    MoveList & moveList) const;
+
+  void generateMoves(
+    std::int8_t index,
+    MoveList & moveList) const;
+
+  void generatePawnCapturesBlack(
+    std::uint64_t pawns,
+    std::uint64_t enemyPieces,
+    MoveList & moveList) const;
+
+  void generatePawnPushesBlack(MoveList & moveList) const;
+
+  void generatePawnCapturesWhite(
+    std::uint64_t pawns,
+    std::uint64_t enemyPieces,
+    MoveList & moveList) const;
+
+  void generatePawnPushesWhite(MoveList & moveList) const;
+
+  void generateStraightMoves(
+    std::uint64_t pieces,
+    Piece pieceType,
+    std::uint64_t enemyPieces,
+    MoveList & moveList) const;
+
+  Piece getCapturedPiece(std::int8_t square) const;
+
+  constexpr std::int8_t getIndex(
+    std::int8_t row,
+    std::int8_t col) const;
+
+  constexpr std::int8_t getRow(std::int8_t index) const;
+
+  constexpr std::int8_t getCol(std::int8_t index) const;
+
+  void initAtacks();
+
+  void initMsb1Table();
+
+  void initSliderAttacks(
+    std::int8_t row,
+    std::int8_t col,
+    std::uint64_t occupancy,
+    std::int8_t rowIncrement,
+    std::int8_t colIncrement,
+    std::uint64_t & attacks) const;
+
+  void pushMove(
+    std::int8_t fromIndex,
+    std::int8_t toIndex,
+    Piece piece,
+    Piece capturePiece,
+    Piece promotionPiece,
+    Move::Type type,
+    MoveList & moveList) const;
+
+  void writeBitBoard(
+    std::uint64_t bb,
+    std::ostream & output) const;
+
+  BoardState mBoardState;
+  Square mBlackKingSquare;
+  Square mWhiteKingSquare;
+  std::uint64_t mWhitePawns;
+  std::uint64_t mWhiteKnights;
+  std::uint64_t mWhiteBishops;
+  std::uint64_t mWhiteRooks;
+  std::uint64_t mWhiteQueens;
+  std::uint64_t mWhiteKing;
+  std::uint64_t mBlackPawns;
+  std::uint64_t mBlackKnights;
+  std::uint64_t mBlackBishops;
+  std::uint64_t mBlackRooks;
+  std::uint64_t mBlackQueens;
+  std::uint64_t mBlackKing;
+  std::uint64_t mWhitePieces;
+  std::uint64_t mBlackPieces;
+  std::uint64_t mAllPieces;
+  std::uint64_t mEmptySquares;
+  std::uint64_t mEnemyBitboards[5];
+  int mMs1bTable[256];
+  Attacks mAttacks[64];
+};
+
+} // namespace jmchess

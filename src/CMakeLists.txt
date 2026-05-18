@@ -1,8 +1,10 @@
 set(TARGET_NAME jmchess)
 
 set(HDR_FILES
+  bitboard.h
   board.h
   board8x8.h
+  cell.h
   engine.h
   evaluation.h
   fen.h
@@ -16,6 +18,7 @@ set(HDR_FILES
 )
 
 set(SRC_FILES
+  bitboard.cpp
   board8x8.cpp
   engine.cpp
   evaluation.cpp
