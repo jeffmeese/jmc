@@ -117,6 +117,13 @@ static constexpr std::int8_t STRAIGHT_COLUMN_INCREMENTS[4] = {+0, +0, +1, -1};
 static constexpr std::int8_t DIAGONAL_ROW_INCREMENTS[4]    = {+1, +1, -1, -1};
 static constexpr std::int8_t DIAGONAL_COLUMN_INCREMENTS[4] = {+1, -1, +1, -1};
 
+static constexpr std::int32_t PAWN_INDEX   = 0;
+static constexpr std::int32_t KNIGHT_INDEX = 1;
+static constexpr std::int32_t BISHOP_INDEX = 2;
+static constexpr std::int32_t ROOK_INDEX   = 3;
+static constexpr std::int32_t QUEEN_INDEX  = 4;
+static constexpr std::int32_t KING_INDEX   = 5;
+
 // clang-format off
 const int index64[64] = 
 {
@@ -201,6 +208,13 @@ BitBoard::BitBoard()
 {
   reset();
   initAtacks();
+
+  mPieceMapping[Piece::Pawn]   = PAWN_INDEX;
+  mPieceMapping[Piece::Knight] = KNIGHT_INDEX;
+  mPieceMapping[Piece::Bishop] = BISHOP_INDEX;
+  mPieceMapping[Piece::Rook]   = ROOK_INDEX;
+  mPieceMapping[Piece::Queen]  = QUEEN_INDEX;
+  mPieceMapping[Piece::King]   = KING_INDEX;
 }
 
 void BitBoard::generateDiagonalMoves(
@@ -219,11 +233,15 @@ void BitBoard::generateDiagonalMoves(
     {
       std::uint64_t attacks  = mAttacks[fromSquare].diagonalAttacks[forward[i]];
       std::uint64_t blockers = attacks & mAllPieces;
+      writeBitBoard(attacks, std::cout);
+      writeBitBoard(mAllPieces, std::cout);
+      writeBitBoard(blockers, std::cout);
       if (blockers)
       {
         std::int8_t toSquare = bitScanForward(blockers);
         attacks ^= mAttacks[toSquare].diagonalAttacks[forward[i]];
       }
+      writeBitBoard(attacks, std::cout);
       allAttacks |= attacks;
     }
 
@@ -239,7 +257,7 @@ void BitBoard::generateDiagonalMoves(
       allAttacks |= attacks;
     }
 
-    writeBitBoard(allAttacks, std::cout);
+    // writeBitBoard(allAttacks, std::cout);
 
     std::uint64_t quietMoves   = allAttacks & ~mAllPieces;
     std::uint64_t captureMoves = allAttacks & enemyPieces;
@@ -328,24 +346,34 @@ void BitBoard::generateMoves(
 {
   Color sideToMove = mBoardState.sideToMove;
 
+  std::int32_t indexIncrement  = 0;
   std::uint64_t friendlyPieces = mWhitePieces;
   std::uint64_t enemyPieces    = mBlackPieces;
-  std::uint64_t knights        = mWhiteKnights;
-  std::uint64_t kings          = mWhiteKing;
-  std::uint64_t bishops        = mWhiteBishops;
-  std::uint64_t rooks          = mWhiteRooks;
-  std::uint64_t queens         = mWhiteQueens;
-  std::uint64_t pawns          = mWhitePawns;
+  // std::uint64_t knights        = mWhiteKnights;
+  // std::uint64_t kings          = mWhiteKing;
+  // std::uint64_t bishops        = mWhiteBishops;
+  // std::uint64_t rooks          = mWhiteRooks;
+  // std::uint64_t queens         = mWhiteQueens;
+  // std::uint64_t pawns          = mWhitePawns;
   if (sideToMove == Color::Black)
   {
-    enemyPieces = mWhitePieces;
-    knights     = mBlackKnights;
-    kings       = mBlackKing;
-    bishops     = mBlackBishops;
-    rooks       = mBlackRooks;
-    queens      = mBlackQueens;
-    pawns       = mBlackPawns;
+    indexIncrement = 6;
+    friendlyPieces = mBlackPieces;
+    enemyPieces    = mWhitePieces;
+    // knights     = mBlackKnights;
+    // kings       = mBlackKing;
+    // bishops     = mBlackBishops;
+    // rooks       = mBlackRooks;
+    // queens      = mBlackQueens;
+    // pawns       = mBlackPawns;
   }
+
+  std::uint64_t pawns   = mBitBoards[PAWN_INDEX + indexIncrement];
+  std::uint64_t knights = mBitBoards[KNIGHT_INDEX + indexIncrement];
+  std::uint64_t bishops = mBitBoards[BISHOP_INDEX + indexIncrement];
+  std::uint64_t rooks   = mBitBoards[ROOK_INDEX + indexIncrement];
+  std::uint64_t queens  = mBitBoards[QUEEN_INDEX + indexIncrement];
+  std::uint64_t kings   = mBitBoards[KING_INDEX + indexIncrement];
 
   if (sideToMove == Color::White)
   {
@@ -380,24 +408,34 @@ void BitBoard::generateMoves(
 {
   Color sideToMove = mBoardState.sideToMove;
 
+  std::int32_t indexIncrement  = 0;
   std::uint64_t friendlyPieces = mWhitePieces;
   std::uint64_t enemyPieces    = mBlackPieces;
-  std::uint64_t knights        = mWhiteKnights;
-  std::uint64_t kings          = mWhiteKing;
-  std::uint64_t bishops        = mWhiteBishops;
-  std::uint64_t rooks          = mWhiteRooks;
-  std::uint64_t queens         = mWhiteQueens;
-  std::uint64_t pawns          = mWhitePawns;
+  // std::uint64_t knights        = mWhiteKnights;
+  // std::uint64_t kings          = mWhiteKing;
+  // std::uint64_t bishops        = mWhiteBishops;
+  // std::uint64_t rooks          = mWhiteRooks;
+  // std::uint64_t queens         = mWhiteQueens;
+  // std::uint64_t pawns          = mWhitePawns;
   if (sideToMove == Color::Black)
   {
-    enemyPieces = mWhitePieces;
-    knights     = mBlackKnights;
-    kings       = mBlackKing;
-    bishops     = mBlackBishops;
-    rooks       = mBlackRooks;
-    queens      = mBlackQueens;
-    pawns       = mBlackPawns;
+    enemyPieces    = mWhitePieces;
+    friendlyPieces = mBlackPieces;
+    indexIncrement = 6;
+    // knights     = mBlackKnights;
+    // kings       = mBlackKing;
+    // bishops     = mBlackBishops;
+    // rooks       = mBlackRooks;
+    // queens      = mBlackQueens;
+    // pawns       = mBlackPawns;
   }
+
+  std::uint64_t knights = mBitBoards[KNIGHT_INDEX + indexIncrement];
+  std::uint64_t kings   = mBitBoards[KING_INDEX + indexIncrement];
+  std::uint64_t bishops = mBitBoards[BISHOP_INDEX + indexIncrement];
+  std::uint64_t rooks   = mBitBoards[ROOK_INDEX + indexIncrement];
+  std::uint64_t queens  = mBitBoards[QUEEN_INDEX + indexIncrement];
+  std::uint64_t pawns   = mBitBoards[PAWN_INDEX + indexIncrement];
 
   std::uint64_t pieceBitboard = (1LL << index);
 
@@ -446,10 +484,12 @@ void BitBoard::generatePawnCapturesBlack(
 void BitBoard::generatePawnPushesBlack(
   MoveList & moveList) const
 {
-  std::uint64_t unmovedPawns   = mBlackPawns & RANK_2;
+  // std::uint64_t unmovedPawns   = mBlackPawns & RANK_2;
+  std::uint64_t unmovedPawns   = mBitBoards[PAWN_INDEX + 6] & RANK_2;
   std::uint64_t singlePushOpen = ~(mAllPieces << 8);
   std::uint64_t doublePushOpen = ~(mAllPieces << 8) & ~(mAllPieces << 16);
-  std::uint64_t singlePushes   = (mBlackPawns >> 8) & singlePushOpen;
+  // std::uint64_t singlePushes   = (mBlackPawns >> 8) & singlePushOpen;
+  std::uint64_t singlePushes   = (mBitBoards[PAWN_INDEX + 6] >> 8) & singlePushOpen;
   std::uint64_t doublePushes   = (unmovedPawns >> 16) & doublePushOpen;
   std::uint64_t pawnPromotions = (singlePushes & RANK_1);
 
@@ -507,10 +547,12 @@ void BitBoard::generatePawnCapturesWhite(
 void BitBoard::generatePawnPushesWhite(
   MoveList & moveList) const
 {
-  std::uint64_t unmovedPawns   = mWhitePawns & RANK_2;
+  // std::uint64_t unmovedPawns   = mWhitePawns & RANK_2;
+  std::uint64_t unmovedPawns   = mBitBoards[PAWN_INDEX] & RANK_2;
   std::uint64_t singlePushOpen = ~(mAllPieces >> 8);
   std::uint64_t doublePushOpen = ~(mAllPieces >> 8) & ~(mAllPieces >> 16);
-  std::uint64_t singlePushes   = (mWhitePawns << 8) & singlePushOpen;
+  // std::uint64_t singlePushes   = (mWhitePawns << 8) & singlePushOpen;
+  std::uint64_t singlePushes   = (mBitBoards[PAWN_INDEX] << 8) & singlePushOpen;
   std::uint64_t doublePushes   = (unmovedPawns << 16) & doublePushOpen;
   std::uint64_t pawnPromotions = (singlePushes & RANK_8);
 
@@ -599,7 +641,7 @@ void BitBoard::generateStraightMoves(
       captureMoves &= captureMoves - 1;
     }
 
-    writeBitBoard(allAttacks, std::cout);
+    // writeBitBoard(allAttacks, std::cout);
 
     pieces &= pieces - 1;
   }
@@ -643,62 +685,69 @@ PieceType BitBoard::getPieceType(
   std::int8_t row,
   std::int8_t col) const
 {
+  static constexpr PieceType pieceTypes[12] = {
+    PieceType::WhitePawn,   PieceType::WhiteKnight, PieceType::WhiteBishop, PieceType::WhiteRook,
+    PieceType::WhiteQueen,  PieceType::WhiteKing,   PieceType::BlackPawn,   PieceType::BlackKnight,
+    PieceType::BlackBishop, PieceType::BlackRook,   PieceType::BlackQueen,  PieceType::BlackKing,
+  };
+
   for (std::int8_t pieceIndex = 0; pieceIndex < 12; pieceIndex++)
   {
-    std::uint64_t pieceBitBoard = 0;
-    PieceType pieceType         = PieceType::None;
+    std::uint64_t pieceBitBoard = mBitBoards[pieceIndex];
+    PieceType pieceType         = pieceTypes[pieceIndex];
 
-    switch (pieceIndex)
-    {
-    case 0:
-      pieceBitBoard = mWhitePawns;
-      pieceType     = PieceType::WhitePawn;
-      break;
-    case 1:
-      pieceBitBoard = mWhiteKnights;
-      pieceType     = PieceType::WhiteKnight;
-      break;
-    case 2:
-      pieceBitBoard = mWhiteBishops;
-      pieceType     = PieceType::WhiteBishop;
-      break;
-    case 3:
-      pieceBitBoard = mWhiteRooks;
-      pieceType     = PieceType::WhiteRook;
-      break;
-    case 4:
-      pieceBitBoard = mWhiteQueens;
-      pieceType     = PieceType::WhiteQueen;
-      break;
-    case 5:
-      pieceBitBoard = mWhiteKing;
-      pieceType     = PieceType::WhiteKing;
-      break;
-    case 6:
-      pieceBitBoard = mBlackPawns;
-      pieceType     = PieceType::BlackPawn;
-      break;
-    case 7:
-      pieceBitBoard = mBlackKnights;
-      pieceType     = PieceType::BlackKnight;
-      break;
-    case 8:
-      pieceBitBoard = mBlackBishops;
-      pieceType     = PieceType::BlackBishop;
-      break;
-    case 9:
-      pieceBitBoard = mBlackRooks;
-      pieceType     = PieceType::BlackRook;
-      break;
-    case 10:
-      pieceBitBoard = mBlackQueens;
-      pieceType     = PieceType::BlackQueen;
-      break;
-    case 11:
-      pieceBitBoard = mBlackKing;
-      pieceType     = PieceType::BlackKing;
-      break;
-    }
+    // switch (pieceIndex)
+    // {
+    // case 0:
+    //   //pieceBitBoard = mWhitePawns;
+    //   //pieceBitBoard = mBitBoards[PAWN_INDEX];
+    //   pieceType     = PieceType::WhitePawn;
+    //   break;
+    // case 1:
+    //   //pieceBitBoard = mWhiteKnights;
+    //   pieceType     = PieceType::WhiteKnight;
+    //   break;
+    // case 2:
+    //   //pieceBitBoard = mWhiteBishops;
+    //   pieceType     = PieceType::WhiteBishop;
+    //   break;
+    // case 3:
+    //   //pieceBitBoard = mWhiteRooks;
+    //   pieceType     = PieceType::WhiteRook;
+    //   break;
+    // case 4:
+    //   //pieceBitBoard = mWhiteQueens;
+    //   pieceType     = PieceType::WhiteQueen;
+    //   break;
+    // case 5:
+    //   //pieceBitBoard = mWhiteKing;
+    //   pieceType     = PieceType::WhiteKing;
+    //   break;
+    // case 6:
+    //   //pieceBitBoard = mBlackPawns;
+    //   pieceType     = PieceType::BlackPawn;
+    //   break;
+    // case 7:
+    //   //pieceBitBoard = mBlackKnights;
+    //   pieceType     = PieceType::BlackKnight;
+    //   break;
+    // case 8:
+    //   //pieceBitBoard = mBlackBishops;
+    //   pieceType     = PieceType::BlackBishop;
+    //   break;
+    // case 9:
+    //   //pieceBitBoard = mBlackRooks;
+    //   pieceType     = PieceType::BlackRook;
+    //   break;
+    // case 10:
+    //   //pieceBitBoard = mBlackQueens;
+    //   pieceType     = PieceType::BlackQueen;
+    //   break;
+    // case 11:
+    //   //pieceBitBoard = mBlackKing;
+    //   pieceType     = PieceType::BlackKing;
+    //   break;
+    // }
 
     std::int8_t index = getIndex(row, col);
     if ((pieceBitBoard >> index) & 0x1)
@@ -817,13 +866,13 @@ void BitBoard::initAtacks()
     }
   }
 
-  writeBitBoard(mAttacks[7].straightAttacks[0], std::cout);
-  writeBitBoard(mAttacks[7].straightAttacks[1], std::cout);
-  writeBitBoard(mAttacks[7].straightAttacks[2], std::cout);
-  writeBitBoard(mAttacks[7].straightAttacks[3], std::cout);
-  // writeBitBoard(mAttacks[35].straightAttacks[1], std::cout);
-  // writeBitBoard(mAttacks[35].straightAttacks[2], std::cout);
-  // writeBitBoard(mAttacks[35].straightAttacks[3], std::cout);
+  // writeBitBoard(mAttacks[7].straightAttacks[0], std::cout);
+  // writeBitBoard(mAttacks[7].straightAttacks[1], std::cout);
+  // writeBitBoard(mAttacks[7].straightAttacks[2], std::cout);
+  // writeBitBoard(mAttacks[7].straightAttacks[3], std::cout);
+  //  writeBitBoard(mAttacks[35].straightAttacks[1], std::cout);
+  //  writeBitBoard(mAttacks[35].straightAttacks[2], std::cout);
+  //  writeBitBoard(mAttacks[35].straightAttacks[3], std::cout);
 
   // writeBitBoard(mAttacks[35].diagonalAttacks[0], std::cout);
   // writeBitBoard(mAttacks[35].diagonalAttacks[1], std::cout);
@@ -897,6 +946,24 @@ bool BitBoard::isKingInCheck(
 void BitBoard::makeMove(
   const Move & move)
 {
+  BoardState boardState   = move.getBoardState();
+  Color sideToMove        = boardState.sideToMove;
+  Square sourceSquare     = move.getSourceSquare();
+  Square destSquare       = move.getDestinationSquare();
+  Piece movedPiece        = move.getPiece();
+  std::int8_t sourceIndex = getIndex(sourceSquare.row, sourceSquare.col);
+  std::int8_t destIndex   = getIndex(destSquare.row, destSquare.col);
+
+  mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
+
+  std::uint64_t sourceBitBoard = (1LL << sourceIndex);
+  std::uint64_t destBitBoard   = (1LL << destIndex);
+
+  // std::uint64_t & pieceBitBoard = mWhitePawns;
+  // if (movedPiece == Piece::Bishop)
+  //{
+  //   pieceBitBoard = mWhiteBishops;
+  // }
 }
 
 void BitBoard::pushMove(
@@ -921,29 +988,67 @@ void BitBoard::pushMove(
 
 void BitBoard::reset()
 {
-  mWhiteRooks   = (1LL << A1) | (1LL << H1);
-  mWhiteKnights = (1LL << B1) | (1LL << G1);
-  mWhiteBishops = (1LL << C1) | (1LL << F1);
-  mWhiteQueens  = (1LL << D1);
-  mWhiteKing    = (1LL << E1);
-  mWhitePawns   = (0xFFLL << 8);
-  mBlackRooks   = (1LL << A8) | (1LL << H8);
-  mBlackKnights = (1LL << B8) | (1LL << G8);
-  mBlackBishops = (1LL << C8) | (1LL << F8);
-  mBlackQueens  = (1LL << D8);
-  mBlackKing    = (1LL << E8);
-  mBlackPawns   = (0xFFLL << 48);
+  for (std::int32_t i = 0; i < 12; i++)
+  {
+    mBitBoards[i] = 0;
+  }
 
-  mWhitePieces  = mWhitePawns | mWhiteKnights | mWhiteBishops | mWhiteRooks | mWhiteQueens | mWhiteKing;
-  mBlackPieces  = mBlackPawns | mBlackKnights | mBlackBishops | mBlackRooks | mBlackQueens | mBlackKing;
+  mBitBoards[PAWN_INDEX]   = (0xFFLL << 8);
+  mBitBoards[KNIGHT_INDEX] = (1LL << B1) | (1LL << G1);
+  mBitBoards[BISHOP_INDEX] = (1LL << C1) | (1LL << F1);
+  mBitBoards[ROOK_INDEX]   = (1LL << A1) | (1LL << H1);
+  mBitBoards[QUEEN_INDEX]  = (1LL << D1);
+  mBitBoards[KING_INDEX]   = (1LL << E1);
+
+  mBitBoards[PAWN_INDEX + 6]   = (0xFFLL << 48);
+  mBitBoards[KNIGHT_INDEX + 6] = (1LL << B8) | (1LL << G8);
+  mBitBoards[BISHOP_INDEX + 6] = (1LL << C8) | (1LL << F8);
+  mBitBoards[ROOK_INDEX + 6]   = (1LL << A8) | (1LL << H8);
+  mBitBoards[QUEEN_INDEX + 6]  = (1LL << D8);
+  mBitBoards[KING_INDEX + 6]   = (1LL << E8);
+
+  mWhitePieces = 0;
+  mBlackPieces = 0;
+  for (std::int32_t i = PAWN_INDEX; i <= KING_INDEX; i++)
+  {
+    mWhitePieces |= mBitBoards[i];
+    mBlackPieces |= mBitBoards[i + 6];
+  }
+
+  for (std::int32_t i = PAWN_INDEX; i <= QUEEN_INDEX; i++)
+  {
+    mEnemyBitboards[i] = mBitBoards[i + 6];
+  }
+
   mAllPieces    = mWhitePieces | mBlackPieces;
   mEmptySquares = ~mAllPieces;
 
-  mEnemyBitboards[0] = mBlackPawns;
-  mEnemyBitboards[1] = mBlackKnights;
-  mEnemyBitboards[2] = mBlackBishops;
-  mEnemyBitboards[3] = mBlackRooks;
-  mEnemyBitboards[4] = mBlackQueens;
+  writeBitBoard(mBitBoards[PAWN_INDEX], std::cout);
+  writeBitBoard(mBitBoards[QUEEN_INDEX], std::cout);
+
+  // mWhiteRooks   = (1LL << A1) | (1LL << H1);
+  // mWhiteKnights = (1LL << B1) | (1LL << G1);
+  // mWhiteBishops = (1LL << C1) | (1LL << F1);
+  // mWhiteQueens  = (1LL << D1);
+  // mWhiteKing    = (1LL << E1);
+  // mWhitePawns   = (0xFFLL << 8);
+  // mBlackRooks   = (1LL << A8) | (1LL << H8);
+  // mBlackKnights = (1LL << B8) | (1LL << G8);
+  // mBlackBishops = (1LL << C8) | (1LL << F8);
+  // mBlackQueens  = (1LL << D8);
+  // mBlackKing    = (1LL << E8);
+  // mBlackPawns   = (0xFFLL << 48);
+
+  // mWhitePieces  = mWhitePawns | mWhiteKnights | mWhiteBishops | mWhiteRooks | mWhiteQueens | mWhiteKing;
+  // mBlackPieces  = mBlackPawns | mBlackKnights | mBlackBishops | mBlackRooks | mBlackQueens | mBlackKing;
+  // mAllPieces    = mWhitePieces | mBlackPieces;
+  // mEmptySquares = ~mAllPieces;
+
+  // mEnemyBitboards[0] = mBlackPawns;
+  // mEnemyBitboards[1] = mBlackKnights;
+  // mEnemyBitboards[2] = mBlackBishops;
+  // mEnemyBitboards[3] = mBlackRooks;
+  // mEnemyBitboards[4] = mBlackQueens;
 
   mWhiteKingSquare = {0, 4};
   mBlackKingSquare = {7, 4};
@@ -963,8 +1068,16 @@ void BitBoard::setPosition(
   Fen fenData;
   fenData.setFromString(fenString);
 
-  mWhitePawns = mWhiteBishops = mWhiteKnights = mWhiteQueens = mWhiteRooks = mWhiteKing = 0;
-  mBlackPawns = mBlackBishops = mBlackKnights = mBlackQueens = mBlackRooks = mBlackKing = 0;
+  for (std::int32_t i = PAWN_INDEX; i <= KING_INDEX; i++)
+  {
+    mBitBoards[i]     = 0;
+    mBitBoards[i + 6] = 0;
+  }
+
+  mWhitePieces = 0;
+  mBlackPieces = 0;
+  // mWhitePawns = mWhiteBishops = mWhiteKnights = mWhiteQueens = mWhiteRooks = mWhiteKing = 0;
+  // mBlackPawns = mBlackBishops = mBlackKnights = mBlackQueens = mBlackRooks = mBlackKing = 0;
 
   mBoardState = fenData.getBoardState();
 
@@ -979,41 +1092,65 @@ void BitBoard::setPosition(
       switch (pieceType)
       {
       case PieceType::WhitePawn:
-        mWhitePawns |= bitBoard;
+        // mWhitePawns |= bitBoard;
+        mBitBoards[PAWN_INDEX] |= bitBoard;
+        mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteRook:
-        mWhiteRooks |= bitBoard;
+        // mWhiteRooks |= bitBoard;
+        mBitBoards[ROOK_INDEX] |= bitBoard;
+        mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteKnight:
-        mWhiteKnights |= bitBoard;
+        // mWhiteKnights |= bitBoard;
+        mBitBoards[KNIGHT_INDEX] |= bitBoard;
+        mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteBishop:
-        mWhiteBishops |= bitBoard;
+        // mWhiteBishops |= bitBoard;
+        mBitBoards[BISHOP_INDEX] |= bitBoard;
+        mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteQueen:
-        mWhiteQueens |= bitBoard;
+        // mWhiteQueens |= bitBoard;
+        mBitBoards[QUEEN_INDEX] |= bitBoard;
+        mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteKing:
-        mWhiteKing |= bitBoard;
+        // mWhiteKing |= bitBoard;
+        mBitBoards[KING_INDEX] |= bitBoard;
+        mWhitePieces |= bitBoard;
         mWhiteKingSquare = Square{i, j};
         break;
       case PieceType::BlackPawn:
-        mBlackPawns |= bitBoard;
+        // mBlackPawns |= bitBoard;
+        mBitBoards[PAWN_INDEX + 6] |= bitBoard;
+        mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackRook:
-        mBlackRooks |= bitBoard;
+        // mBlackRooks |= bitBoard;
+        mBitBoards[ROOK_INDEX + 6] |= bitBoard;
+        mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackKnight:
-        mBlackKnights |= bitBoard;
+        // mBlackKnights |= bitBoard;
+        mBitBoards[KNIGHT_INDEX + 6] |= bitBoard;
+        mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackBishop:
-        mBlackBishops |= bitBoard;
+        // mBlackBishops |= bitBoard;
+        mBitBoards[BISHOP_INDEX + 6] |= bitBoard;
+        mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackQueen:
-        mBlackQueens |= bitBoard;
+        // mBlackQueens |= bitBoard;
+        mBitBoards[QUEEN_INDEX + 6] |= bitBoard;
+        mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackKing:
-        mBlackKing |= bitBoard;
+        // mBlackKing |= bitBoard;
+        mBitBoards[KING_INDEX + 6] |= bitBoard;
+        mBlackPieces |= bitBoard;
         mBlackKingSquare = Square{i, j};
         break;
       default:
@@ -1022,11 +1159,14 @@ void BitBoard::setPosition(
     }
   }
 
-  mWhitePieces = mWhitePawns | mWhiteKnights | mWhiteBishops | mWhiteRooks | mWhiteQueens | mWhiteKing;
-  mBlackPieces = mBlackPawns | mBlackKnights | mBlackBishops | mBlackRooks | mBlackQueens | mBlackKing;
-  mAllPieces   = mWhitePieces | mBlackPieces;
-  writeBitBoard(mAllPieces, std::cout);
+  mAllPieces    = mWhitePieces | mBlackPieces;
   mEmptySquares = ~mAllPieces;
+
+  // mWhitePieces = mWhitePawns | mWhiteKnights | mWhiteBishops | mWhiteRooks | mWhiteQueens | mWhiteKing;
+  // mBlackPieces = mBlackPawns | mBlackKnights | mBlackBishops | mBlackRooks | mBlackQueens | mBlackKing;
+  // mAllPieces   = mWhitePieces | mBlackPieces;
+  // writeBitBoard(mAllPieces, std::cout);
+  // mEmptySquares = ~mAllPieces;
 }
 
 void BitBoard::unmakeMove(
