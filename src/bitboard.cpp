@@ -127,24 +127,20 @@ static constexpr std::int32_t KING_INDEX   = 5;
 // clang-format off
 const int index64[64] = 
 {
-  0,  1,  48, 2,  57, 49, 28, 3,  
-  61, 58, 50, 42, 38, 29, 17, 4,  
-  62, 55, 59, 36, 53, 51,43, 22, 
-  45, 39, 33, 30, 24, 18, 12, 5,  
-  63, 47, 56, 27, 60, 41, 37, 16, 
-  54, 35, 52, 21,44, 32, 23, 11, 
-  46, 26, 40, 15, 34, 20, 31, 10, 
-  25, 14, 19, 9,  13, 8,  7,  6
+    0, 47,  1, 56, 48, 27,  2, 60,
+   57, 49, 41, 37, 28, 16,  3, 61,
+   54, 58, 35, 52, 50, 42, 21, 44,
+   38, 32, 29, 23, 17, 11,  4, 62,
+   46, 55, 26, 59, 40, 36, 15, 53,
+   34, 51, 20, 43, 31, 22, 10, 45,
+   25, 39, 14, 33, 19, 30,  9, 24,
+   13, 18,  8, 12,  7,  6,  5, 63
 };
 // clang-format on
 
 /**
  * bitScanForward
- * @author Martin Läuter (1997)
- *         Charles E. Leiserson
- *         Harald Prokop
- *         Keith H. Randall
- * "Using de Bruijn Sequences to Index a 1 in a Computer Word"
+ * @author Kim Walisch (2012)
  * @param bb bitboard to scan
  * @precondition bb != 0
  * @return index (0..63) of least significant one bit
@@ -154,35 +150,28 @@ int BitBoard::bitScanForward(
 {
   const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
   assert(bb != 0);
-  return index64[((bb & -bb) * debruijn64) >> 58];
+  return index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
 }
 
 /**
  * bitScanReverse
- * @author Eugene Nalimov
+ * @authors Kim Walisch, Mark Dickinson
  * @param bb bitboard to scan
+ * @precondition bb != 0
  * @return index (0..63) of most significant one bit
  */
 int BitBoard::bitScanReverse(
   std::uint64_t bb) const
 {
-  int result = 0;
-  if (bb > 0xFFFFFFFF)
-  {
-    bb >>= 32;
-    result = 32;
-  }
-  if (bb > 0xFFFF)
-  {
-    bb >>= 16;
-    result += 16;
-  }
-  if (bb > 0xFF)
-  {
-    bb >>= 8;
-    result += 8;
-  }
-  return result + mMs1bTable[bb];
+  const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
+  assert(bb != 0);
+  bb |= bb >> 1;
+  bb |= bb >> 2;
+  bb |= bb >> 4;
+  bb |= bb >> 8;
+  bb |= bb >> 16;
+  bb |= bb >> 32;
+  return index64[(bb * debruijn64) >> 58];
 }
 
 constexpr std::int8_t BitBoard::getIndex(
@@ -209,12 +198,12 @@ BitBoard::BitBoard()
   reset();
   initAtacks();
 
-  mPieceMapping[Piece::Pawn]   = PAWN_INDEX;
-  mPieceMapping[Piece::Knight] = KNIGHT_INDEX;
-  mPieceMapping[Piece::Bishop] = BISHOP_INDEX;
-  mPieceMapping[Piece::Rook]   = ROOK_INDEX;
-  mPieceMapping[Piece::Queen]  = QUEEN_INDEX;
-  mPieceMapping[Piece::King]   = KING_INDEX;
+  mPieceToIndex[Piece::Pawn]   = PAWN_INDEX;
+  mPieceToIndex[Piece::Knight] = KNIGHT_INDEX;
+  mPieceToIndex[Piece::Bishop] = BISHOP_INDEX;
+  mPieceToIndex[Piece::Rook]   = ROOK_INDEX;
+  mPieceToIndex[Piece::Queen]  = QUEEN_INDEX;
+  mPieceToIndex[Piece::King]   = KING_INDEX;
 }
 
 void BitBoard::generateDiagonalMoves(
@@ -233,15 +222,15 @@ void BitBoard::generateDiagonalMoves(
     {
       std::uint64_t attacks  = mAttacks[fromSquare].diagonalAttacks[forward[i]];
       std::uint64_t blockers = attacks & mAllPieces;
-      writeBitBoard(attacks, std::cout);
-      writeBitBoard(mAllPieces, std::cout);
-      writeBitBoard(blockers, std::cout);
+      // writeBitBoard(attacks, std::cout);
+      // writeBitBoard(mAllPieces, std::cout);
+      // writeBitBoard(blockers, std::cout);
       if (blockers)
       {
         std::int8_t toSquare = bitScanForward(blockers);
         attacks ^= mAttacks[toSquare].diagonalAttacks[forward[i]];
       }
-      writeBitBoard(attacks, std::cout);
+      // writeBitBoard(attacks, std::cout);
       allAttacks |= attacks;
     }
 
@@ -349,23 +338,11 @@ void BitBoard::generateMoves(
   std::int32_t indexIncrement  = 0;
   std::uint64_t friendlyPieces = mWhitePieces;
   std::uint64_t enemyPieces    = mBlackPieces;
-  // std::uint64_t knights        = mWhiteKnights;
-  // std::uint64_t kings          = mWhiteKing;
-  // std::uint64_t bishops        = mWhiteBishops;
-  // std::uint64_t rooks          = mWhiteRooks;
-  // std::uint64_t queens         = mWhiteQueens;
-  // std::uint64_t pawns          = mWhitePawns;
   if (sideToMove == Color::Black)
   {
     indexIncrement = 6;
     friendlyPieces = mBlackPieces;
     enemyPieces    = mWhitePieces;
-    // knights     = mBlackKnights;
-    // kings       = mBlackKing;
-    // bishops     = mBlackBishops;
-    // rooks       = mBlackRooks;
-    // queens      = mBlackQueens;
-    // pawns       = mBlackPawns;
   }
 
   std::uint64_t pawns   = mBitBoards[PAWN_INDEX + indexIncrement];
@@ -411,23 +388,11 @@ void BitBoard::generateMoves(
   std::int32_t indexIncrement  = 0;
   std::uint64_t friendlyPieces = mWhitePieces;
   std::uint64_t enemyPieces    = mBlackPieces;
-  // std::uint64_t knights        = mWhiteKnights;
-  // std::uint64_t kings          = mWhiteKing;
-  // std::uint64_t bishops        = mWhiteBishops;
-  // std::uint64_t rooks          = mWhiteRooks;
-  // std::uint64_t queens         = mWhiteQueens;
-  // std::uint64_t pawns          = mWhitePawns;
   if (sideToMove == Color::Black)
   {
     enemyPieces    = mWhitePieces;
     friendlyPieces = mBlackPieces;
     indexIncrement = 6;
-    // knights     = mBlackKnights;
-    // kings       = mBlackKing;
-    // bishops     = mBlackBishops;
-    // rooks       = mBlackRooks;
-    // queens      = mBlackQueens;
-    // pawns       = mBlackPawns;
   }
 
   std::uint64_t knights = mBitBoards[KNIGHT_INDEX + indexIncrement];
@@ -484,11 +449,9 @@ void BitBoard::generatePawnCapturesBlack(
 void BitBoard::generatePawnPushesBlack(
   MoveList & moveList) const
 {
-  // std::uint64_t unmovedPawns   = mBlackPawns & RANK_2;
-  std::uint64_t unmovedPawns   = mBitBoards[PAWN_INDEX + 6] & RANK_2;
+  std::uint64_t unmovedPawns   = mBitBoards[PAWN_INDEX + 6] & RANK_6;
   std::uint64_t singlePushOpen = ~(mAllPieces << 8);
   std::uint64_t doublePushOpen = ~(mAllPieces << 8) & ~(mAllPieces << 16);
-  // std::uint64_t singlePushes   = (mBlackPawns >> 8) & singlePushOpen;
   std::uint64_t singlePushes   = (mBitBoards[PAWN_INDEX + 6] >> 8) & singlePushOpen;
   std::uint64_t doublePushes   = (unmovedPawns >> 16) & doublePushOpen;
   std::uint64_t pawnPromotions = (singlePushes & RANK_1);
@@ -547,11 +510,9 @@ void BitBoard::generatePawnCapturesWhite(
 void BitBoard::generatePawnPushesWhite(
   MoveList & moveList) const
 {
-  // std::uint64_t unmovedPawns   = mWhitePawns & RANK_2;
   std::uint64_t unmovedPawns   = mBitBoards[PAWN_INDEX] & RANK_2;
   std::uint64_t singlePushOpen = ~(mAllPieces >> 8);
   std::uint64_t doublePushOpen = ~(mAllPieces >> 8) & ~(mAllPieces >> 16);
-  // std::uint64_t singlePushes   = (mWhitePawns << 8) & singlePushOpen;
   std::uint64_t singlePushes   = (mBitBoards[PAWN_INDEX] << 8) & singlePushOpen;
   std::uint64_t doublePushes   = (unmovedPawns << 16) & doublePushOpen;
   std::uint64_t pawnPromotions = (singlePushes & RANK_8);
@@ -596,19 +557,23 @@ void BitBoard::generateStraightMoves(
   {
     std::int8_t fromSquare   = bitScanForward(pieces);
     std::uint64_t allAttacks = 0;
-    for (int32_t i = 0; i < 2; i++)
+    for (std::int32_t i = 0; i < 2; i++)
     {
       std::uint64_t attacks  = mAttacks[fromSquare].straightAttacks[forward[i]];
       std::uint64_t blockers = attacks & mAllPieces;
+      // writeBitBoard(attacks, std::cout);
+      // writeBitBoard(mAllPieces, std::cout);
+      // writeBitBoard(blockers, std::cout);
       if (blockers)
       {
         std::int8_t toSquare = bitScanForward(blockers);
         attacks ^= mAttacks[toSquare].straightAttacks[forward[i]];
       }
+      // writeBitBoard(attacks, std::cout);
       allAttacks |= attacks;
     }
 
-    for (int32_t i = 0; i < 2; i++)
+    for (std::int32_t i = 0; i < 2; i++)
     {
       std::uint64_t attacks  = mAttacks[fromSquare].straightAttacks[reverse[i]];
       std::uint64_t blockers = attacks & mAllPieces;
@@ -620,6 +585,7 @@ void BitBoard::generateStraightMoves(
         std::int8_t toSquare = bitScanReverse(blockers);
         attacks ^= mAttacks[toSquare].straightAttacks[reverse[i]];
       }
+      // writeBitBoard(attacks, std::cout);
       allAttacks |= attacks;
     }
 
@@ -696,59 +662,6 @@ PieceType BitBoard::getPieceType(
     std::uint64_t pieceBitBoard = mBitBoards[pieceIndex];
     PieceType pieceType         = pieceTypes[pieceIndex];
 
-    // switch (pieceIndex)
-    // {
-    // case 0:
-    //   //pieceBitBoard = mWhitePawns;
-    //   //pieceBitBoard = mBitBoards[PAWN_INDEX];
-    //   pieceType     = PieceType::WhitePawn;
-    //   break;
-    // case 1:
-    //   //pieceBitBoard = mWhiteKnights;
-    //   pieceType     = PieceType::WhiteKnight;
-    //   break;
-    // case 2:
-    //   //pieceBitBoard = mWhiteBishops;
-    //   pieceType     = PieceType::WhiteBishop;
-    //   break;
-    // case 3:
-    //   //pieceBitBoard = mWhiteRooks;
-    //   pieceType     = PieceType::WhiteRook;
-    //   break;
-    // case 4:
-    //   //pieceBitBoard = mWhiteQueens;
-    //   pieceType     = PieceType::WhiteQueen;
-    //   break;
-    // case 5:
-    //   //pieceBitBoard = mWhiteKing;
-    //   pieceType     = PieceType::WhiteKing;
-    //   break;
-    // case 6:
-    //   //pieceBitBoard = mBlackPawns;
-    //   pieceType     = PieceType::BlackPawn;
-    //   break;
-    // case 7:
-    //   //pieceBitBoard = mBlackKnights;
-    //   pieceType     = PieceType::BlackKnight;
-    //   break;
-    // case 8:
-    //   //pieceBitBoard = mBlackBishops;
-    //   pieceType     = PieceType::BlackBishop;
-    //   break;
-    // case 9:
-    //   //pieceBitBoard = mBlackRooks;
-    //   pieceType     = PieceType::BlackRook;
-    //   break;
-    // case 10:
-    //   //pieceBitBoard = mBlackQueens;
-    //   pieceType     = PieceType::BlackQueen;
-    //   break;
-    // case 11:
-    //   //pieceBitBoard = mBlackKing;
-    //   pieceType     = PieceType::BlackKing;
-    //   break;
-    // }
-
     std::int8_t index = getIndex(row, col);
     if ((pieceBitBoard >> index) & 0x1)
     {
@@ -775,11 +688,6 @@ void BitBoard::initAtacks()
     {
       mAttacks[index].diagonalAttacks[i] = 0;
       mAttacks[index].straightAttacks[i] = 0;
-      // for (std::int8_t j = 0; j < 7; j++)
-      // {
-      //   mAttacks[index].diagonalAttacks[i][j] = INVALID_INDEX;
-      //   mAttacks[index].straightAttacks[i][j] = INVALID_INDEX;
-      // }
     }
 
     // Initialize pawn attacks
@@ -838,7 +746,6 @@ void BitBoard::initAtacks()
 
         std::int8_t destIndex = getIndex(destRow, destColumn);
         mAttacks[index].straightAttacks[i] |= (1LL << destIndex);
-        // mAttacks[index].straightAttacks[i][j] = destIndex;
         destRow += rowIncrement;
         destColumn += colIncrement;
       }
@@ -859,7 +766,6 @@ void BitBoard::initAtacks()
 
         std::int8_t destIndex = getIndex(destRow, destColumn);
         mAttacks[index].diagonalAttacks[i] |= (1LL << destIndex);
-        // mAttacks[index].diagonalAttacks[i][j] = destIndex;
         destRow += rowIncrement;
         destColumn += colIncrement;
       }
@@ -878,23 +784,6 @@ void BitBoard::initAtacks()
   // writeBitBoard(mAttacks[35].diagonalAttacks[1], std::cout);
   // writeBitBoard(mAttacks[35].diagonalAttacks[2], std::cout);
   // writeBitBoard(mAttacks[35].diagonalAttacks[3], std::cout);
-}
-
-void BitBoard::initMsb1Table()
-{
-  int i;
-  for (i = 0; i < 256; i++)
-  {
-    mMs1bTable[i] =
-      ((i > 127)    ? 7
-         : (i > 63) ? 6
-         : (i > 31) ? 5
-         : (i > 15) ? 4
-         : (i > 7)  ? 3
-         : (i > 3)  ? 2
-         : (i > 1)  ? 1
-                    : 0);
-  }
 }
 
 void BitBoard::initSliderAttacks(
@@ -946,24 +835,213 @@ bool BitBoard::isKingInCheck(
 void BitBoard::makeMove(
   const Move & move)
 {
-  BoardState boardState   = move.getBoardState();
-  Color sideToMove        = boardState.sideToMove;
-  Square sourceSquare     = move.getSourceSquare();
-  Square destSquare       = move.getDestinationSquare();
-  Piece movedPiece        = move.getPiece();
-  std::int8_t sourceIndex = getIndex(sourceSquare.row, sourceSquare.col);
-  std::int8_t destIndex   = getIndex(destSquare.row, destSquare.col);
-
-  mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
-
+  // Perform some general calculations
+  BoardState boardState        = move.getBoardState();
+  Color sideToMove             = boardState.sideToMove;
+  Square sourceSquare          = move.getSourceSquare();
+  Square destSquare            = move.getDestinationSquare();
+  Piece movedPiece             = move.getPiece();
+  mBoardState.enpassantColumn  = INVALID_ENPASSANT_COLUMN;
+  std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
+  std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
   std::uint64_t sourceBitBoard = (1LL << sourceIndex);
   std::uint64_t destBitBoard   = (1LL << destIndex);
+  std::int32_t pieceIndex      = mPieceToIndex[movedPiece];
+  if (sideToMove == Color::Black)
+  {
+    pieceIndex += 6;
+  }
 
-  // std::uint64_t & pieceBitBoard = mWhitePawns;
-  // if (movedPiece == Piece::Bishop)
-  //{
-  //   pieceBitBoard = mWhiteBishops;
-  // }
+  // Handle quiet moves
+  if (move.isQuiet())
+  {
+    mBitBoards[pieceIndex] ^= sourceBitBoard;
+    mBitBoards[pieceIndex] |= destBitBoard;
+  }
+
+  // Handle double pushes
+  if (move.isEnpassantPush())
+  {
+    mBitBoards[pieceIndex] ^= sourceBitBoard;
+    mBitBoards[pieceIndex] |= destBitBoard;
+    mBoardState.enpassantColumn = sourceSquare.col;
+  }
+
+  // Handle promotion moves
+  if (move.isPromotion() && !move.isPromotionCapture())
+  {
+    Piece promotedPiece             = move.getPromotedPiece();
+    std::int32_t promotedPieceIndex = mPieceToIndex[promotedPiece];
+    if (sideToMove == Color::Black)
+    {
+      promotedPieceIndex += 6;
+    }
+
+    mBitBoards[pieceIndex] ^= sourceBitBoard;
+    // mBitBoards[pieceIndex] ^= destBitBoard;
+    mBitBoards[promotedPieceIndex] |= destBitBoard;
+  }
+
+  // Handle capture moves
+  if (move.isCapture())
+  {
+    Piece capturePiece             = move.getCapturedPiece();
+    std::int32_t capturePieceIndex = mPieceToIndex[capturePiece];
+    if (sideToMove == Color::White)
+    {
+      capturePieceIndex += 6;
+    }
+
+    if (move.isPromotionCapture())
+    {
+      Piece promotedPiece             = move.getPromotedPiece();
+      std::int32_t promotedPieceIndex = mPieceToIndex[promotedPiece];
+      if (sideToMove == Color::Black)
+      {
+        promotedPieceIndex += 6;
+      }
+
+      mBitBoards[pieceIndex] ^= sourceBitBoard;
+      // mBitBoards[pieceIndex] ^= destBitBoard;
+      mBitBoards[promotedPieceIndex] |= destBitBoard;
+      mBitBoards[capturePieceIndex] ^= destBitBoard;
+    }
+    else if (move.isEnpassantCapture())
+    {
+      std::int8_t dir            = (sideToMove == Color::White ? -1 : +1);
+      std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::uint64_t epBitBoard   = (1LL << enPassantIndex);
+
+      mBitBoards[pieceIndex] ^= sourceBitBoard;
+      mBitBoards[pieceIndex] |= destBitBoard;
+      mBitBoards[capturePieceIndex] ^= epBitBoard;
+    }
+    else // Standard captures
+    {
+      mBitBoards[pieceIndex] ^= sourceBitBoard;
+      mBitBoards[pieceIndex] |= destBitBoard;
+      mBitBoards[capturePieceIndex] ^= destBitBoard;
+    }
+  }
+
+  // Handle castle moves
+  if (move.isCastle())
+  {
+    if (destIndex == C1)
+    {
+      mBitBoards[ROOK_INDEX] ^= (1LL << A1);
+      mBitBoards[ROOK_INDEX] |= (1LL << D1);
+    }
+
+    if (destIndex == G1)
+    {
+      mBitBoards[ROOK_INDEX] ^= (1LL << H1);
+      mBitBoards[ROOK_INDEX] |= (1LL << F1);
+    }
+
+    if (destIndex == C8)
+    {
+      mBitBoards[ROOK_INDEX + 6] ^= (1LL << A8);
+      mBitBoards[ROOK_INDEX + 6] |= (1LL << D8);
+    }
+
+    if (destIndex == G8)
+    {
+      mBitBoards[ROOK_INDEX + 6] ^= (1LL << H8);
+      mBitBoards[ROOK_INDEX + 6] |= (1LL << F8);
+    }
+  }
+
+  // Handle king moves
+  if (movedPiece == Piece::King)
+  {
+    mBitBoards[pieceIndex] ^= sourceBitBoard;
+    mBitBoards[pieceIndex] |= destBitBoard;
+
+    if (sideToMove == Color::White)
+    {
+      mWhiteKingSquare = destSquare;
+    }
+    else
+    {
+      mBlackKingSquare = destSquare;
+    }
+  }
+
+  // Update the aggregated bitboards
+  mWhitePieces = 0;
+  mBlackPieces = 0;
+  for (std::int32_t i = PAWN_INDEX; i <= KING_INDEX; i++)
+  {
+    mWhitePieces |= mBitBoards[i];
+    mBlackPieces |= mBitBoards[i + 6];
+  }
+  mAllPieces    = mWhitePieces | mBlackPieces;
+  mEmptySquares = ~mAllPieces;
+
+  // Update castling rights
+  // If the square associated with a king or rook is
+  // modified in any way remove the castling ability
+  // for that piece
+  switch (sourceIndex)
+  {
+  case H1:
+    mBoardState.castlingRights &= ~CASTLE_WHITE_KING;
+    break;
+  case E1:
+    mBoardState.castlingRights &= ~(CASTLE_WHITE_KING | CASTLE_WHITE_QUEEN);
+    break;
+  case A1:
+    mBoardState.castlingRights &= ~CASTLE_WHITE_QUEEN;
+    break;
+  case H8:
+    mBoardState.castlingRights &= ~CASTLE_BLACK_KING;
+    break;
+  case E8:
+    mBoardState.castlingRights &= ~(CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN);
+    break;
+  case A8:
+    mBoardState.castlingRights &= ~CASTLE_BLACK_QUEEN;
+    break;
+  }
+
+  switch (destIndex)
+  {
+  case H1:
+    mBoardState.castlingRights &= ~CASTLE_WHITE_KING;
+    break;
+  case E1:
+    mBoardState.castlingRights &= ~(CASTLE_WHITE_KING | CASTLE_WHITE_QUEEN);
+    break;
+  case A1:
+    mBoardState.castlingRights &= ~CASTLE_WHITE_QUEEN;
+    break;
+  case H8:
+    mBoardState.castlingRights &= ~CASTLE_BLACK_KING;
+    break;
+  case E8:
+    mBoardState.castlingRights &= ~(CASTLE_BLACK_KING | CASTLE_BLACK_QUEEN);
+    break;
+  case A8:
+    mBoardState.castlingRights &= ~CASTLE_BLACK_QUEEN;
+    break;
+  }
+
+  // Update half move clock
+  mBoardState.halfMoveClock++;
+  if (movedPiece == Piece::Pawn || move.isCapture())
+  {
+    mBoardState.halfMoveClock = 0;
+  }
+
+  // Update full move clock
+  if (sideToMove == Color::Black)
+  {
+    mBoardState.fullMoveClock++;
+  }
+
+  // Update side to move
+  mBoardState.sideToMove = (sideToMove == Color::White) ? Color::Black : Color::White;
 }
 
 void BitBoard::pushMove(
@@ -1015,40 +1093,16 @@ void BitBoard::reset()
     mBlackPieces |= mBitBoards[i + 6];
   }
 
+  mAllPieces    = mWhitePieces | mBlackPieces;
+  mEmptySquares = ~mAllPieces;
+
   for (std::int32_t i = PAWN_INDEX; i <= QUEEN_INDEX; i++)
   {
     mEnemyBitboards[i] = mBitBoards[i + 6];
   }
 
-  mAllPieces    = mWhitePieces | mBlackPieces;
-  mEmptySquares = ~mAllPieces;
-
-  writeBitBoard(mBitBoards[PAWN_INDEX], std::cout);
-  writeBitBoard(mBitBoards[QUEEN_INDEX], std::cout);
-
-  // mWhiteRooks   = (1LL << A1) | (1LL << H1);
-  // mWhiteKnights = (1LL << B1) | (1LL << G1);
-  // mWhiteBishops = (1LL << C1) | (1LL << F1);
-  // mWhiteQueens  = (1LL << D1);
-  // mWhiteKing    = (1LL << E1);
-  // mWhitePawns   = (0xFFLL << 8);
-  // mBlackRooks   = (1LL << A8) | (1LL << H8);
-  // mBlackKnights = (1LL << B8) | (1LL << G8);
-  // mBlackBishops = (1LL << C8) | (1LL << F8);
-  // mBlackQueens  = (1LL << D8);
-  // mBlackKing    = (1LL << E8);
-  // mBlackPawns   = (0xFFLL << 48);
-
-  // mWhitePieces  = mWhitePawns | mWhiteKnights | mWhiteBishops | mWhiteRooks | mWhiteQueens | mWhiteKing;
-  // mBlackPieces  = mBlackPawns | mBlackKnights | mBlackBishops | mBlackRooks | mBlackQueens | mBlackKing;
-  // mAllPieces    = mWhitePieces | mBlackPieces;
-  // mEmptySquares = ~mAllPieces;
-
-  // mEnemyBitboards[0] = mBlackPawns;
-  // mEnemyBitboards[1] = mBlackKnights;
-  // mEnemyBitboards[2] = mBlackBishops;
-  // mEnemyBitboards[3] = mBlackRooks;
-  // mEnemyBitboards[4] = mBlackQueens;
+  // writeBitBoard(mBitBoards[PAWN_INDEX], std::cout);
+  // writeBitBoard(mBitBoards[QUEEN_INDEX], std::cout);
 
   mWhiteKingSquare = {0, 4};
   mBlackKingSquare = {7, 4};
@@ -1076,10 +1130,7 @@ void BitBoard::setPosition(
 
   mWhitePieces = 0;
   mBlackPieces = 0;
-  // mWhitePawns = mWhiteBishops = mWhiteKnights = mWhiteQueens = mWhiteRooks = mWhiteKing = 0;
-  // mBlackPawns = mBlackBishops = mBlackKnights = mBlackQueens = mBlackRooks = mBlackKing = 0;
-
-  mBoardState = fenData.getBoardState();
+  mBoardState  = fenData.getBoardState();
 
   for (std::int8_t i = 0; i < 8; i++)
   {
@@ -1092,63 +1143,51 @@ void BitBoard::setPosition(
       switch (pieceType)
       {
       case PieceType::WhitePawn:
-        // mWhitePawns |= bitBoard;
         mBitBoards[PAWN_INDEX] |= bitBoard;
         mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteRook:
-        // mWhiteRooks |= bitBoard;
         mBitBoards[ROOK_INDEX] |= bitBoard;
         mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteKnight:
-        // mWhiteKnights |= bitBoard;
         mBitBoards[KNIGHT_INDEX] |= bitBoard;
         mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteBishop:
-        // mWhiteBishops |= bitBoard;
         mBitBoards[BISHOP_INDEX] |= bitBoard;
         mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteQueen:
-        // mWhiteQueens |= bitBoard;
         mBitBoards[QUEEN_INDEX] |= bitBoard;
         mWhitePieces |= bitBoard;
         break;
       case PieceType::WhiteKing:
-        // mWhiteKing |= bitBoard;
         mBitBoards[KING_INDEX] |= bitBoard;
         mWhitePieces |= bitBoard;
         mWhiteKingSquare = Square{i, j};
         break;
       case PieceType::BlackPawn:
-        // mBlackPawns |= bitBoard;
         mBitBoards[PAWN_INDEX + 6] |= bitBoard;
         mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackRook:
-        // mBlackRooks |= bitBoard;
         mBitBoards[ROOK_INDEX + 6] |= bitBoard;
         mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackKnight:
-        // mBlackKnights |= bitBoard;
         mBitBoards[KNIGHT_INDEX + 6] |= bitBoard;
         mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackBishop:
-        // mBlackBishops |= bitBoard;
         mBitBoards[BISHOP_INDEX + 6] |= bitBoard;
         mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackQueen:
-        // mBlackQueens |= bitBoard;
         mBitBoards[QUEEN_INDEX + 6] |= bitBoard;
         mBlackPieces |= bitBoard;
         break;
       case PieceType::BlackKing:
-        // mBlackKing |= bitBoard;
         mBitBoards[KING_INDEX + 6] |= bitBoard;
         mBlackPieces |= bitBoard;
         mBlackKingSquare = Square{i, j};
@@ -1161,17 +1200,22 @@ void BitBoard::setPosition(
 
   mAllPieces    = mWhitePieces | mBlackPieces;
   mEmptySquares = ~mAllPieces;
-
-  // mWhitePieces = mWhitePawns | mWhiteKnights | mWhiteBishops | mWhiteRooks | mWhiteQueens | mWhiteKing;
-  // mBlackPieces = mBlackPawns | mBlackKnights | mBlackBishops | mBlackRooks | mBlackQueens | mBlackKing;
-  // mAllPieces   = mWhitePieces | mBlackPieces;
-  // writeBitBoard(mAllPieces, std::cout);
-  // mEmptySquares = ~mAllPieces;
 }
 
 void BitBoard::unmakeMove(
   const Move & move)
 {
+  // Do some general calculations
+  BoardState boardState        = move.getBoardState();
+  Color sideThatMoved          = boardState.sideToMove;
+  Color otherSide              = (sideThatMoved == Color::White) ? Color::Black : Color::White;
+  Square sourceSquare          = move.getSourceSquare();
+  Square destSquare            = move.getDestinationSquare();
+  Piece movedPiece             = move.getPiece();
+  std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
+  std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  std::uint64_t sourceBitBoard = (1LL << sourceIndex);
+  std::uint64_t destBitBoard   = (1LL << destIndex);
 }
 
 void BitBoard::writeBitBoard(

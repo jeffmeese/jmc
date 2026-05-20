@@ -122,8 +122,6 @@ private:
 
   void initAtacks();
 
-  void initMsb1Table();
-
   void initSliderAttacks(
     std::int8_t row,
     std::int8_t col,
@@ -148,26 +146,13 @@ private:
   BoardState mBoardState;
   Square mBlackKingSquare;
   Square mWhiteKingSquare;
-  //std::uint64_t mWhitePawns;
-  //std::uint64_t mWhiteKnights;
-  //std::uint64_t mWhiteBishops;
-  //std::uint64_t mWhiteRooks;
-  //std::uint64_t mWhiteQueens;
-  //std::uint64_t mWhiteKing;
-  //std::uint64_t mBlackPawns;
-  //std::uint64_t mBlackKnights;
-  //std::uint64_t mBlackBishops;
-  //std::uint64_t mBlackRooks;
-  //std::uint64_t mBlackQueens;
-  //std::uint64_t mBlackKing;
   std::uint64_t mWhitePieces;
   std::uint64_t mBlackPieces;
   std::uint64_t mAllPieces;
   std::uint64_t mEmptySquares;
   std::uint64_t mEnemyBitboards[5];
   std::uint64_t mBitBoards[12];
-  std::map<Piece, std::int32_t> mPieceMapping;
-  int mMs1bTable[256];
+  std::map<Piece, std::int32_t> mPieceToIndex;
   Attacks mAttacks[64];
 };
 
