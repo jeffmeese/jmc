@@ -70,6 +70,10 @@ private:
 
   int bitScanReverse(std::uint64_t bb) const;
 
+  void generateCastlingMoves(
+    Color sideToMove,
+    MoveList & moveList) const;
+
   void generateDiagonalMoves(
     std::uint64_t pieces,
     Piece pieceType,
@@ -130,6 +134,10 @@ private:
     std::int8_t colIncrement,
     std::uint64_t & attacks) const;
 
+  bool isCellAttacked(
+    std::int8_t index,
+    Color attackingColor) const;
+    
   void pushMove(
     std::int8_t fromIndex,
     std::int8_t toIndex,
@@ -138,6 +146,8 @@ private:
     Piece promotionPiece,
     Move::Type type,
     MoveList & moveList) const;
+
+  void updateAggregateBitboards();
 
   void writeBitBoard(
     std::uint64_t bb,

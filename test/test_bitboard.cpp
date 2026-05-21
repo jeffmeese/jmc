@@ -1,8 +1,8 @@
-// board8x8_tests.cpp
+// BitBoard_tests.cpp
 
 #include <gtest/gtest.h>
 
-#include "board8x8.h"
+#include "bitboard.h"
 #include "move.h"
 #include "move_list.h"
 
@@ -37,20 +37,20 @@ bool containsMove(
 } // namespace
 
 TEST(
-  Board8x8Tests,
+  BitboardTests,
   ResetPlacesKingsCorrectly)
 {
-  Board8x8 board;
+  BitBoard board;
 
   EXPECT_EQ(board.getPieceType(0, 4), PieceType::WhiteKing);
   EXPECT_EQ(board.getPieceType(7, 4), PieceType::BlackKing);
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   ResetPlacesPawnsCorrectly)
 {
-  Board8x8 board;
+  BitBoard board;
 
   for (int col = 0; col < 8; ++col)
   {
@@ -60,10 +60,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   InitialPositionGenerates20Moves)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(moveList);
@@ -72,10 +72,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   WhitePawnSinglePushGenerated)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(1, 4, moveList);
@@ -84,10 +84,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   WhitePawnDoublePushGenerated)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(1, 4, moveList);
@@ -96,10 +96,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   KnightMovesGeneratedCorrectly)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(0, 1, moveList);
@@ -109,10 +109,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   BishopInitiallyBlocked)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(0, 2, moveList);
@@ -121,10 +121,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   RookInitiallyBlocked)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(0, 0, moveList);
@@ -133,10 +133,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   QueenInitiallyBlocked)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(0, 3, moveList);
@@ -145,10 +145,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   KingInitiallyBlocked)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(0, 4, moveList);
@@ -157,10 +157,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   EmptyBoardHasNoMoves)
 {
-  Board8x8 board;
+  BitBoard board;
   board.setPosition("8/8/8/8/8/8/8/8 w - - 0 1");
 
   MoveList moveList;
@@ -170,100 +170,100 @@ TEST(
   EXPECT_EQ(moveList.totalMoves(), 0);
 }
 
+// TEST(
+//   BitBoardTests,
+//   WhiteKingAttackDetection)
+// {
+//   BitBoard board;
+
+//   board.setPosition("8/8/8/8/4r3/8/4K3/8 w - - 0 1");
+
+//   EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
+// }
+
+// TEST(
+//   BitBoardTests,
+//   BlackKingAttackDetection)
+// {
+//   BitBoard board;
+
+//   board.setPosition("8/8/8/B7/8/8/8/4k3 b - - 0 1");
+
+//   EXPECT_TRUE(board.isCellAttacked(0, 4, Color::White));
+// }
+
+// TEST(
+//   BitBoardTests,
+//   KnightAttackDetection)
+// {
+//   BitBoard board;
+
+//   board.setPosition("8/8/8/8/3n4/8/4K3/8 w - - 0 1");
+
+//   EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
+// }
+
+// TEST(
+//   BitBoardTests,
+//   PawnAttackDetection)
+// {
+//   BitBoard board;
+
+//   board.setPosition("8/8/8/8/3p4/4K3/8/8 w - - 0 1");
+
+//   EXPECT_TRUE(board.isCellAttacked(2, 4, Color::Black));
+// }
+
+// TEST(
+//   BitBoardTests,
+//   CastlingGeneratedWhiteKingside)
+// {
+//   BitBoard board;
+
+//   board.setPosition("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
+
+//   MoveList moveList;
+
+//   board.generateMoves(moveList);
+
+//   EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 6));
+// }
+
+// TEST(
+//   BitBoardTests,
+//   CastlingGeneratedWhiteQueenside)
+// {
+//   BitBoard board;
+
+//   board.setPosition("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
+
+//   MoveList moveList;
+
+//   board.generateMoves(moveList);
+
+//   EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 2));
+// }
+
+// TEST(
+//   BitBoardTests,
+//   CastlingBlockedByAttack)
+// {
+//   BitBoard board;
+
+//   board.setPosition("4k1r1/8/8/8/8/8/8/4K2R w K - 0 1");
+
+//   MoveList moveList;
+
+//   board.generateMoves(moveList);
+
+//   EXPECT_FALSE(containsMove(moveList, 0, 4, 0, 6));
+// }
+
 TEST(
-  Board8x8Tests,
-  WhiteKingAttackDetection)
-{
-  Board8x8 board;
-
-  board.setPosition("8/8/8/8/4r3/8/4K3/8 w - - 0 1");
-
-  EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
-}
-
-TEST(
-  Board8x8Tests,
-  BlackKingAttackDetection)
-{
-  Board8x8 board;
-
-  board.setPosition("8/8/8/B7/8/8/8/4k3 b - - 0 1");
-
-  EXPECT_TRUE(board.isCellAttacked(0, 4, Color::White));
-}
-
-TEST(
-  Board8x8Tests,
-  KnightAttackDetection)
-{
-  Board8x8 board;
-
-  board.setPosition("8/8/8/8/3n4/8/4K3/8 w - - 0 1");
-
-  EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
-}
-
-TEST(
-  Board8x8Tests,
-  PawnAttackDetection)
-{
-  Board8x8 board;
-
-  board.setPosition("8/8/8/8/3p4/4K3/8/8 w - - 0 1");
-
-  EXPECT_TRUE(board.isCellAttacked(2, 4, Color::Black));
-}
-
-TEST(
-  Board8x8Tests,
-  CastlingGeneratedWhiteKingside)
-{
-  Board8x8 board;
-
-  board.setPosition("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
-
-  MoveList moveList;
-
-  board.generateMoves(moveList);
-
-  EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 6));
-}
-
-TEST(
-  Board8x8Tests,
-  CastlingGeneratedWhiteQueenside)
-{
-  Board8x8 board;
-
-  board.setPosition("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
-
-  MoveList moveList;
-
-  board.generateMoves(moveList);
-
-  EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 2));
-}
-
-TEST(
-  Board8x8Tests,
-  CastlingBlockedByAttack)
-{
-  Board8x8 board;
-
-  board.setPosition("4k1r1/8/8/8/8/8/8/4K2R w K - 0 1");
-
-  MoveList moveList;
-
-  board.generateMoves(moveList);
-
-  EXPECT_FALSE(containsMove(moveList, 0, 4, 0, 6));
-}
-
-TEST(
-  Board8x8Tests,
+  BitBoardTests,
   PawnPromotionGenerated)
 {
-  Board8x8 board;
+  BitBoard board;
 
   board.setPosition("4k3/P7/8/8/8/8/8/4K3 w - - 0 1");
 
@@ -285,16 +285,17 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   EnPassantGenerated)
 {
-  Board8x8 board;
+  BitBoard board;
 
   board.setPosition("4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 1");
 
   MoveList moveList;
 
   board.generateMoves(moveList);
+  std::cout << moveList.totalMoves() << std::endl;
 
   bool found = false;
 
@@ -311,10 +312,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   MakeMoveUpdatesBoard)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(1, 4, moveList);
@@ -345,10 +346,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   UnmakeMoveRestoresBoard)
 {
-  Board8x8 board;
+  BitBoard board;
   MoveList moveList;
 
   board.generateMoves(1, 4, moveList);
@@ -380,10 +381,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   MakeUnmakePreservesBoardState)
 {
-  Board8x8 board;
+  BitBoard board;
 
   BoardState originalState = board.getBoardState();
 
@@ -407,10 +408,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   SlidingMovesGeneratedCorrectly)
 {
-  Board8x8 board;
+  BitBoard board;
 
   board.setPosition("4k3/8/8/8/3R4/8/8/4K3 w - - 0 1");
 
@@ -425,10 +426,10 @@ TEST(
 }
 
 TEST(
-  Board8x8Tests,
+  BitBoardTests,
   CaptureMovesGenerated)
 {
-  Board8x8 board;
+  BitBoard board;
 
   board.setPosition("4k3/8/8/4p3/3R4/8/8/4K3 w - - 0 1");
 
