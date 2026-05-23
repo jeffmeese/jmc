@@ -170,94 +170,94 @@ TEST(
   EXPECT_EQ(moveList.totalMoves(), 0);
 }
 
-// TEST(
-//   BitBoardTests,
-//   WhiteKingAttackDetection)
-// {
-//   BitBoard board;
+TEST(
+  BitBoardTests,
+  WhiteKingAttackDetection)
+{
+  BitBoard board;
 
-//   board.setPosition("8/8/8/8/4r3/8/4K3/8 w - - 0 1");
+  board.setPosition("8/8/8/8/4r3/8/4K3/8 w - - 0 1");
 
-//   EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
-// }
+  EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
+}
 
-// TEST(
-//   BitBoardTests,
-//   BlackKingAttackDetection)
-// {
-//   BitBoard board;
+TEST(
+  BitBoardTests,
+  BlackKingAttackDetection)
+{
+  BitBoard board;
 
-//   board.setPosition("8/8/8/B7/8/8/8/4k3 b - - 0 1");
+  board.setPosition("8/8/8/B7/8/8/8/4k3 b - - 0 1");
 
-//   EXPECT_TRUE(board.isCellAttacked(0, 4, Color::White));
-// }
+  EXPECT_TRUE(board.isCellAttacked(0, 4, Color::White));
+}
 
-// TEST(
-//   BitBoardTests,
-//   KnightAttackDetection)
-// {
-//   BitBoard board;
+TEST(
+  BitBoardTests,
+  KnightAttackDetection)
+{
+  BitBoard board;
 
-//   board.setPosition("8/8/8/8/3n4/8/4K3/8 w - - 0 1");
+  board.setPosition("8/8/8/8/3n4/8/4K3/8 w - - 0 1");
 
-//   EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
-// }
+  EXPECT_TRUE(board.isCellAttacked(1, 4, Color::Black));
+}
 
-// TEST(
-//   BitBoardTests,
-//   PawnAttackDetection)
-// {
-//   BitBoard board;
+TEST(
+  BitBoardTests,
+  PawnAttackDetection)
+{
+  BitBoard board;
 
-//   board.setPosition("8/8/8/8/3p4/4K3/8/8 w - - 0 1");
+  board.setPosition("8/8/8/8/3p4/4K3/8/8 w - - 0 1");
 
-//   EXPECT_TRUE(board.isCellAttacked(2, 4, Color::Black));
-// }
+  EXPECT_TRUE(board.isCellAttacked(2, 4, Color::Black));
+}
 
-// TEST(
-//   BitBoardTests,
-//   CastlingGeneratedWhiteKingside)
-// {
-//   BitBoard board;
+TEST(
+  BitBoardTests,
+  CastlingGeneratedWhiteKingside)
+{
+  BitBoard board;
 
-//   board.setPosition("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
+  board.setPosition("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
 
-//   MoveList moveList;
+  MoveList moveList;
 
-//   board.generateMoves(moveList);
+  board.generateMoves(moveList);
 
-//   EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 6));
-// }
+  EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 6));
+}
 
-// TEST(
-//   BitBoardTests,
-//   CastlingGeneratedWhiteQueenside)
-// {
-//   BitBoard board;
+TEST(
+  BitBoardTests,
+  CastlingGeneratedWhiteQueenside)
+{
+  BitBoard board;
 
-//   board.setPosition("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
+  board.setPosition("4k3/8/8/8/8/8/8/R3K3 w Q - 0 1");
 
-//   MoveList moveList;
+  MoveList moveList;
 
-//   board.generateMoves(moveList);
+  board.generateMoves(moveList);
 
-//   EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 2));
-// }
+  EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 2));
+}
 
-// TEST(
-//   BitBoardTests,
-//   CastlingBlockedByAttack)
-// {
-//   BitBoard board;
+TEST(
+  BitBoardTests,
+  CastlingBlockedByAttack)
+{
+  BitBoard board;
 
-//   board.setPosition("4k1r1/8/8/8/8/8/8/4K2R w K - 0 1");
+  board.setPosition("4k1r1/8/8/8/8/8/8/4K2R w K - 0 1");
 
-//   MoveList moveList;
+  MoveList moveList;
 
-//   board.generateMoves(moveList);
+  board.generateMoves(moveList);
 
-//   EXPECT_FALSE(containsMove(moveList, 0, 4, 0, 6));
-// }
+  EXPECT_FALSE(containsMove(moveList, 0, 4, 0, 6));
+}
 
 TEST(
   BitBoardTests,

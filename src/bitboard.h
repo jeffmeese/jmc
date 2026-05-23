@@ -70,6 +70,11 @@ private:
 
   int bitScanReverse(std::uint64_t bb) const;
 
+  bool checkSliderAttacks(
+    std::uint64_t attacks,
+    std::uint64_t attackingPieces,
+    std::uint64_t enemyPieces) const;
+
   void generateCastlingMoves(
     Color sideToMove,
     MoveList & moveList) const;
@@ -137,7 +142,7 @@ private:
   bool isCellAttacked(
     std::int8_t index,
     Color attackingColor) const;
-    
+
   void pushMove(
     std::int8_t fromIndex,
     std::int8_t toIndex,
@@ -160,7 +165,7 @@ private:
   std::uint64_t mBlackPieces;
   std::uint64_t mAllPieces;
   std::uint64_t mEmptySquares;
-  std::uint64_t mEnemyBitboards[5];
+  //std::uint64_t mEnemyBitboards[5];
   std::uint64_t mBitBoards[12];
   std::map<Piece, std::int32_t> mPieceToIndex;
   Attacks mAttacks[64];
