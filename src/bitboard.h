@@ -160,7 +160,6 @@ private:
   std::uint64_t mBlackPieces;
   std::uint64_t mAllPieces;
   std::uint64_t mBitBoards[12];
-  //std::map<Piece, std::int32_t> mPieceToIndex;
   Attacks mAttacks[64];
 };
 

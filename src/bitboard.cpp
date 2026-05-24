@@ -519,7 +519,6 @@ void BitBoard::generatePawnCapturesBlack(
         }
       }
     }
-
     pawns &= pawns - 1;
   }
 }
@@ -527,12 +526,13 @@ void BitBoard::generatePawnCapturesBlack(
 void BitBoard::generatePawnPushesBlack(
   MoveList & moveList) const
 {
-  std::uint64_t unmovedPawns   = mBitBoards[PAWN_INDEX + 6] & RANK_7;
-  std::uint64_t singlePushOpen = ~(mAllPieces << 8);
-  std::uint64_t doublePushOpen = ~(mAllPieces << 8) & ~(mAllPieces << 16);
   std::uint64_t empty          = ~mAllPieces;
-  std::uint64_t singlePushes   = ((mBitBoards[PAWN_INDEX + 6] >> 8) & empty);
-  std::uint64_t doublePushes   = ((((mBitBoards[PAWN_INDEX + 6] & RANK_7) >> 8) & empty) >> 8) & empty;
+  std::uint64_t pawns          = mBitBoards[PAWN_INDEX + 6];
+  std::uint64_t unmovedPawns   = pawns & RANK_7;
+  std::uint64_t singlePushOpen = ~(mAllPieces << 8);
+  std::uint64_t doublePushOpen = singlePushOpen & ~(mAllPieces << 16);
+  std::uint64_t singlePushes   = ((pawns >> 8) & empty);
+  std::uint64_t doublePushes   = (((unmovedPawns >> 8) & empty) >> 8) & empty;
   std::uint64_t pawnPromotions = (singlePushes & RANK_1);
 
   singlePushes &= ~pawnPromotions;
@@ -617,12 +617,13 @@ void BitBoard::generatePawnCapturesWhite(
 void BitBoard::generatePawnPushesWhite(
   MoveList & moveList) const
 {
-  std::uint64_t unmovedPawns   = mBitBoards[PAWN_INDEX] & RANK_2;
-  std::uint64_t singlePushOpen = ~(mAllPieces >> 8);
-  std::uint64_t doublePushOpen = ~(mAllPieces >> 8) & ~(mAllPieces >> 16);
   std::uint64_t empty          = ~mAllPieces;
-  std::uint64_t singlePushes   = ((mBitBoards[PAWN_INDEX] << 8) & empty);
-  std::uint64_t doublePushes   = ((((mBitBoards[PAWN_INDEX] & RANK_2) << 8) & empty) << 8) & empty;
+  std::uint64_t pawns          = mBitBoards[PAWN_INDEX];
+  std::uint64_t unmovedPawns   = pawns & RANK_2;
+  std::uint64_t singlePushOpen = ~(mAllPieces >> 8);
+  std::uint64_t doublePushOpen = singlePushOpen & ~(mAllPieces >> 16);
+  std::uint64_t singlePushes   = ((pawns << 8) & empty);
+  std::uint64_t doublePushes   = (((unmovedPawns << 8) & empty) << 8) & empty;
   std::uint64_t pawnPromotions = (singlePushes & RANK_8);
 
   singlePushes &= ~pawnPromotions;
@@ -721,7 +722,6 @@ BoardState BitBoard::getBoardState() const
 Piece BitBoard::getCapturedPiece(
   std::int8_t square) const
 {
-  // The order of these must match the order of the bitboards in mEnemyPieces
   static constexpr Piece pieceTypes[5] = {Piece::Pawn, Piece::Knight, Piece::Bishop, Piece::Rook, Piece::Queen};
 
   std::uint64_t captureBitBoard = (1ULL << square);
@@ -1403,8 +1403,8 @@ void BitBoard::unmakeMove(
   const Move & move)
 {
   // Do some general calculations
-  BoardState boardState = move.getBoardState();
-  Color sideThatMoved   = boardState.sideToMove;
+  BoardState boardState        = move.getBoardState();
+  Color sideThatMoved          = boardState.sideToMove;
   Square sourceSquare          = move.getSourceSquare();
   Square destSquare            = move.getDestinationSquare();
   Piece movedPiece             = move.getPiece();
