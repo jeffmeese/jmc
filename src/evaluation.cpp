@@ -113,21 +113,21 @@ namespace jmchess
 double Evaluation::evaluate(
   const Board * board)
 {
-  double pieceWeight = 0.0;
+  double pieceWeight    = 0.0;
   double mobilityWeight = 0.0;
 
-  const double * pawnSquareTable = MiddleGamePawnSquareValue;
+  const double * pawnSquareTable   = MiddleGamePawnSquareValue;
   const double * knightSquareTable = MiddleGameKnightSquareValue;
   const double * bishopSquareTable = MiddleGameBishopSquareValue;
-  const double * rookSquareTable = MiddleGameRookSquareValue;
-  const double * queenSquareTable = MiddleGameQueenSquareValue;
-  const double * kingSquareTable = MiddleGameKingSquareValue;
+  const double * rookSquareTable   = MiddleGameRookSquareValue;
+  const double * queenSquareTable  = MiddleGameQueenSquareValue;
+  const double * kingSquareTable   = MiddleGameKingSquareValue;
 
   for (std::int8_t i = 0; i < 8; i++)
   {
     for (std::int8_t j = 0; j < 8; j++)
     {
-      std::int8_t index = getIndex(i, j);
+      std::int8_t index   = getIndex(i, j);
       PieceType pieceType = board->getPieceType(i, j);
       switch (pieceType)
       {
