@@ -37,18 +37,16 @@ void Perft::divide(
   {
     const Move & move = moveList.getMove(i);
 
-    mBoard->makeMove(move);
-    bool attacked = mBoard->isKingInCheck(sideToMove);
-    if (!attacked)
+    bool isLegal = mBoard->makeMove(move);
+    if (isLegal)
     {
       std::uint64_t nodes    = executePerft(perftDepth - 1);
       std::string moveString = move.toSmithNotation();
       std::cout << moveString << ": " << nodes << "\n";
       totalNodes += nodes;
       validMoves++;
+      mBoard->unmakeMove(move);
     }
-
-    mBoard->unmakeMove(move);
   }
 
   std::cout << "\n";
@@ -83,13 +81,12 @@ std::uint64_t Perft::executePerft(
   {
     const Move & move = moveList.getMove(i);
 
-    mBoard->makeMove(move);
-    bool attacked = mBoard->isKingInCheck(sideToMove);
-    if (!attacked)
+    bool isLegal = mBoard->makeMove(move);
+    if (isLegal)
     {
       totalNodes += executePerft(perftDepth - 1);
+      mBoard->unmakeMove(move);
     }
-    mBoard->unmakeMove(move);
   }
 
   return totalNodes;
