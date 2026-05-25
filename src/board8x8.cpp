@@ -764,7 +764,7 @@ bool Board8x8::isKingInCheck(
   return isCellAttacked(index, attackColor);
 }
 
-void Board8x8::makeMove(
+bool Board8x8::makeMove(
   const Move & move)
 {
   BoardState boardState   = move.getBoardState();
@@ -913,6 +913,17 @@ void Board8x8::makeMove(
 
   // Update side to move
   mBoardState.sideToMove = (sideToMove == Color::White) ? Color::Black : Color::White;
+
+  // Check if the king is in check. If it is
+  // this is not a legal move. Unmake it right away
+  // and return false
+  if (isKingInCheck(sideToMove))
+  {
+    unmakeMove(move);
+    return false;
+  }
+
+  return true;
 }
 
 void Board8x8::pushMove(

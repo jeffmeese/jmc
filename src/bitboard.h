@@ -47,7 +47,7 @@ public:
 
   bool isKingInCheck(Color color) const override;
 
-  void makeMove(const Move & move) override;
+  bool makeMove(const Move & move) override;
 
   void reset() override;
 

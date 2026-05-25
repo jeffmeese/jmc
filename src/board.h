@@ -49,7 +49,7 @@ public:
 
   virtual bool isKingInCheck(Color color) const = 0;
 
-  virtual void makeMove(const Move & move) = 0;
+  virtual bool makeMove(const Move & move) = 0;
 
   virtual void reset() = 0;
 

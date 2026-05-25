@@ -1069,7 +1069,7 @@ bool BitBoard::isKingInCheck(
   return isCellAttacked(index, attackColor);
 }
 
-void BitBoard::makeMove(
+bool BitBoard::makeMove(
   const Move & move)
 {
   // Perform some general calculations
@@ -1271,6 +1271,17 @@ void BitBoard::makeMove(
 
   // Update the aggregated bitboards
   updateAggregateBitboards();
+
+  // Check if the king is in check. If it is
+  // this is not a legal move. Unmake it right away
+  // and return false
+  if (isKingInCheck(sideToMove))
+  {
+    unmakeMove(move);
+    return false;
+  }
+
+  return true;
 }
 
 void BitBoard::pushMove(
