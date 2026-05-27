@@ -120,8 +120,31 @@ void ConsoleGame::handleDivideCommand(std::istream & input)
 
 void ConsoleGame::handleEngineCommand()
 {
-  jmchess::Move move = getEngine()->getMove(getBoard());
-  makeMove(move);
+  if (isCheckmate() || isStalemate())
+  {
+    std::cout << "Game is over" << std::endl;
+    return;
+  }
+
+  performEngineCommand();
+
+  if (isCheckmate())
+  {
+    jmchess::Color sideToMove = getBoard()->getBoardState().sideToMove;
+    if (sideToMove == jmchess::Color::White)
+    {
+      std::cout << "Checkmate: Black Wins" << std::endl;
+    }
+    else
+    {
+      std::cout << "Checkmate: White Wins" << std::endl;
+    }
+  }
+
+  if (isStalemate())
+  {
+    std::cout << "Stalemate" << std::endl;
+  }
 }
 
 void ConsoleGame::handleEvalCommand()
@@ -202,6 +225,24 @@ void ConsoleGame::handleMoveCommand(
   const jmchess::Move & selectedMove = moveList.getMove(moveIndex);
 
   makeMove(selectedMove);
+
+  if (isCheckmate())
+  {
+    jmchess::Color sideToMove = getBoard()->getBoardState().sideToMove;
+    if (sideToMove == jmchess::Color::White)
+    {
+      std::cout << "Checkmate: Black Wins" << std::endl;
+    }
+    else
+    {
+      std::cout << "Checkmate: White Wins" << std::endl;
+    }
+  }
+
+  if (isStalemate())
+  {
+    std::cout << "Stalemate" << std::endl;
+  }
 }
 
 void ConsoleGame::handleNewCommand()
@@ -343,19 +384,11 @@ void ConsoleGame::handleShowCommand()
   for (std::uint8_t i = 0; i < moveList.totalMoves(); i++)
   {
     const jmchess::Move & move = moveList.getMove(i);
-    bool validMove             = false;
-
-    board->makeMove(move);
-    bool attacked = board->isKingInCheck(sideToMove);
-    if (!attacked)
+    bool isLegal = board->makeMove(move);
+    if (isLegal)
     {
       totalMoves++;
-      validMove = true;
-    }
-    board->unmakeMove(move);
-
-    if (validMove)
-    {
+      board->unmakeMove(move);
       std::cout << move.toSmithNotation() << "\n";
     }
   }
