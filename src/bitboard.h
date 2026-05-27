@@ -149,7 +149,7 @@ private:
   void pushMove(
     std::int8_t fromIndex,
     std::int8_t toIndex,
-    Piece piece,
+    std::uint32_t flags,
     Piece capturePiece,
     Piece promotionPiece,
     Move::Type type,
@@ -162,11 +162,13 @@ private:
     std::ostream & output) const;
 
   BoardState mBoardState;
-  Square mBlackKingSquare;
-  Square mWhiteKingSquare;
-  std::uint64_t mWhitePieces;
-  std::uint64_t mBlackPieces;
-  std::uint64_t mAllPieces;
+  std::int8_t mBlackKingIndex = 0;
+  std::int8_t mWhiteKingIndex = 0;
+  //Square mBlackKingSquare;
+  //Square mWhiteKingSquare;
+  std::uint64_t mWhitePieces = 0;
+  std::uint64_t mBlackPieces = 0;
+  std::uint64_t mAllPieces = 0;
   std::uint64_t mBitBoards[12];
   Attacks mAttacks[64];
   Cell mCells[64];

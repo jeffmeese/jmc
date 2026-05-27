@@ -10,6 +10,21 @@
 namespace jmchess
 {
 
+static constexpr std::uint32_t MOVE_QUIET                    = 0x00;
+static constexpr std::uint32_t MOVE_DOUBLE_PAWN_PUSH         = 0x01;
+static constexpr std::uint32_t MOVE_KING_CASTLE              = 0x02;
+static constexpr std::uint32_t MOVE_QUEEN_CASTLE             = 0x03;
+static constexpr std::uint32_t MOVE_CAPTURE                  = 0x04;
+static constexpr std::uint32_t MOVE_ENPASSANT_CAPTURE        = 0x05;
+static constexpr std::uint32_t MOVE_KNIGHT_PROMOTION         = 0x08;
+static constexpr std::uint32_t MOVE_BISHOP_PROMOTION         = 0x09;
+static constexpr std::uint32_t MOVE_ROOK_PROMOTION           = 0x0A;
+static constexpr std::uint32_t MOVE_QUEEN_PROMOTION          = 0x0B;
+static constexpr std::uint32_t MOVE_KNIGHT_PROMOTION_CAPTURE = 0x0C;
+static constexpr std::uint32_t MOVE_BISHOP_PROMOTION_CAPTURE = 0x0D;
+static constexpr std::uint32_t MOVE_ROOK_PROMOTION_CAPTURE   = 0x0E;
+static constexpr std::uint32_t MOVE_QUEEN_PROMOTION_CAPTURE  = 0x0F;
+
 class Move
 {
 public:
@@ -26,9 +41,11 @@ public:
   };
 
   Move(
-    const Square & source,
-    const Square & destination,
-    Piece piece,
+    std::int8_t sourceIndex,
+    std::int8_t destIndex,
+    // const Square & source,
+    // const Square & destination,
+    std::uint32_t flags,
     BoardState boardState,
     Type type           = Type::Quiet,
     Piece capturePiece  = Piece::None,
@@ -36,10 +53,11 @@ public:
 
   BoardState getBoardState() const;
   Piece getCapturedPiece() const;
-  Square getDestinationSquare() const;
-  Piece getPiece() const;
+  std::int8_t getDestinationIndex() const;
+  // Square getDestinationSquare() const;
   Piece getPromotedPiece() const;
-  Square getSourceSquare() const;
+  std::int8_t getSourceIndex() const;
+  // Square getSourceSquare() const;
   Type getType() const;
 
   bool isCapture() const;
@@ -57,12 +75,14 @@ public:
     const Move & move2);
 
 private:
-  Square mSource       = {0, 0};
-  Square mDestination  = {0, 0};
-  Piece mPiece         = Piece::None;
-  Piece mCapturedPiece = Piece::None;
-  Piece mPromotedPiece = Piece::None;
-  Type mType           = Type::Quiet;
+  // Square mSource       = {0, 0};
+  // Square mDestination  = {0, 0};
+  std::int8_t mSourceIndex = -1;
+  std::int8_t mDestIndex   = -1;
+  std::uint32_t mFlags     = 0;
+  Piece mCapturedPiece     = Piece::None;
+  Piece mPromotedPiece     = Piece::None;
+  Type mType               = Type::Quiet;
   BoardState mBoardState;
 };
 

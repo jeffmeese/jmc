@@ -243,7 +243,7 @@ void BitBoard::generateSlidingMoves(
     while (quietMoves)
     {
       std::int8_t toSquare = bitScanForward(quietMoves);
-      pushMove(fromSquare, toSquare, pieceType, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+      pushMove(fromSquare, toSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
       quietMoves &= quietMoves - 1;
     }
 
@@ -251,7 +251,7 @@ void BitBoard::generateSlidingMoves(
     {
       std::int8_t toSquare = bitScanForward(captureMoves);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, pieceType, capturePiece, Piece::None, Move::Type::Capture, moveList);
+      pushMove(fromSquare, toSquare, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
       captureMoves &= captureMoves - 1;
     }
 
@@ -283,7 +283,7 @@ void BitBoard::generateCastlingMoves(
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(F1, attackColor) && !isCellAttacked(G1, attackColor))
         {
-          pushMove(E1, G1, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E1, G1, MOVE_KING_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -297,7 +297,7 @@ void BitBoard::generateCastlingMoves(
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(D1, attackColor) && !isCellAttacked(C1, attackColor))
         {
-          pushMove(E1, C1, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E1, C1, MOVE_QUEEN_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -313,7 +313,7 @@ void BitBoard::generateCastlingMoves(
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(F8, attackColor) && !isCellAttacked(G8, attackColor))
         {
-          pushMove(E8, G8, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E8, G8, MOVE_KING_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -327,7 +327,7 @@ void BitBoard::generateCastlingMoves(
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(D8, attackColor) && !isCellAttacked(C8, attackColor))
         {
-          pushMove(E8, C8, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E8, C8, MOVE_QUEEN_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -381,7 +381,7 @@ void BitBoard::generateDiagonalMoves(
     while (quietMoves)
     {
       std::int8_t toSquare = bitScanForward(quietMoves);
-      pushMove(fromSquare, toSquare, pieceType, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+      pushMove(fromSquare, toSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
       quietMoves &= quietMoves - 1;
     }
 
@@ -389,7 +389,7 @@ void BitBoard::generateDiagonalMoves(
     {
       std::int8_t toSquare = bitScanForward(captureMoves);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, pieceType, capturePiece, Piece::None, Move::Type::Capture, moveList);
+      pushMove(fromSquare, toSquare, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
       captureMoves &= captureMoves - 1;
     }
 
@@ -412,7 +412,7 @@ void BitBoard::generateKingMoves(
     while (quietMoves)
     {
       std::int8_t toSquare = bitScanForward(quietMoves);
-      pushMove(fromSquare, toSquare, Piece::King, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+      pushMove(fromSquare, toSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
       quietMoves &= quietMoves - 1;
     }
 
@@ -420,7 +420,7 @@ void BitBoard::generateKingMoves(
     {
       std::int8_t toSquare = bitScanForward(captureMoves);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, Piece::King, capturePiece, Piece::None, Move::Type::Capture, moveList);
+      pushMove(fromSquare, toSquare, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
       captureMoves &= captureMoves - 1;
     }
 
@@ -442,7 +442,7 @@ void BitBoard::generateKnightMoves(
     while (quietMoves)
     {
       std::int8_t toSquare = bitScanForward(quietMoves);
-      pushMove(fromSquare, toSquare, Piece::Knight, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+      pushMove(fromSquare, toSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
       quietMoves &= quietMoves - 1;
     }
 
@@ -450,7 +450,7 @@ void BitBoard::generateKnightMoves(
     {
       std::int8_t toSquare = bitScanForward(captureMoves);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, Piece::Knight, capturePiece, Piece::None, Move::Type::Capture, moveList);
+      pushMove(fromSquare, toSquare, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
       captureMoves &= captureMoves - 1;
     }
 
@@ -592,7 +592,7 @@ void BitBoard::generatePawnCapturesBlack(
     {
       std::int8_t toSquare = bitScanForward(captureMoves);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::None, Move::Type::Capture, moveList);
+      pushMove(fromSquare, toSquare, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
       captureMoves &= captureMoves - 1;
     }
 
@@ -600,10 +600,18 @@ void BitBoard::generatePawnCapturesBlack(
     {
       std::int8_t toSquare = bitScanForward(promotionCaptures);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Queen, Move::Type::PromotionCapture, moveList);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Rook, Move::Type::PromotionCapture, moveList);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Bishop, Move::Type::PromotionCapture, moveList);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Knight, Move::Type::PromotionCapture, moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, Piece::Queen, Move::Type::PromotionCapture,
+        moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, Piece::Rook, Move::Type::PromotionCapture,
+        moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, Piece::Bishop, Move::Type::PromotionCapture,
+        moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, Piece::Knight, Move::Type::PromotionCapture,
+        moveList);
       promotionCaptures &= promotionCaptures - 1;
     }
 
@@ -616,7 +624,9 @@ void BitBoard::generatePawnCapturesBlack(
         if (std::abs(int(col - mBoardState.enpassantColumn)) == 1)
         {
           std::int8_t toSquare = getIndex(row - 1, mBoardState.enpassantColumn);
-          pushMove(fromSquare, toSquare, Piece::Pawn, Piece::Pawn, Piece::None, Move::Type::EnpassantCapture, moveList);
+          pushMove(
+            fromSquare, toSquare, MOVE_ENPASSANT_CAPTURE, Piece::Pawn, Piece::None, Move::Type::EnpassantCapture,
+            moveList);
         }
       }
     }
@@ -642,7 +652,7 @@ void BitBoard::generatePawnPushesBlack(
   {
     std::int8_t toSquare   = bitScanForward(singlePushes);
     std::int8_t fromSquare = toSquare + 8;
-    pushMove(fromSquare, toSquare, Piece::Pawn, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+    pushMove(fromSquare, toSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
     singlePushes &= singlePushes - 1;
   }
 
@@ -650,7 +660,8 @@ void BitBoard::generatePawnPushesBlack(
   {
     std::int8_t toSquare   = bitScanForward(doublePushes);
     std::int8_t fromSquare = toSquare + 16;
-    pushMove(fromSquare, toSquare, Piece::Pawn, Piece::None, Piece::None, Move::Type::EnpassantPush, moveList);
+    pushMove(
+      fromSquare, toSquare, MOVE_DOUBLE_PAWN_PUSH, Piece::None, Piece::None, Move::Type::EnpassantPush, moveList);
     doublePushes &= doublePushes - 1;
   }
 
@@ -658,10 +669,10 @@ void BitBoard::generatePawnPushesBlack(
   {
     uint8_t toSq   = bitScanForward(pawnPromotions);
     uint8_t fromSq = toSq + 8;
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Queen, Move::Type::Promotion, moveList);
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Rook, Move::Type::Promotion, moveList);
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Bishop, Move::Type::Promotion, moveList);
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Knight, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_QUEEN_PROMOTION, Piece::None, Piece::Queen, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_ROOK_PROMOTION, Piece::None, Piece::Rook, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_BISHOP_PROMOTION, Piece::None, Piece::Bishop, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_KNIGHT_PROMOTION, Piece::None, Piece::Knight, Move::Type::Promotion, moveList);
     pawnPromotions &= pawnPromotions - 1;
   }
 }
@@ -683,7 +694,7 @@ void BitBoard::generatePawnCapturesWhite(
     {
       std::int8_t toSquare = bitScanForward(captureMoves);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::None, Move::Type::Capture, moveList);
+      pushMove(fromSquare, toSquare, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
       captureMoves &= captureMoves - 1;
     }
 
@@ -691,10 +702,18 @@ void BitBoard::generatePawnCapturesWhite(
     {
       std::int8_t toSquare = bitScanForward(promotionCaptures);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Queen, Move::Type::PromotionCapture, moveList);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Rook, Move::Type::PromotionCapture, moveList);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Bishop, Move::Type::PromotionCapture, moveList);
-      pushMove(fromSquare, toSquare, Piece::Pawn, capturePiece, Piece::Knight, Move::Type::PromotionCapture, moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, Piece::Queen, Move::Type::PromotionCapture,
+        moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, Piece::Rook, Move::Type::PromotionCapture,
+        moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, Piece::Bishop, Move::Type::PromotionCapture,
+        moveList);
+      pushMove(
+        fromSquare, toSquare, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, Piece::Knight, Move::Type::PromotionCapture,
+        moveList);
       promotionCaptures &= promotionCaptures - 1;
     }
 
@@ -707,7 +726,9 @@ void BitBoard::generatePawnCapturesWhite(
         if (abs(col - mBoardState.enpassantColumn) == 1)
         {
           std::int8_t toSquare = getIndex(row + 1, mBoardState.enpassantColumn);
-          pushMove(fromSquare, toSquare, Piece::Pawn, Piece::Pawn, Piece::None, Move::Type::EnpassantCapture, moveList);
+          pushMove(
+            fromSquare, toSquare, MOVE_ENPASSANT_CAPTURE, Piece::Pawn, Piece::None, Move::Type::EnpassantCapture,
+            moveList);
         }
       }
     }
@@ -733,7 +754,7 @@ void BitBoard::generatePawnPushesWhite(
   {
     std::int8_t toSquare   = bitScanForward(singlePushes);
     std::int8_t fromSquare = toSquare - 8;
-    pushMove(fromSquare, toSquare, Piece::Pawn, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+    pushMove(fromSquare, toSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
     singlePushes &= singlePushes - 1;
   }
 
@@ -741,7 +762,8 @@ void BitBoard::generatePawnPushesWhite(
   {
     std::int8_t toSquare   = bitScanForward(doublePushes);
     std::int8_t fromSquare = toSquare - 16;
-    pushMove(fromSquare, toSquare, Piece::Pawn, Piece::None, Piece::None, Move::Type::EnpassantPush, moveList);
+    pushMove(
+      fromSquare, toSquare, MOVE_DOUBLE_PAWN_PUSH, Piece::None, Piece::None, Move::Type::EnpassantPush, moveList);
     doublePushes &= doublePushes - 1;
   }
 
@@ -749,10 +771,10 @@ void BitBoard::generatePawnPushesWhite(
   {
     std::uint8_t toSq   = bitScanForward(pawnPromotions);
     std::uint8_t fromSq = toSq - 8;
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Queen, Move::Type::Promotion, moveList);
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Rook, Move::Type::Promotion, moveList);
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Bishop, Move::Type::Promotion, moveList);
-    pushMove(fromSq, toSq, Piece::Pawn, Piece::None, Piece::Knight, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_QUEEN_PROMOTION, Piece::None, Piece::Queen, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_ROOK_PROMOTION, Piece::None, Piece::Rook, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_BISHOP_PROMOTION, Piece::None, Piece::Bishop, Move::Type::Promotion, moveList);
+    pushMove(fromSq, toSq, MOVE_KNIGHT_PROMOTION, Piece::None, Piece::Knight, Move::Type::Promotion, moveList);
     pawnPromotions &= pawnPromotions - 1;
   }
 }
@@ -799,7 +821,7 @@ void BitBoard::generateStraightMoves(
     while (quietMoves)
     {
       std::int8_t toSquare = bitScanForward(quietMoves);
-      pushMove(fromSquare, toSquare, pieceType, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+      pushMove(fromSquare, toSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
       quietMoves &= quietMoves - 1;
     }
 
@@ -807,7 +829,7 @@ void BitBoard::generateStraightMoves(
     {
       std::int8_t toSquare = bitScanForward(captureMoves);
       Piece capturePiece   = getCapturedPiece(toSquare);
-      pushMove(fromSquare, toSquare, pieceType, capturePiece, Piece::None, Move::Type::Capture, moveList);
+      pushMove(fromSquare, toSquare, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
       captureMoves &= captureMoves - 1;
     }
 
@@ -882,13 +904,15 @@ Piece BitBoard::getCapturedPiece(
 std::int8_t BitBoard::getKingColumn(
   Color color) const
 {
-  return (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
+  return (color == Color::White) ? getCol(mWhiteKingIndex) : getCol(mBlackKingIndex);
+  // return (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
 }
 
 std::int8_t BitBoard::getKingRow(
   Color color) const
 {
-  return (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
+  return (color == Color::White) ? getRow(mWhiteKingIndex) : getRow(mBlackKingIndex);
+  // return (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
 }
 
 PieceType BitBoard::getPieceType(
@@ -1228,8 +1252,10 @@ bool BitBoard::isCellAttacked(
 bool BitBoard::isKingInCheck(
   Color color) const
 {
-  std::int8_t row    = (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
-  std::int8_t column = (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
+  // std::int8_t row    = (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
+  // std::int8_t column = (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
+  std::int8_t row    = getKingRow(color);
+  std::int8_t column = getKingColumn(color);
   Color attackColor  = (color == Color::White) ? Color::Black : Color::White;
   std::int8_t index  = getIndex(row, column);
 
@@ -1240,13 +1266,16 @@ bool BitBoard::makeMove(
   const Move & move)
 {
   // Perform some general calculations
-  BoardState boardState        = move.getBoardState();
+  BoardState boardState   = move.getBoardState();
+  std::int8_t sourceIndex = move.getSourceIndex();
+  std::int8_t destIndex   = move.getDestinationIndex();
+  // Square sourceSquare   = move.getSourceSquare();
+  // Square destSquare     = move.getDestinationSquare();
+  //  Piece movedPiece             = move.getPiece();
+  // std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
+  // std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
   Color sideToMove             = boardState.sideToMove;
-  Square sourceSquare          = move.getSourceSquare();
-  Square destSquare            = move.getDestinationSquare();
-  Piece movedPiece             = move.getPiece();
-  std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
-  std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  Piece movedPiece             = mCells[sourceIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
   mBoardState.enpassantColumn  = INVALID_ENPASSANT_COLUMN;
@@ -1273,9 +1302,12 @@ bool BitBoard::makeMove(
   // Handle double pushes
   if (move.isEnpassantPush())
   {
+    std::int8_t col = getCol(sourceIndex);
+
     mBitBoards[movedPieceIndex] ^= sourceBitBoard;
     mBitBoards[movedPieceIndex] |= destBitBoard;
-    mBoardState.enpassantColumn = sourceSquare.col;
+    // mBoardState.enpassantColumn = sourceSquare.col;
+    mBoardState.enpassantColumn = col;
 
     mCells[sourceIndex].piece = Piece::None;
     mCells[sourceIndex].color = Color::None;
@@ -1332,8 +1364,10 @@ bool BitBoard::makeMove(
     }
     else if (move.isEnpassantCapture())
     {
-      std::int8_t dir            = (sideToMove == Color::White ? -1 : +1);
-      std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::int8_t row = getRow(destIndex);
+      std::int8_t dir = (sideToMove == Color::White ? -1 : +1);
+      // std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::int8_t enPassantIndex = getIndex(row + dir, boardState.enpassantColumn);
       std::uint64_t epBitBoard   = (1ULL << enPassantIndex);
 
       mBitBoards[movedPieceIndex] ^= sourceBitBoard;
@@ -1421,11 +1455,13 @@ bool BitBoard::makeMove(
   {
     if (sideToMove == Color::White)
     {
-      mWhiteKingSquare = destSquare;
+      mWhiteKingIndex = destIndex;
+      // mWhiteKingSquare = destSquare;
     }
     else
     {
-      mBlackKingSquare = destSquare;
+      mBlackKingIndex = destIndex;
+      // mBlackKingSquare = destSquare;
     }
   }
 
@@ -1511,20 +1547,21 @@ bool BitBoard::makeMove(
 void BitBoard::pushMove(
   std::int8_t fromSquare,
   std::int8_t toSquare,
-  Piece piece,
+  std::uint32_t flags,
   Piece capturePiece,
   Piece promotionPiece,
   Move::Type type,
   MoveList & moveList) const
 {
-  std::int8_t sourceRow = getRow(fromSquare);
-  std::int8_t sourceCol = getCol(fromSquare);
-  std::int8_t destRow   = getRow(toSquare);
-  std::int8_t destCol   = getCol(toSquare);
+  // std::int8_t sourceRow = getRow(fromSquare);
+  // std::int8_t sourceCol = getCol(fromSquare);
+  // std::int8_t destRow   = getRow(toSquare);
+  // std::int8_t destCol   = getCol(toSquare);
 
-  Square sourceSquare = {sourceRow, sourceCol};
-  Square destSquare   = {destRow, destCol};
-  Move move(sourceSquare, destSquare, piece, mBoardState, type, capturePiece, promotionPiece);
+  // Square sourceSquare = {sourceRow, sourceCol};
+  // Square destSquare   = {destRow, destCol};
+  // Move move(sourceSquare, destSquare, mBoardState, type, capturePiece, promotionPiece);
+  Move move(fromSquare, toSquare, flags, mBoardState, type, capturePiece, promotionPiece);
   moveList.addMove(move);
 }
 
@@ -1570,8 +1607,10 @@ void BitBoard::reset()
   mBitBoards[QUEEN_INDEX + 6]  = (1ULL << D8);
   mBitBoards[KING_INDEX + 6]   = (1ULL << E8);
 
-  mWhiteKingSquare = {0, 4};
-  mBlackKingSquare = {7, 4};
+  mWhiteKingIndex = E1;
+  mBlackKingIndex = E8;
+  // mWhiteKingSquare = {0, 4};
+  // mBlackKingSquare = {7, 4};
 
   mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
   mBoardState.sideToMove      = Color::White;
@@ -1640,7 +1679,8 @@ void BitBoard::setPosition(
         mBitBoards[KING_INDEX] |= bitBoard;
         mCells[index].piece = Piece::King;
         mCells[index].color = Color::White;
-        mWhiteKingSquare    = Square{i, j};
+        mWhiteKingIndex     = index;
+        // mWhiteKingSquare    = Square{i, j};
         break;
       case PieceType::BlackPawn:
         mBitBoards[PAWN_INDEX + 6] |= bitBoard;
@@ -1671,7 +1711,8 @@ void BitBoard::setPosition(
         mBitBoards[KING_INDEX + 6] |= bitBoard;
         mCells[index].piece = Piece::King;
         mCells[index].color = Color::Black;
-        mBlackKingSquare    = Square{i, j};
+        mBlackKingIndex     = index;
+        // mBlackKingSquare    = Square{i, j};
         break;
       default:
         break;
@@ -1686,14 +1727,17 @@ void BitBoard::unmakeMove(
   const Move & move)
 {
   // Do some general calculations
-  BoardState boardState        = move.getBoardState();
-  Color sideThatMoved          = boardState.sideToMove;
-  Color otherSide              = (sideThatMoved == Color::White) ? Color::Black : Color::White;
-  Square sourceSquare          = move.getSourceSquare();
-  Square destSquare            = move.getDestinationSquare();
-  Piece movedPiece             = move.getPiece();
-  std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
-  std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  BoardState boardState   = move.getBoardState();
+  Color sideThatMoved     = boardState.sideToMove;
+  Color otherSide         = (sideThatMoved == Color::White) ? Color::Black : Color::White;
+  std::int8_t sourceIndex = move.getSourceIndex();
+  std::int8_t destIndex   = move.getDestinationIndex();
+  // Square sourceSquare   = move.getSourceSquare();
+  // Square destSquare     = move.getDestinationSquare();
+  //  Piece movedPiece             = move.getPiece();
+  // std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
+  // std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  Piece movedPiece             = mCells[destIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
 
@@ -1705,18 +1749,17 @@ void BitBoard::unmakeMove(
   }
 
   // Reset the board state
-  mBoardState = boardState;
+  mBoardState               = boardState;
+  mCells[sourceIndex].piece = movedPiece;
+  mCells[sourceIndex].color = sideThatMoved;
+  mCells[destIndex].piece   = Piece::None;
+  mCells[destIndex].color   = Color::None;
 
   // Handle quiet moves
   if (move.isQuiet())
   {
     mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
   }
 
   // Handle double push moves
@@ -1725,10 +1768,10 @@ void BitBoard::unmakeMove(
     mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[movedPieceIndex] |= sourceBitBoard;
 
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
+    //mCells[sourceIndex].piece = movedPiece;
+    //mCells[sourceIndex].color = sideThatMoved;
+    //mCells[destIndex].piece   = Piece::None;
+    //mCells[destIndex].color   = Color::None;
   }
 
   // Handle standard promotion moves
@@ -1744,10 +1787,10 @@ void BitBoard::unmakeMove(
     mBitBoards[promotedPieceIndex] ^= destBitBoard;
     mBitBoards[movedPieceIndex] |= sourceBitBoard;
 
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
+    mCells[sourceIndex].piece = Piece::Pawn;
+    //mCells[sourceIndex].color = sideThatMoved;
+    //mCells[destIndex].piece   = Piece::None;
+    //mCells[destIndex].color   = Color::None;
   }
 
   // Handle captures
@@ -1773,25 +1816,29 @@ void BitBoard::unmakeMove(
       mBitBoards[capturePieceIndex] |= destBitBoard;
       mBitBoards[promotedPieceIndex] ^= destBitBoard;
 
-      mCells[sourceIndex].piece = movedPiece;
-      mCells[sourceIndex].color = sideThatMoved;
-      mCells[destIndex].piece   = capturePiece;
-      mCells[destIndex].color   = otherSide;
+      mCells[sourceIndex].piece = Piece::Pawn;
+      mCells[destIndex].piece = capturePiece;
+      mCells[destIndex].color = otherSide;
+      //mCells[sourceIndex].color = sideThatMoved;
+      //mCells[destIndex].piece   = capturePiece;
+      //mCells[destIndex].color   = otherSide;
     }
     else if (move.isEnpassantCapture())
     {
-      std::int8_t dir            = (sideThatMoved == Color::White ? -1 : +1);
-      std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::int8_t row = getRow(destIndex);
+      std::int8_t dir = (sideThatMoved == Color::White ? -1 : +1);
+      // std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::int8_t enPassantIndex = getIndex(row + dir, boardState.enpassantColumn);
       std::uint64_t epBitBoard   = (1ULL << enPassantIndex);
 
       mBitBoards[movedPieceIndex] ^= destBitBoard;
       mBitBoards[movedPieceIndex] |= sourceBitBoard;
       mBitBoards[capturePieceIndex] |= epBitBoard;
 
-      mCells[sourceIndex].piece    = movedPiece;
-      mCells[sourceIndex].color    = sideThatMoved;
-      mCells[destIndex].piece      = Piece::None;
-      mCells[destIndex].color      = Color::None;
+      //mCells[sourceIndex].piece    = movedPiece;
+      //mCells[sourceIndex].color    = sideThatMoved;
+      //mCells[destIndex].piece      = Piece::None;
+      //mCells[destIndex].color      = Color::None;
       mCells[enPassantIndex].piece = Piece::Pawn;
       mCells[enPassantIndex].color = otherSide;
     }
@@ -1801,8 +1848,8 @@ void BitBoard::unmakeMove(
       mBitBoards[movedPieceIndex] |= sourceBitBoard;
       mBitBoards[capturePieceIndex] |= destBitBoard;
 
-      mCells[sourceIndex].piece = movedPiece;
-      mCells[sourceIndex].color = sideThatMoved;
+      //mCells[sourceIndex].piece = movedPiece;
+      //mCells[sourceIndex].color = sideThatMoved;
       mCells[destIndex].piece   = capturePiece;
       mCells[destIndex].color   = otherSide;
     }
@@ -1814,10 +1861,10 @@ void BitBoard::unmakeMove(
     mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[movedPieceIndex] |= sourceBitBoard;
 
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
+    //mCells[sourceIndex].piece = movedPiece;
+    //mCells[sourceIndex].color = sideThatMoved;
+    //mCells[destIndex].piece   = Piece::None;
+    //mCells[destIndex].color   = Color::None;
 
     if (destIndex == C1)
     {
@@ -1869,11 +1916,13 @@ void BitBoard::unmakeMove(
   {
     if (sideThatMoved == Color::White)
     {
-      mWhiteKingSquare = sourceSquare;
+      mWhiteKingIndex = sourceIndex;
+      // mWhiteKingSquare = sourceSquare;
     }
     else
     {
-      mBlackKingSquare = sourceSquare;
+      mBlackKingIndex = sourceIndex;
+      // mBlackKingSquare = sourceSquare;
     }
   }
 

@@ -14,7 +14,8 @@
 #include "timer.h"
 
 template <typename T>
-T readValue(std::istream & iss)
+T readValue(
+  std::istream & iss)
 {
   T value = T();
   iss >> value;
@@ -104,7 +105,8 @@ void ConsoleGame::execute()
   }
 }
 
-void ConsoleGame::handleDivideCommand(std::istream & input)
+void ConsoleGame::handleDivideCommand(
+  std::istream & input)
 {
   const jmchess::Board * board = this->getBoard();
 
@@ -173,6 +175,13 @@ void ConsoleGame::handleHelpCommand() const
   std::cout << "undo.................Undoes the last move\n";
 }
 
+constexpr std::int8_t getIndex(
+  std::int8_t row,
+  std::int8_t col)
+{
+  return (row << 3) | col;
+}
+
 void ConsoleGame::handleMoveCommand(
   std::istream & input)
 {
@@ -203,17 +212,25 @@ void ConsoleGame::handleMoveCommand(
   for (uint8_t i = 0; i < moveList.totalMoves(); i++)
   {
     const jmchess::Move & move   = moveList.getMove(i);
-    jmchess::Square sourceSquare = move.getSourceSquare();
-    jmchess::Square destSquare   = move.getDestinationSquare();
-
-    if (
-      sourceSquare.row == sourceRow && destSquare.row == destinationRow && sourceSquare.col == sourceColumn &&
-      destSquare.col == destinationColumn)
+    std::int8_t sourceIndex = getIndex(sourceRow, sourceColumn);
+    std::int8_t destIndex = getIndex(destinationRow, destinationColumn);
+    if (sourceIndex == move.getSourceIndex() && destIndex == move.getDestinationIndex())
     {
       moveIndex = i;
       break;
     }
   }
+  //   jmchess::Square sourceSquare = move.getSourceSquare();
+  //   jmchess::Square destSquare   = move.getDestinationSquare();
+
+  //   if (
+  //     sourceSquare.row == sourceRow && destSquare.row == destinationRow && sourceSquare.col == sourceColumn &&
+  //     destSquare.col == destinationColumn)
+  //   {
+  //     moveIndex = i;
+  //     break;
+  //   }
+  // }
 
   if (moveIndex == -1)
   {
@@ -274,7 +291,7 @@ void ConsoleGame::handlePerftCommand(
   timer.start();
   std::uint64_t totalNodes = perft.execute(perftLevel);
   timer.stop();
-  std::cout << "Total Nodes: " << totalNodes << " Time: " << timer.elapsed()/1e3 << " milliseconds\n";
+  std::cout << "Total Nodes: " << totalNodes << " Time: " << timer.elapsed() / 1e3 << " milliseconds\n";
 }
 
 void ConsoleGame::handlePrintCommand()
@@ -384,7 +401,7 @@ void ConsoleGame::handleShowCommand()
   for (std::uint8_t i = 0; i < moveList.totalMoves(); i++)
   {
     const jmchess::Move & move = moveList.getMove(i);
-    bool isLegal = board->makeMove(move);
+    bool isLegal               = board->makeMove(move);
     if (isLegal)
     {
       totalMoves++;
@@ -454,7 +471,7 @@ void ConsoleGame::handleTestMoveGen()
 
       bool success = (totalNodes == numNodes);
       std::cout << "Perft (" << static_cast<int>(depthLevel) << "): " << totalNodes << " nodes, ";
-      std::cout << "Time: " << timer.elapsed()/1e6 << " s, [" << static_cast<int>(numNodes) << "], ";
+      std::cout << "Time: " << timer.elapsed() / 1e6 << " s, [" << static_cast<int>(numNodes) << "], ";
       std::cout << (success ? "OK" : "FAIL") << "\n";
 
       // if (!success)
@@ -520,10 +537,11 @@ bool ConsoleGame::parseMovePos(
   return true;
 }
 
-int32_t ConsoleGame::readLevel(std::istream & iss) const
+int32_t ConsoleGame::readLevel(
+  std::istream & iss) const
 {
   int32_t perftLevel = readValue<int32_t>(iss);
-  if (iss.fail()) 
+  if (iss.fail())
   {
     std::cout << "Invalid perft level\n";
     return 0;

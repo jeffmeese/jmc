@@ -113,15 +113,17 @@ private:
   void pushMove(
     std::int8_t fromIndex,
     std::int8_t toIndex,
-    Piece piece,
+    std::uint32_t flags,
     Piece capturePiece,
     Piece promotionPiece,
     Move::Type type,
     MoveList & moveList) const;
 
   BoardState mBoardState;
-  Square mBlackKingSquare;
-  Square mWhiteKingSquare;
+  std::int8_t mBlackKingIndex;
+  std::int8_t mWhiteKingIndex;
+  //Square mBlackKingSquare;
+  //Square mWhiteKingSquare;
   Cell mCells[64];
   Attacks mAttacks[64];
 };

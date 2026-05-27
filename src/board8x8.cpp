@@ -18,10 +18,10 @@ namespace jmchess
 {
 
 // Constants for movement
-static constexpr std::int8_t NORTH         = 8;
-static constexpr std::int8_t SOUTH         = -8;
-static constexpr std::int8_t EAST          = 1;
-static constexpr std::int8_t WEST          = -1;
+static constexpr std::int8_t NORTH = 8;
+static constexpr std::int8_t SOUTH = -8;
+static constexpr std::int8_t EAST  = 1;
+static constexpr std::int8_t WEST  = -1;
 
 // Constants for board squares
 static constexpr std::int8_t A1            = 0;
@@ -158,7 +158,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(F1, attackColor) && !isCellAttacked(G1, attackColor))
         {
-          pushMove(E1, G1, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E1, G1, MOVE_KING_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -172,7 +172,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(D1, attackColor) && !isCellAttacked(C1, attackColor))
         {
-          pushMove(E1, C1, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E1, C1, MOVE_QUEEN_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -188,7 +188,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(F8, attackColor) && !isCellAttacked(G8, attackColor))
         {
-          pushMove(E8, G8, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E8, G8, MOVE_KING_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -202,7 +202,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(D8, attackColor) && !isCellAttacked(C8, attackColor))
         {
-          pushMove(E8, C8, Piece::King, Piece::None, Piece::None, Move::Type::Castle, moveList);
+          pushMove(E8, C8, MOVE_QUEEN_CASTLE, Piece::None, Piece::None, Move::Type::Castle, moveList);
         }
       }
     }
@@ -228,11 +228,11 @@ void Board8x8::generateJumpMoves(
 
       if (otherColor == Color::None)
       {
-        pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+        pushMove(index, destIndex, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
       }
       else if (isOppositeColor(pieceColor, otherColor))
       {
-        pushMove(index, destIndex, piece, otherPiece, Piece::None, Move::Type::Capture, moveList);
+        pushMove(index, destIndex, MOVE_CAPTURE, otherPiece, Piece::None, Move::Type::Capture, moveList);
       }
     }
   }
@@ -373,21 +373,21 @@ void Board8x8::generatePawnMoves(
       std::int8_t destRow = getRow(pushSquare);
       if (destRow == WHITE_PROMOTION_ROW || destRow == BLACK_PROMOTION_ROW)
       {
-        pushMove(index, pushSquare, Piece::Pawn, Piece::None, Piece::Bishop, Move::Type::Promotion, moveList);
-        pushMove(index, pushSquare, Piece::Pawn, Piece::None, Piece::Knight, Move::Type::Promotion, moveList);
-        pushMove(index, pushSquare, Piece::Pawn, Piece::None, Piece::Rook, Move::Type::Promotion, moveList);
-        pushMove(index, pushSquare, Piece::Pawn, Piece::None, Piece::Queen, Move::Type::Promotion, moveList);
+        pushMove(index, pushSquare, MOVE_BISHOP_PROMOTION, Piece::None, Piece::Bishop, Move::Type::Promotion, moveList);
+        pushMove(index, pushSquare, MOVE_KNIGHT_PROMOTION, Piece::None, Piece::Knight, Move::Type::Promotion, moveList);
+        pushMove(index, pushSquare, MOVE_ROOK_PROMOTION, Piece::None, Piece::Rook, Move::Type::Promotion, moveList);
+        pushMove(index, pushSquare, MOVE_QUEEN_PROMOTION, Piece::None, Piece::Queen, Move::Type::Promotion, moveList);
       }
       else
       {
-        pushMove(index, pushSquare, Piece::Pawn, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+        pushMove(index, pushSquare, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
       }
 
       if (doublePushSquare >= 0 && doublePushSquare <= 63)
       {
         if (sourceRow == startRow && mCells[doublePushSquare].piece == Piece::None)
         {
-          pushMove(index, doublePushSquare, Piece::Pawn, Piece::None, Piece::None, Move::Type::EnpassantPush, moveList);
+          pushMove(index, doublePushSquare, MOVE_DOUBLE_PAWN_PUSH, Piece::None, Piece::None, Move::Type::EnpassantPush, moveList);
         }
       }
     }
@@ -411,22 +411,22 @@ void Board8x8::generatePawnMoves(
           if (pieceColor == Color::White && destRow == WHITE_PROMOTION_ROW)
           {
             Move::Type moveType = Move::Type::PromotionCapture;
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Bishop, moveType, moveList);
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Knight, moveType, moveList);
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Rook, moveType, moveList);
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Queen, moveType, moveList);
+            pushMove(index, destIndex, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, Piece::Bishop, moveType, moveList);
+            pushMove(index, destIndex, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, Piece::Knight, moveType, moveList);
+            pushMove(index, destIndex, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, Piece::Rook, moveType, moveList);
+            pushMove(index, destIndex, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, Piece::Queen, moveType, moveList);
           }
           else if (pieceColor == Color::Black && destRow == BLACK_PROMOTION_ROW)
           {
             Move::Type moveType = Move::Type::PromotionCapture;
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Bishop, moveType, moveList);
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Knight, moveType, moveList);
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Rook, moveType, moveList);
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::Queen, moveType, moveList);
+            pushMove(index, destIndex, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, Piece::Bishop, moveType, moveList);
+            pushMove(index, destIndex, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, Piece::Knight, moveType, moveList);
+            pushMove(index, destIndex, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, Piece::Rook, moveType, moveList);
+            pushMove(index, destIndex, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, Piece::Queen, moveType, moveList);
           }
           else
           {
-            pushMove(index, destIndex, Piece::Pawn, capturePiece, Piece::None, Move::Type::Capture, moveList);
+            pushMove(index, destIndex, MOVE_CAPTURE, capturePiece, Piece::None, Move::Type::Capture, moveList);
           }
         }
       }
@@ -446,7 +446,7 @@ void Board8x8::generatePawnMoves(
         std::int8_t captureIndex = destIndex - indexIncrement;
         if (mCells[captureIndex].piece == Piece::Pawn && mCells[captureIndex].color == otherColor)
         {
-          pushMove(index, destIndex, Piece::Pawn, Piece::Pawn, Piece::None, Move::Type::EnpassantCapture, moveList);
+          pushMove(index, destIndex, MOVE_ENPASSANT_CAPTURE, Piece::Pawn, Piece::None, Move::Type::EnpassantCapture, moveList);
         }
       }
     }
@@ -482,13 +482,13 @@ void Board8x8::generateSlidingMoves(
     // Check for quiet move or capture
     if (otherColor == Color::None)
     {
-      pushMove(index, destIndex, piece, Piece::None, Piece::None, Move::Type::Quiet, moveList);
+      pushMove(index, destIndex, MOVE_QUIET, Piece::None, Piece::None, Move::Type::Quiet, moveList);
     }
     else
     {
       if (isOppositeColor(pieceColor, otherColor))
       {
-        pushMove(index, destIndex, piece, otherPiece, Piece::None, Move::Type::Capture, moveList);
+        pushMove(index, destIndex, MOVE_CAPTURE, otherPiece, Piece::None, Move::Type::Capture, moveList);
       }
 
       break;
@@ -504,13 +504,15 @@ BoardState Board8x8::getBoardState() const
 std::int8_t Board8x8::getKingColumn(
   Color color) const
 {
-  return (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
+  return (color == Color::White) ? getCol(mWhiteKingIndex) : getCol(mBlackKingIndex);
+  // return (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
 }
 
 std::int8_t Board8x8::getKingRow(
   Color color) const
 {
-  return (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
+  return (color == Color::White) ? getRow(mWhiteKingIndex) : getRow(mBlackKingIndex);
+  // return (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
 }
 
 PieceType Board8x8::getPieceType(
@@ -756,8 +758,10 @@ bool Board8x8::isCellAttacked(
 bool Board8x8::isKingInCheck(
   Color color) const
 {
-  std::int8_t row    = (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
-  std::int8_t column = (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
+  // std::int8_t row    = (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
+  // std::int8_t column = (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
+  std::int8_t row    = getKingRow(color);
+  std::int8_t column = getKingColumn(color);
   Color attackColor  = (color == Color::White) ? Color::Black : Color::White;
   std::int8_t index  = getIndex(row, column);
 
@@ -769,11 +773,14 @@ bool Board8x8::makeMove(
 {
   BoardState boardState   = move.getBoardState();
   Color sideToMove        = boardState.sideToMove;
-  Square sourceSquare     = move.getSourceSquare();
-  Square destSquare       = move.getDestinationSquare();
-  Piece movedPiece        = move.getPiece();
-  std::int8_t sourceIndex = getIndex(sourceSquare.row, sourceSquare.col);
-  std::int8_t destIndex   = getIndex(destSquare.row, destSquare.col);
+  std::int8_t sourceIndex = move.getSourceIndex();
+  std::int8_t destIndex   = move.getDestinationIndex();
+  // Square sourceSquare   = move.getSourceSquare();
+  // Square destSquare     = move.getDestinationSquare();
+  //  Piece movedPiece        = move.getPiece();
+  // std::int8_t sourceIndex = getIndex(sourceSquare.row, sourceSquare.col);
+  // std::int8_t destIndex   = getIndex(destSquare.row, destSquare.col);
+  Piece movedPiece = mCells[sourceIndex].piece;
 
   mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
 
@@ -786,7 +793,8 @@ bool Board8x8::makeMove(
   // Handle double pawn pushes
   if (move.isEnpassantPush())
   {
-    mBoardState.enpassantColumn = sourceSquare.col;
+    std::int8_t col             = getCol(sourceIndex);
+    mBoardState.enpassantColumn = col;
   }
 
   // Handle promotion moves
@@ -833,19 +841,22 @@ bool Board8x8::makeMove(
   {
     if (sideToMove == Color::White)
     {
-      mWhiteKingSquare = destSquare;
+      mWhiteKingIndex = destIndex;
+      // mWhiteKingSquare = destSquare;
     }
     else
     {
-      mBlackKingSquare = destSquare;
+      mBlackKingIndex = destIndex;
+      // mBlackKingSquare = destSquare;
     }
   }
 
   // Handle en-passant captures
   if (move.isEnpassantCapture())
   {
+    std::int8_t destRow          = getRow(destIndex);
     std::int8_t dir              = (sideToMove == Color::White ? -1 : +1);
-    std::int8_t enPassantIndex   = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+    std::int8_t enPassantIndex   = getIndex(destRow + dir, boardState.enpassantColumn);
     mCells[enPassantIndex].piece = Piece::None;
     mCells[enPassantIndex].color = Color::None;
   }
@@ -929,20 +940,21 @@ bool Board8x8::makeMove(
 void Board8x8::pushMove(
   std::int8_t fromSquare,
   std::int8_t toSquare,
-  Piece piece,
+  std::uint32_t flags,
   Piece capturePiece,
   Piece promotionPiece,
   Move::Type type,
   MoveList & moveList) const
 {
-  std::int8_t sourceRow = getRow(fromSquare);
-  std::int8_t sourceCol = getCol(fromSquare);
-  std::int8_t destRow   = getRow(toSquare);
-  std::int8_t destCol   = getCol(toSquare);
+  //std::int8_t sourceRow = getRow(fromSquare);
+  //std::int8_t sourceCol = getCol(fromSquare);
+  //std::int8_t destRow   = getRow(toSquare);
+  //std::int8_t destCol   = getCol(toSquare);
 
-  Square sourceSquare = {sourceRow, sourceCol};
-  Square destSquare   = {destRow, destCol};
-  Move move(sourceSquare, destSquare, piece, mBoardState, type, capturePiece, promotionPiece);
+  //Square sourceSquare = {sourceRow, sourceCol};
+  //Square destSquare   = {destRow, destCol};
+  // Move move(sourceSquare, destSquare, mBoardState, type, capturePiece, promotionPiece);
+  Move move(fromSquare, toSquare, flags, mBoardState, type, capturePiece, promotionPiece);
   moveList.addMove(move);
 }
 
@@ -969,8 +981,10 @@ void Board8x8::reset()
     mCells[getIndex(7, col)].color = Color::Black;
   }
 
-  mWhiteKingSquare = {0, 4};
-  mBlackKingSquare = {7, 4};
+  mWhiteKingIndex = E1;
+  mBlackKingIndex = E8;
+  // mWhiteKingSquare = {0, 4};
+  // mBlackKingSquare = {7, 4};
 
   mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
   mBoardState.sideToMove      = Color::White;
@@ -1023,7 +1037,8 @@ void Board8x8::setPosition(
       case PieceType::WhiteKing:
         mCells[index].piece = Piece::King;
         mCells[index].color = Color::White;
-        mWhiteKingSquare    = Square{i, j};
+        mWhiteKingIndex     = index;
+        // mWhiteKingSquare    = Square{i, j};
         break;
       case PieceType::BlackPawn:
         mCells[index].piece = Piece::Pawn;
@@ -1048,7 +1063,8 @@ void Board8x8::setPosition(
       case PieceType::BlackKing:
         mCells[index].piece = Piece::King;
         mCells[index].color = Color::Black;
-        mBlackKingSquare    = Square{i, j};
+        mBlackKingIndex     = index;
+        // mBlackKingSquare    = Square{i, j};
         break;
       default:
         mCells[index].piece = Piece::None;
@@ -1066,11 +1082,14 @@ void Board8x8::unmakeMove(
   BoardState boardState   = move.getBoardState();
   Color sideThatMoved     = boardState.sideToMove;
   Color otherSide         = (sideThatMoved == Color::White) ? Color::Black : Color::White;
-  Square sourceSquare     = move.getSourceSquare();
-  Square destSquare       = move.getDestinationSquare();
-  Piece movedPiece        = move.getPiece();
-  std::int8_t sourceIndex = getIndex(sourceSquare.row, sourceSquare.col);
-  std::int8_t destIndex   = getIndex(destSquare.row, destSquare.col);
+  std::int8_t sourceIndex = move.getSourceIndex();
+  std::int8_t destIndex   = move.getDestinationIndex();
+  // Square sourceSquare   = move.getSourceSquare();
+  // Square destSquare     = move.getDestinationSquare();
+  //  Piece movedPiece        = move.getPiece();
+  // std::int8_t sourceIndex = getIndex(sourceSquare.row, sourceSquare.col);
+  // std::int8_t destIndex   = getIndex(destSquare.row, destSquare.col);
+  Piece movedPiece = mCells[destIndex].piece;
 
   // Do basic update
   mBoardState               = boardState;
@@ -1085,13 +1104,23 @@ void Board8x8::unmakeMove(
     Piece capturePiece      = move.getCapturedPiece();
     mCells[destIndex].piece = capturePiece;
     mCells[destIndex].color = otherSide;
+    if (move.isPromotionCapture())
+    {
+      mCells[sourceIndex].piece = Piece::Pawn;
+    }
+  }
+
+  if (move.isPromotion())
+  {
+    mCells[sourceIndex].piece = Piece::Pawn;
   }
 
   // Handle enpassant capture
   if (move.isEnpassantCapture())
   {
+    std::int8_t destRow        = getRow(destIndex);
     std::int8_t dir            = (sideThatMoved == Color::White ? -1 : +1);
-    std::int8_t captureIndex   = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+    std::int8_t captureIndex   = getIndex(destRow + dir, boardState.enpassantColumn);
     Piece capturePiece         = move.getCapturedPiece();
     mCells[captureIndex].piece = capturePiece;
     mCells[captureIndex].color = otherSide;
@@ -1102,12 +1131,14 @@ void Board8x8::unmakeMove(
   {
     if (sideThatMoved == Color::White)
     {
-      mWhiteKingSquare = sourceSquare;
+      mWhiteKingIndex = sourceIndex;
+      // mWhiteKingSquare = sourceSquare;
     }
 
     if (sideThatMoved == Color::Black)
     {
-      mBlackKingSquare = sourceSquare;
+      mBlackKingIndex = sourceIndex;
+      // mBlackKingSquare = sourceSquare;
     }
   }
 
