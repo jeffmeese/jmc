@@ -74,10 +74,18 @@ private:
     Color sideToMove,
     MoveList & moveList) const;
 
+  template <bool Diagonal>
+  void generateSlidingMoves(
+    std::uint64_t pieces,
+    Piece pieceType,
+    std::uint64_t enemyPieces,
+    MoveList & moveList) const;
+
   void generateDiagonalMoves(
     std::uint64_t pieces,
     Piece pieceType,
     std::uint64_t enemyPieces,
+    bool diagonal,
     MoveList & moveList) const;
 
   void generateKingMoves(
@@ -124,7 +132,7 @@ private:
 
   constexpr std::int8_t getCol(std::int8_t index) const;
 
-  void initAtacks();
+  void initAttacks();
 
   void initSliderAttacks(
     std::int8_t row,
@@ -161,6 +169,7 @@ private:
   std::uint64_t mAllPieces;
   std::uint64_t mBitBoards[12];
   Attacks mAttacks[64];
+  Cell mCells[64];
 };
 
 } // namespace jmchess
