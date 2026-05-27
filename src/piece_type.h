@@ -7,22 +7,23 @@ namespace jmchess
 
 enum class PieceType
 {
-  None = 0,
-  WhitePawn,
-  WhiteKnight,
-  WhiteBishop,
-  WhiteRook,
-  WhiteQueen,
-  WhiteKing,
-  BlackPawn,
-  BlackKnight,
-  BlackBishop,
-  BlackRook,
-  BlackQueen,
-  BlackKing
+  WhitePawn   = 0,
+  WhiteKnight = 1,
+  WhiteBishop = 2,
+  WhiteRook   = 3,
+  WhiteQueen  = 4,
+  WhiteKing   = 5,
+  BlackPawn   = 6,
+  BlackKnight = 7,
+  BlackBishop = 8,
+  BlackRook   = 9,
+  BlackQueen  = 10,
+  BlackKing   = 11,
+  None        = 12
 };
 
-inline bool isBlack(PieceType pieceType)
+inline bool isBlack(
+  PieceType pieceType)
 {
   if (pieceType == PieceType::BlackPawn)
   {
@@ -57,12 +58,14 @@ inline bool isBlack(PieceType pieceType)
   return false;
 }
 
-inline bool isNone(PieceType pieceType)
+inline bool isNone(
+  PieceType pieceType)
 {
   return pieceType == PieceType::None;
 }
 
-inline bool isWhite(PieceType pieceType)
+inline bool isWhite(
+  PieceType pieceType)
 {
   if (pieceType == PieceType::WhitePawn)
   {
@@ -97,9 +100,11 @@ inline bool isWhite(PieceType pieceType)
   return false;
 }
 
-inline bool isColor(PieceType pieceType, Color color)
+inline bool isColor(
+  PieceType pieceType,
+  Color color)
 {
   return (color == Color::White) ? isWhite(pieceType) : isBlack(pieceType);
 }
 
-}
+} // namespace jmchess
