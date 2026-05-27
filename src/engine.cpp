@@ -3,15 +3,12 @@
 namespace jmchess
 {
 
-Engine::Engine()
-  : mSearch(new Search)
-{
-}
-
-Move Engine::getMove(
-  Board * board) const
-{
-  return mSearch->execute(board, board->getBoardState().sideToMove, mSearchDepth);
-}
+// Move Engine::getMove(
+//   Board * board,
+//   Search * search) const
+// {
+//   BoardState boardState = board->getBoardState();
+//   return search->execute(board, boardState.sideToMove, mSearchDepth);
+// }
 
 } // namespace jmchess

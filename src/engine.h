@@ -11,14 +11,12 @@ namespace jmchess
 class Engine
 {
 public:
-  Engine();
-
   Move getMove(
-    Board * board) const;
+    Board * board,
+    Search * search) const;
 
 private:
-  std::unique_ptr<Search> mSearch;
   std::int32_t mSearchDepth = 3;
 };
 
-}
+} // namespace jmchess
