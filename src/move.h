@@ -28,6 +28,8 @@ public:
   Move(
     const Square & source,
     const Square & destination,
+    std::int8_t sourceIndex,
+    std::int8_t destIndex,
     Piece piece,
     BoardState boardState,
     Type type           = Type::Quiet,
@@ -36,9 +38,11 @@ public:
 
   BoardState getBoardState() const;
   Piece getCapturedPiece() const;
+  std::int8_t getDestinationIndex() const;
   Square getDestinationSquare() const;
   Piece getPiece() const;
   Piece getPromotedPiece() const;
+  std::int8_t getSourceIndex() const;
   Square getSourceSquare() const;
   Type getType() const;
 
@@ -57,12 +61,14 @@ public:
     const Move & move2);
 
 private:
-  Square mSource       = {0, 0};
-  Square mDestination  = {0, 0};
-  Piece mPiece         = Piece::None;
-  Piece mCapturedPiece = Piece::None;
-  Piece mPromotedPiece = Piece::None;
-  Type mType           = Type::Quiet;
+  Square mSource                = {0, 0};
+  Square mDestination           = {0, 0};
+  std::int8_t mSourceIndex      = 0;
+  std::int8_t mDestinationIndex = 0;
+  Piece mPiece                  = Piece::None;
+  Piece mCapturedPiece          = Piece::None;
+  Piece mPromotedPiece          = Piece::None;
+  Type mType                    = Type::Quiet;
   BoardState mBoardState;
 };
 

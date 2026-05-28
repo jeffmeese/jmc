@@ -1065,16 +1065,17 @@ bool BitBoard::makeMove(
   const Move & move)
 {
   // Perform some general calculations
-  BoardState boardState        = move.getBoardState();
-  Color sideToMove             = boardState.sideToMove;
-  Square sourceSquare          = move.getSourceSquare();
-  Square destSquare            = move.getDestinationSquare();
-  std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
-  std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  BoardState boardState = move.getBoardState();
+  Color sideToMove      = boardState.sideToMove;
+  // Square sourceSquare          = move.getSourceSquare();
+  // Square destSquare            = move.getDestinationSquare();
+  // std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
+  // std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  std::int8_t sourceIndex      = move.getSourceIndex();
+  std::int8_t destIndex        = move.getDestinationIndex();
   Piece movedPiece             = mCells[sourceIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
-  mBoardState.enpassantColumn  = INVALID_ENPASSANT_COLUMN;
   Square & kingSquare          = (sideToMove == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
 
   // Get the bitboard index for the piece being moved
@@ -1084,17 +1085,20 @@ bool BitBoard::makeMove(
     movedPieceIndex += 6;
   }
 
-  mCells[sourceIndex].piece = Piece::None;
-  mCells[sourceIndex].color = Color::None;
-  mCells[destIndex].piece   = movedPiece;
-  mCells[destIndex].color   = sideToMove;
+  mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
+  mCells[sourceIndex].piece   = Piece::None;
+  mCells[sourceIndex].color   = Color::None;
+  mCells[destIndex].piece     = movedPiece;
+  mCells[destIndex].color     = sideToMove;
   mBitBoards[movedPieceIndex] ^= sourceBitBoard;
   mBitBoards[movedPieceIndex] |= destBitBoard;
 
   // Handle double pushes
   if (move.isEnpassantPush())
   {
-    mBoardState.enpassantColumn = sourceSquare.col;
+    std::int8_t col             = getCol(sourceIndex);
+    mBoardState.enpassantColumn = col;
+    // mBoardState.enpassantColumn = sourceSquare.col;
   }
 
   // Handle promotion moves
@@ -1126,9 +1130,11 @@ bool BitBoard::makeMove(
 
     if (move.isEnpassantCapture())
     {
+      std::int8_t row            = getRow(destIndex);
       std::int8_t dir            = (sideToMove == Color::White ? -1 : +1);
-      std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
-      std::uint64_t epBitBoard   = (1ULL << enPassantIndex);
+      std::int8_t enPassantIndex = getIndex(row + dir, boardState.enpassantColumn);
+      // std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::uint64_t epBitBoard = (1ULL << enPassantIndex);
 
       mBitBoards[capturePieceIndex] ^= destBitBoard;
       mBitBoards[capturePieceIndex] ^= epBitBoard;
@@ -1180,7 +1186,8 @@ bool BitBoard::makeMove(
   // Handle king moves
   if (movedPiece == Piece::King)
   {
-    kingSquare = destSquare;
+    Square destSquare = {getRow(destIndex), getCol(destIndex)};
+    kingSquare        = destSquare;
   }
 
   // Update castling rights
@@ -1278,7 +1285,7 @@ void BitBoard::pushMove(
 
   Square sourceSquare = {sourceRow, sourceCol};
   Square destSquare   = {destRow, destCol};
-  Move move(sourceSquare, destSquare, piece, mBoardState, type, capturePiece, promotionPiece);
+  Move move(sourceSquare, destSquare, fromSquare, toSquare, piece, mBoardState, type, capturePiece, promotionPiece);
   moveList.addMove(move);
 }
 
@@ -1440,12 +1447,14 @@ void BitBoard::unmakeMove(
   const Move & move)
 {
   // Do some general calculations
-  BoardState boardState        = move.getBoardState();
-  Color sideThatMoved          = boardState.sideToMove;
-  Square sourceSquare          = move.getSourceSquare();
-  Square destSquare            = move.getDestinationSquare();
-  std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
-  std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  BoardState boardState = move.getBoardState();
+  Color sideThatMoved   = boardState.sideToMove;
+  // Square sourceSquare          = move.getSourceSquare();
+  // Square destSquare            = move.getDestinationSquare();
+  // std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
+  // std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  std::int8_t sourceIndex      = move.getSourceIndex();
+  std::int8_t destIndex        = move.getDestinationIndex();
   Piece movedPiece             = mCells[destIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
@@ -1506,8 +1515,10 @@ void BitBoard::unmakeMove(
     // Handle en-passant captures
     if (move.isEnpassantCapture())
     {
-      std::int8_t dir            = (sideThatMoved == Color::White ? -1 : +1);
-      std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::int8_t row = getRow(destIndex);
+      std::int8_t dir = (sideThatMoved == Color::White ? -1 : +1);
+      // std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
+      std::int8_t enPassantIndex = getIndex(row + dir, boardState.enpassantColumn);
       std::uint64_t epBitBoard   = (1ULL << enPassantIndex);
 
       // En-passant captures take place on a different square
@@ -1567,7 +1578,8 @@ void BitBoard::unmakeMove(
   // Handle king moves
   if (movedPiece == Piece::King)
   {
-    kingSquare = sourceSquare;
+    Square sourceSquare = {getRow(sourceIndex), getCol(sourceIndex)};
+    kingSquare          = sourceSquare;
   }
 
   // Update the aggregated bitboards

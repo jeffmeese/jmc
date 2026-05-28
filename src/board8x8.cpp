@@ -942,7 +942,7 @@ void Board8x8::pushMove(
 
   Square sourceSquare = {sourceRow, sourceCol};
   Square destSquare   = {destRow, destCol};
-  Move move(sourceSquare, destSquare, piece, mBoardState, type, capturePiece, promotionPiece);
+  Move move(sourceSquare, destSquare, fromSquare, toSquare, piece, mBoardState, type, capturePiece, promotionPiece);
   moveList.addMove(move);
 }
 

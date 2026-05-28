@@ -12,19 +12,23 @@ namespace jmchess
 Move::Move(
   const Square & source,
   const Square & desination,
+  std::int8_t sourceIndex,
+  std::int8_t destinationIndex,
   Piece piece,
   BoardState boardState,
   Type type,
   Piece capturePiece,
   Piece promotedPiece)
 {
-  mSource        = source;
-  mDestination   = desination;
-  mPiece         = piece;
-  mBoardState    = boardState;
-  mCapturedPiece = capturePiece;
-  mPromotedPiece = promotedPiece;
-  mType          = type;
+  mSource           = source;
+  mDestination      = desination;
+  mSourceIndex      = sourceIndex;
+  mDestinationIndex = destinationIndex;
+  mPiece            = piece;
+  mBoardState       = boardState;
+  mCapturedPiece    = capturePiece;
+  mPromotedPiece    = promotedPiece;
+  mType             = type;
 }
 
 BoardState Move::getBoardState() const
@@ -35,6 +39,11 @@ BoardState Move::getBoardState() const
 Piece Move::getCapturedPiece() const
 {
   return mCapturedPiece;
+}
+
+std::int8_t Move::getDestinationIndex() const
+{
+  return mDestinationIndex;
 }
 
 Square Move::getDestinationSquare() const
@@ -50,6 +59,11 @@ Piece Move::getPiece() const
 Piece Move::getPromotedPiece() const
 {
   return mPromotedPiece;
+}
+
+std::int8_t Move::getSourceIndex() const
+{
+  return mSourceIndex;
 }
 
 Square Move::getSourceSquare() const
