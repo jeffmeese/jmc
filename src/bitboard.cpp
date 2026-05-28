@@ -1069,12 +1069,13 @@ bool BitBoard::makeMove(
   Color sideToMove             = boardState.sideToMove;
   Square sourceSquare          = move.getSourceSquare();
   Square destSquare            = move.getDestinationSquare();
-  Piece movedPiece             = move.getPiece();
   std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
   std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  Piece movedPiece             = mCells[sourceIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
   mBoardState.enpassantColumn  = INVALID_ENPASSANT_COLUMN;
+  Square & kingSquare          = (sideToMove == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
 
   // Get the bitboard index for the piece being moved
   std::int32_t movedPieceIndex = static_cast<std::int32_t>(movedPiece);
@@ -1139,62 +1140,47 @@ bool BitBoard::makeMove(
   // Handle castle moves
   if (move.isCastle())
   {
-    if (destIndex == C1)
+    switch (destIndex)
     {
+    case C1:
       mBitBoards[ROOK_INDEX] ^= (1ULL << A1);
       mBitBoards[ROOK_INDEX] |= (1ULL << D1);
-
       mCells[A1].piece = Piece::None;
       mCells[A1].color = Color::None;
       mCells[D1].piece = Piece::Rook;
       mCells[D1].color = sideToMove;
-    }
-
-    if (destIndex == G1)
-    {
+      break;
+    case G1:
       mBitBoards[ROOK_INDEX] ^= (1ULL << H1);
       mBitBoards[ROOK_INDEX] |= (1ULL << F1);
-
       mCells[H1].piece = Piece::None;
       mCells[H1].color = Color::None;
       mCells[F1].piece = Piece::Rook;
       mCells[F1].color = sideToMove;
-    }
-
-    if (destIndex == C8)
-    {
+      break;
+    case C8:
       mBitBoards[ROOK_INDEX + 6] ^= (1ULL << A8);
       mBitBoards[ROOK_INDEX + 6] |= (1ULL << D8);
-
       mCells[A8].piece = Piece::None;
       mCells[A8].color = Color::None;
       mCells[D8].piece = Piece::Rook;
       mCells[D8].color = sideToMove;
-    }
-
-    if (destIndex == G8)
-    {
+      break;
+    case G8:
       mBitBoards[ROOK_INDEX + 6] ^= (1ULL << H8);
       mBitBoards[ROOK_INDEX + 6] |= (1ULL << F8);
-
       mCells[H8].piece = Piece::None;
       mCells[H8].color = Color::None;
       mCells[F8].piece = Piece::Rook;
       mCells[F8].color = sideToMove;
+      break;
     }
   }
 
   // Handle king moves
   if (movedPiece == Piece::King)
   {
-    if (sideToMove == Color::White)
-    {
-      mWhiteKingSquare = destSquare;
-    }
-    else
-    {
-      mBlackKingSquare = destSquare;
-    }
+    kingSquare = destSquare;
   }
 
   // Update castling rights
@@ -1456,14 +1442,15 @@ void BitBoard::unmakeMove(
   // Do some general calculations
   BoardState boardState        = move.getBoardState();
   Color sideThatMoved          = boardState.sideToMove;
-  Color otherSide              = (sideThatMoved == Color::White) ? Color::Black : Color::White;
   Square sourceSquare          = move.getSourceSquare();
   Square destSquare            = move.getDestinationSquare();
-  Piece movedPiece             = move.getPiece();
   std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
   std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  Piece movedPiece             = mCells[destIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
+  Square & kingSquare          = (sideThatMoved == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
+  Color otherSide              = (sideThatMoved == Color::White) ? Color::Black : Color::White;
 
   // Get the bitboard index for the piece that moved
   std::int32_t movedPieceIndex = static_cast<std::int32_t>(movedPiece);
@@ -1478,6 +1465,7 @@ void BitBoard::unmakeMove(
   // Perform standard move update
   // 1. Move the moved piece back to the source square
   // 2. Set the destination cell to empty
+  // 3. Update the moved piece bitboard
   mCells[sourceIndex].piece = movedPiece;
   mCells[sourceIndex].color = sideThatMoved;
   mCells[destIndex].piece   = Piece::None;
@@ -1488,33 +1476,32 @@ void BitBoard::unmakeMove(
   // Handle promotion moves
   if (move.isPromotion())
   {
-    Piece promotedPiece             = move.getPromotedPiece();
-    std::int32_t promotedPieceIndex = static_cast<std::int32_t>(promotedPiece);
-    if (sideThatMoved == Color::Black)
-    {
-      promotedPieceIndex += 6;
-    }
+    std::int32_t pawnIndex = (sideThatMoved == Color::White) ? PAWN_INDEX : PAWN_INDEX + 6;
 
-    // Remove the moved piece from the destination square since it was added above
-    // Remove the promoted piece from the destination square
-    mBitBoards[movedPieceIndex] ^= destBitBoard;
-    mBitBoards[promotedPieceIndex] ^= destBitBoard;
+    // Promotions must be handled in a special way
+    // Since the movedPiece variable will actually contain the promoted piece
+    // the standard update above will place the promoted piece on
+    // the source square. Therefore we need to remove the promoted piece
+    // from that square and place a pawn on it instead.
+    mBitBoards[movedPieceIndex] ^= sourceBitBoard; // Remove the promoted piece from the source square
+    mBitBoards[pawnIndex] |= sourceBitBoard;       // Add a pawn to the source square
+    mCells[sourceIndex].piece = Piece::Pawn;       // Replace the promoted piece with a pawn
   }
 
   // Handle captures
   if (move.isCapture())
   {
-    Piece capturePiece             = move.getCapturedPiece();
-    std::int32_t capturePieceIndex = static_cast<std::int32_t>(capturePiece);
+    Piece capturePiece              = move.getCapturedPiece();
+    std::int32_t capturedPieceIndex = static_cast<std::int32_t>(capturePiece);
     if (sideThatMoved == Color::White)
     {
-      capturePieceIndex += 6;
+      capturedPieceIndex += 6;
     }
 
     // Add the captured piece to the destination
     mCells[destIndex].piece = capturePiece;
     mCells[destIndex].color = otherSide;
-    mBitBoards[capturePieceIndex] |= destBitBoard;
+    mBitBoards[capturedPieceIndex] |= destBitBoard;
 
     // Handle en-passant captures
     if (move.isEnpassantCapture())
@@ -1524,10 +1511,10 @@ void BitBoard::unmakeMove(
       std::uint64_t epBitBoard   = (1ULL << enPassantIndex);
 
       // En-passant captures take place on a different square
-      // Above we put the captured piece on the desintation square
-      // so we need to move it now.
-      mBitBoards[capturePieceIndex] ^= destBitBoard;
-      mBitBoards[capturePieceIndex] |= epBitBoard;
+      // Above we put the captured piece on the destination square
+      // so we need to move it over the en-passant capture square.
+      mBitBoards[capturedPieceIndex] ^= destBitBoard;
+      mBitBoards[capturedPieceIndex] |= epBitBoard;
       mCells[destIndex].piece      = Piece::None;
       mCells[destIndex].color      = Color::None;
       mCells[enPassantIndex].piece = Piece::Pawn;
@@ -1538,62 +1525,49 @@ void BitBoard::unmakeMove(
   // Handle castle moves
   if (move.isCastle())
   {
-    if (destIndex == C1)
+    switch (destIndex)
     {
+    case C1:
       mBitBoards[ROOK_INDEX] ^= (1ULL << D1);
       mBitBoards[ROOK_INDEX] |= (1ULL << A1);
-
       mCells[A1].piece = Piece::Rook;
       mCells[A1].color = sideThatMoved;
       mCells[D1].piece = Piece::None;
       mCells[D1].color = Color::None;
-    }
-
-    if (destIndex == G1)
-    {
+      break;
+    case G1:
       mBitBoards[ROOK_INDEX] ^= (1ULL << F1);
       mBitBoards[ROOK_INDEX] |= (1ULL << H1);
-
       mCells[H1].piece = Piece::Rook;
       mCells[H1].color = sideThatMoved;
       mCells[F1].piece = Piece::None;
       mCells[F1].color = Color::None;
-    }
-
-    if (destIndex == C8)
-    {
+      break;
+    case C8:
       mBitBoards[ROOK_INDEX + 6] ^= (1ULL << D8);
       mBitBoards[ROOK_INDEX + 6] |= (1ULL << A8);
-
       mCells[A8].piece = Piece::Rook;
       mCells[A8].color = sideThatMoved;
       mCells[D8].piece = Piece::None;
       mCells[D8].color = Color::None;
-    }
-
-    if (destIndex == G8)
-    {
+      break;
+    case G8:
       mBitBoards[ROOK_INDEX + 6] ^= (1ULL << F8);
       mBitBoards[ROOK_INDEX + 6] |= (1ULL << H8);
-
       mCells[H8].piece = Piece::Rook;
       mCells[H8].color = sideThatMoved;
       mCells[F8].piece = Piece::None;
       mCells[F8].color = Color::None;
+      break;
+    default:
+      break;
     }
   }
 
   // Handle king moves
   if (movedPiece == Piece::King)
   {
-    if (sideThatMoved == Color::White)
-    {
-      mWhiteKingSquare = sourceSquare;
-    }
-    else
-    {
-      mBlackKingSquare = sourceSquare;
-    }
+    kingSquare = sourceSquare;
   }
 
   // Update the aggregated bitboards
