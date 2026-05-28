@@ -81,12 +81,12 @@ private:
     std::uint64_t enemyPieces,
     MoveList & moveList) const;
 
-  void generateDiagonalMoves(
-    std::uint64_t pieces,
-    Piece pieceType,
-    std::uint64_t enemyPieces,
-    bool diagonal,
-    MoveList & moveList) const;
+  // void generateDiagonalMoves(
+  //   std::uint64_t pieces,
+  //   Piece pieceType,
+  //   std::uint64_t enemyPieces,
+  //   bool diagonal,
+  //   MoveList & moveList) const;
 
   void generateKingMoves(
     std::uint64_t kings,
@@ -116,11 +116,11 @@ private:
 
   void generatePawnPushesWhite(MoveList & moveList) const;
 
-  void generateStraightMoves(
-    std::uint64_t pieces,
-    Piece pieceType,
-    std::uint64_t enemyPieces,
-    MoveList & moveList) const;
+  // void generateStraightMoves(
+  //   std::uint64_t pieces,
+  //   Piece pieceType,
+  //   std::uint64_t enemyPieces,
+  //   MoveList & moveList) const;
 
   Piece getCapturedPiece(std::int8_t square) const;
 
@@ -133,14 +133,6 @@ private:
   constexpr std::int8_t getCol(std::int8_t index) const;
 
   void initAttacks();
-
-  void initSliderAttacks(
-    std::int8_t row,
-    std::int8_t col,
-    std::uint64_t occupancy,
-    std::int8_t rowIncrement,
-    std::int8_t colIncrement,
-    std::uint64_t & attacks) const;
 
   bool isCellAttacked(
     std::int8_t index,
