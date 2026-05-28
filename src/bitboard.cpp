@@ -1474,10 +1474,10 @@ void BitBoard::unmakeMove(
 
   // Reset the board state
   mBoardState = boardState;
-  // mCells[sourceIndex].piece = movedPiece;
-  // mCells[sourceIndex].color = sideThatMoved;
-  // mCells[destIndex].piece   = Piece::None;
-  // mCells[destIndex].color   = Color::None;
+  mCells[sourceIndex].piece = movedPiece;
+  mCells[sourceIndex].color = sideThatMoved;
+  mCells[destIndex].piece   = Piece::None;
+  mCells[destIndex].color   = Color::None;
 
   // mBitBoards[movedPieceIndex] ^= destBitBoard;
   // mBitBoards[movedPieceIndex] |= sourceBitBoard;
@@ -1487,11 +1487,6 @@ void BitBoard::unmakeMove(
   {
     mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
   }
 
   // Handle double push moves
@@ -1499,11 +1494,6 @@ void BitBoard::unmakeMove(
   {
     mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
   }
 
   // Handle standard promotion moves
@@ -1523,11 +1513,6 @@ void BitBoard::unmakeMove(
     // mBitBoards[movedPieceIndex] |= sourceBitBoard;
 
     // mBitBoards[promotedPieceIndex] ^= destBitBoard;
-
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
   }
 
   // Handle captures
@@ -1557,8 +1542,6 @@ void BitBoard::unmakeMove(
       mBitBoards[capturePieceIndex] |= destBitBoard;
       mBitBoards[promotedPieceIndex] ^= destBitBoard;
       
-      mCells[sourceIndex].piece = movedPiece;
-      mCells[sourceIndex].color = sideThatMoved;
       mCells[destIndex].piece = capturePiece;
       mCells[destIndex].color = otherSide;
     }
@@ -1572,10 +1555,6 @@ void BitBoard::unmakeMove(
       mBitBoards[movedPieceIndex] |= sourceBitBoard;
       mBitBoards[capturePieceIndex] |= epBitBoard;
 
-      mCells[sourceIndex].piece = movedPiece;
-      mCells[sourceIndex].color = sideThatMoved;
-      mCells[destIndex].piece   = Piece::None;
-      mCells[destIndex].color   = Color::None;
       mCells[enPassantIndex].piece = Piece::Pawn;
       mCells[enPassantIndex].color = otherSide;
     }
@@ -1586,8 +1565,6 @@ void BitBoard::unmakeMove(
 
       mBitBoards[capturePieceIndex] |= destBitBoard;
 
-      mCells[sourceIndex].piece = movedPiece;
-      mCells[sourceIndex].color = sideThatMoved;
       mCells[destIndex].piece = capturePiece;
       mCells[destIndex].color = otherSide;
     }
@@ -1598,11 +1575,6 @@ void BitBoard::unmakeMove(
   {
     mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-    mCells[sourceIndex].piece = movedPiece;
-    mCells[sourceIndex].color = sideThatMoved;
-    mCells[destIndex].piece   = Piece::None;
-    mCells[destIndex].color   = Color::None;
 
     if (destIndex == C1)
     {
