@@ -1065,14 +1065,10 @@ bool BitBoard::makeMove(
   const Move & move)
 {
   // Perform some general calculations
-  BoardState boardState = move.getBoardState();
-  Color sideToMove      = boardState.sideToMove;
-  // Square sourceSquare          = move.getSourceSquare();
-  // Square destSquare            = move.getDestinationSquare();
-  // std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
-  // std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  BoardState boardState        = move.getBoardState();
   std::int8_t sourceIndex      = move.getSourceIndex();
   std::int8_t destIndex        = move.getDestinationIndex();
+  Color sideToMove             = boardState.sideToMove;
   Piece movedPiece             = mCells[sourceIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
@@ -1447,14 +1443,10 @@ void BitBoard::unmakeMove(
   const Move & move)
 {
   // Do some general calculations
-  BoardState boardState = move.getBoardState();
-  Color sideThatMoved   = boardState.sideToMove;
-  // Square sourceSquare          = move.getSourceSquare();
-  // Square destSquare            = move.getDestinationSquare();
-  // std::int8_t sourceIndex      = getIndex(sourceSquare.row, sourceSquare.col);
-  // std::int8_t destIndex        = getIndex(destSquare.row, destSquare.col);
+  BoardState boardState        = move.getBoardState();
   std::int8_t sourceIndex      = move.getSourceIndex();
   std::int8_t destIndex        = move.getDestinationIndex();
+  Color sideThatMoved          = boardState.sideToMove;
   Piece movedPiece             = mCells[destIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
