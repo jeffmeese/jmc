@@ -1525,8 +1525,8 @@ void BitBoard::unmakeMove(
       capturePieceIndex += 6;
     }
 
-    // mCells[destIndex].piece   = capturePiece;
-    // mCells[destIndex].color   = otherSide;
+    mCells[destIndex].piece   = capturePiece;
+    mCells[destIndex].color   = otherSide;
     // mBitBoards[capturePieceIndex] |= destBitBoard;
 
     if (move.isPromotionCapture())
@@ -1541,9 +1541,6 @@ void BitBoard::unmakeMove(
       mBitBoards[movedPieceIndex] |= sourceBitBoard;
       mBitBoards[capturePieceIndex] |= destBitBoard;
       mBitBoards[promotedPieceIndex] ^= destBitBoard;
-      
-      mCells[destIndex].piece = capturePiece;
-      mCells[destIndex].color = otherSide;
     }
     else if (move.isEnpassantCapture())
     {
@@ -1555,6 +1552,11 @@ void BitBoard::unmakeMove(
       mBitBoards[movedPieceIndex] |= sourceBitBoard;
       mBitBoards[capturePieceIndex] |= epBitBoard;
 
+      // En-passant captures take place on a different square
+      // Above we put the captured piece on the desintation square
+      // so we need to move it now.
+      mCells[destIndex].piece = Piece::None;
+      mCells[destIndex].color = Color::None;
       mCells[enPassantIndex].piece = Piece::Pawn;
       mCells[enPassantIndex].color = otherSide;
     }
@@ -1564,9 +1566,6 @@ void BitBoard::unmakeMove(
       mBitBoards[movedPieceIndex] |= sourceBitBoard;
 
       mBitBoards[capturePieceIndex] |= destBitBoard;
-
-      mCells[destIndex].piece = capturePiece;
-      mCells[destIndex].color = otherSide;
     }
   }
 
