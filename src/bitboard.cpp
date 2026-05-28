@@ -1474,30 +1474,19 @@ void BitBoard::unmakeMove(
 
   // Reset the board state
   mBoardState = boardState;
+
+  // Perform standard move update
+  // 1. Move the moved piece back to the source square
+  // 2. Set the destination cell to empty
   mCells[sourceIndex].piece = movedPiece;
   mCells[sourceIndex].color = sideThatMoved;
   mCells[destIndex].piece   = Piece::None;
   mCells[destIndex].color   = Color::None;
+  mBitBoards[movedPieceIndex] ^= destBitBoard;
+  mBitBoards[movedPieceIndex] |= sourceBitBoard;
 
-  // mBitBoards[movedPieceIndex] ^= destBitBoard;
-  // mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-  // Handle quiet moves
-  if (move.isQuiet())
-  {
-    mBitBoards[movedPieceIndex] ^= destBitBoard;
-    mBitBoards[movedPieceIndex] |= sourceBitBoard;
-  }
-
-  // Handle double push moves
-  if (move.isEnpassantPush())
-  {
-    mBitBoards[movedPieceIndex] ^= destBitBoard;
-    mBitBoards[movedPieceIndex] |= sourceBitBoard;
-  }
-
-  // Handle standard promotion moves
-  if (move.isPromotion() && !move.isPromotionCapture())
+  // Handle promotion moves
+  if (move.isPromotion())
   {
     Piece promotedPiece             = move.getPromotedPiece();
     std::int32_t promotedPieceIndex = static_cast<std::int32_t>(promotedPiece);
@@ -1506,13 +1495,10 @@ void BitBoard::unmakeMove(
       promotedPieceIndex += 6;
     }
 
+    // Remove the moved piece from the destination square since it was added above
+    // Remove the promoted piece from the destination square
+    mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[promotedPieceIndex] ^= destBitBoard;
-    mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-    // mBitBoards[movedPieceIndex] ^= destBitBoard;
-    // mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-    // mBitBoards[promotedPieceIndex] ^= destBitBoard;
   }
 
   // Handle captures
@@ -1525,56 +1511,33 @@ void BitBoard::unmakeMove(
       capturePieceIndex += 6;
     }
 
-    mCells[destIndex].piece   = capturePiece;
-    mCells[destIndex].color   = otherSide;
-    // mBitBoards[capturePieceIndex] |= destBitBoard;
+    // Add the captured piece to the destination
+    mCells[destIndex].piece = capturePiece;
+    mCells[destIndex].color = otherSide;
+    mBitBoards[capturePieceIndex] |= destBitBoard;
 
-    if (move.isPromotionCapture())
-    {
-      Piece promotedPiece             = move.getPromotedPiece();
-      std::int32_t promotedPieceIndex = static_cast<std::int32_t>(promotedPiece);
-      if (sideThatMoved == Color::Black)
-      {
-        promotedPieceIndex += 6;
-      }
-
-      mBitBoards[movedPieceIndex] |= sourceBitBoard;
-      mBitBoards[capturePieceIndex] |= destBitBoard;
-      mBitBoards[promotedPieceIndex] ^= destBitBoard;
-    }
-    else if (move.isEnpassantCapture())
+    // Handle en-passant captures
+    if (move.isEnpassantCapture())
     {
       std::int8_t dir            = (sideThatMoved == Color::White ? -1 : +1);
       std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
       std::uint64_t epBitBoard   = (1ULL << enPassantIndex);
 
-      mBitBoards[movedPieceIndex] ^= destBitBoard;
-      mBitBoards[movedPieceIndex] |= sourceBitBoard;
-      mBitBoards[capturePieceIndex] |= epBitBoard;
-
       // En-passant captures take place on a different square
       // Above we put the captured piece on the desintation square
       // so we need to move it now.
-      mCells[destIndex].piece = Piece::None;
-      mCells[destIndex].color = Color::None;
+      mBitBoards[capturePieceIndex] ^= destBitBoard;
+      mBitBoards[capturePieceIndex] |= epBitBoard;
+      mCells[destIndex].piece      = Piece::None;
+      mCells[destIndex].color      = Color::None;
       mCells[enPassantIndex].piece = Piece::Pawn;
       mCells[enPassantIndex].color = otherSide;
-    }
-    else // Standard captures
-    {
-      mBitBoards[movedPieceIndex] ^= destBitBoard;
-      mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
-      mBitBoards[capturePieceIndex] |= destBitBoard;
     }
   }
 
   // Handle castle moves
   if (move.isCastle())
   {
-    mBitBoards[movedPieceIndex] ^= destBitBoard;
-    mBitBoards[movedPieceIndex] |= sourceBitBoard;
-
     if (destIndex == C1)
     {
       mBitBoards[ROOK_INDEX] ^= (1ULL << D1);
