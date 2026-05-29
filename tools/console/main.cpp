@@ -4,8 +4,7 @@ int main(
   int argc,
   char ** argv)
 {
-  std::unique_ptr<ConsoleGame> game(new ConsoleGame);
-  game->execute();
-
+  ConsoleGame game;
+  game.execute();
   return 0;
 }
