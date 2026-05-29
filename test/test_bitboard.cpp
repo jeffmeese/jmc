@@ -13,22 +13,26 @@ namespace
 
 bool containsMove(
   const MoveList & moveList,
-  int sourceRow,
-  int sourceCol,
-  int destRow,
-  int destCol)
+  std::int8_t sourceIndex,
+  std::int8_t destIndex)
 {
   for (std::int32_t i = 0; i < moveList.totalMoves(); ++i)
   {
     const Move & move = moveList.getMove(i);
 
-    Square src = move.getSourceSquare();
-    Square dst = move.getDestinationSquare();
-
-    if (src.row == sourceRow && src.col == sourceCol && dst.row == destRow && dst.col == destCol)
+    std::int8_t source = move.getSourceIndex();
+    std::int8_t dest = move.getDestinationIndex();
+    if (source == sourceIndex && dest == destIndex)
     {
       return true;
     }
+    //Square src = move.getSourceSquare();
+    //Square dst = move.getDestinationSquare();
+
+    //if (src.row == sourceRow && src.col == sourceCol && dst.row == destRow && dst.col == destCol)
+    //{
+    //  return true;
+    //}
   }
 
   return false;
@@ -80,7 +84,7 @@ TEST(
 
   board.generateMoves(1, 4, moveList);
 
-  EXPECT_TRUE(containsMove(moveList, 1, 4, 2, 4));
+  EXPECT_TRUE(containsMove(moveList, 12, 20));
 }
 
 TEST(
@@ -92,7 +96,7 @@ TEST(
 
   board.generateMoves(1, 4, moveList);
 
-  EXPECT_TRUE(containsMove(moveList, 1, 4, 3, 4));
+  EXPECT_TRUE(containsMove(moveList, 12, 28));
 }
 
 TEST(
@@ -104,8 +108,8 @@ TEST(
 
   board.generateMoves(0, 1, moveList);
 
-  EXPECT_TRUE(containsMove(moveList, 0, 1, 2, 0));
-  EXPECT_TRUE(containsMove(moveList, 0, 1, 2, 2));
+  EXPECT_TRUE(containsMove(moveList, 1, 16));
+  EXPECT_TRUE(containsMove(moveList, 1, 18));
 }
 
 TEST(
@@ -226,7 +230,7 @@ TEST(
 
   board.generateMoves(moveList);
 
-  EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 6));
+  EXPECT_TRUE(containsMove(moveList, 4, 6));
 }
 
 TEST(
@@ -241,7 +245,7 @@ TEST(
 
   board.generateMoves(moveList);
 
-  EXPECT_TRUE(containsMove(moveList, 0, 4, 0, 2));
+  EXPECT_TRUE(containsMove(moveList, 4, 2));
 }
 
 TEST(
@@ -256,7 +260,7 @@ TEST(
 
   board.generateMoves(moveList);
 
-  EXPECT_FALSE(containsMove(moveList, 0, 4, 0, 6));
+  EXPECT_FALSE(containsMove(moveList, 4, 6));
 }
 
 TEST(
@@ -326,10 +330,13 @@ TEST(
 
   for (std::int32_t i = 0; i < moveList.totalMoves(); ++i)
   {
-    Square src = moveList.getMove(i).getSourceSquare();
-    Square dst = moveList.getMove(i).getDestinationSquare();
+    std::int8_t src = moveList.getMove(i).getSourceIndex();
+    std::int8_t dst = moveList.getMove(i).getDestinationIndex();
+    //Square src = moveList.getMove(i).getSourceSquare();
+    //Square dst = moveList.getMove(i).getDestinationSquare();
 
-    if (src.row == 1 && src.col == 4 && dst.row == 3 && dst.col == 4)
+    //if (src.row == 1 && src.col == 4 && dst.row == 3 && dst.col == 4)
+    if (src == 12 && dst == 28)
     {
       selectedMove = moveList.getMove(i);
       found        = true;
@@ -360,10 +367,13 @@ TEST(
 
   for (std::int32_t i = 0; i < moveList.totalMoves(); ++i)
   {
-    Square src = moveList.getMove(i).getSourceSquare();
-    Square dst = moveList.getMove(i).getDestinationSquare();
+    std::int8_t src = moveList.getMove(i).getSourceIndex();
+    std::int8_t dst = moveList.getMove(i).getDestinationIndex();
+    //Square src = moveList.getMove(i).getSourceSquare();
+    //Square dst = moveList.getMove(i).getDestinationSquare();
 
-    if (src.row == 1 && src.col == 4 && dst.row == 3 && dst.col == 4)
+    //if (src.row == 1 && src.col == 4 && dst.row == 3 && dst.col == 4)
+    if (src == 12 && dst == 28)
     {
       selectedMove = moveList.getMove(i);
       found        = true;
@@ -419,10 +429,10 @@ TEST(
 
   board.generateMoves(3, 3, moveList);
 
-  EXPECT_TRUE(containsMove(moveList, 3, 3, 3, 0));
-  EXPECT_TRUE(containsMove(moveList, 3, 3, 3, 7));
-  EXPECT_TRUE(containsMove(moveList, 3, 3, 0, 3));
-  EXPECT_TRUE(containsMove(moveList, 3, 3, 7, 3));
+  EXPECT_TRUE(containsMove(moveList, 27, 24));
+  EXPECT_TRUE(containsMove(moveList, 27, 31));
+  EXPECT_TRUE(containsMove(moveList, 27, 3));
+  EXPECT_TRUE(containsMove(moveList, 27, 59));
 }
 
 TEST(
@@ -437,5 +447,5 @@ TEST(
 
   board.generateMoves(3, 3, moveList);
 
-  EXPECT_TRUE(containsMove(moveList, 3, 3, 4, 3));
+  EXPECT_TRUE(containsMove(moveList, 27, 35));
 }
