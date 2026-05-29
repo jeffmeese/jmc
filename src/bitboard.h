@@ -81,13 +81,6 @@ private:
     std::uint64_t enemyPieces,
     MoveList & moveList) const;
 
-  // void generateDiagonalMoves(
-  //   std::uint64_t pieces,
-  //   Piece pieceType,
-  //   std::uint64_t enemyPieces,
-  //   bool diagonal,
-  //   MoveList & moveList) const;
-
   void generateKingMoves(
     std::uint64_t kings,
     std::uint64_t enemyPieces,
@@ -116,12 +109,6 @@ private:
 
   void generatePawnPushesWhite(MoveList & moveList) const;
 
-  // void generateStraightMoves(
-  //   std::uint64_t pieces,
-  //   Piece pieceType,
-  //   std::uint64_t enemyPieces,
-  //   MoveList & moveList) const;
-
   Piece getCapturedPiece(std::int8_t square) const;
 
   constexpr std::int8_t getIndex(
@@ -141,10 +128,9 @@ private:
   void pushMove(
     std::int8_t fromIndex,
     std::int8_t toIndex,
-    Piece piece,
+    std::uint8_t flags,
     Piece capturePiece,
     Piece promotionPiece,
-    Move::Type type,
     MoveList & moveList) const;
 
   void updateAggregateBitboards();

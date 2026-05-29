@@ -113,10 +113,9 @@ private:
   void pushMove(
     std::int8_t fromIndex,
     std::int8_t toIndex,
-    Piece piece,
+    std::uint8_t flags,
     Piece capturePiece,
     Piece promotionPiece,
-    Move::Type type,
     MoveList & moveList) const;
 
   BoardState mBoardState;
