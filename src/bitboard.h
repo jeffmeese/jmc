@@ -111,14 +111,6 @@ private:
 
   Piece getCapturedPiece(std::int8_t square) const;
 
-  // constexpr std::int8_t getIndex(
-  //   std::int8_t row,
-  //   std::int8_t col) const;
-
-  // constexpr std::int8_t getRow(std::int8_t index) const;
-
-  // constexpr std::int8_t getCol(std::int8_t index) const;
-
   void initAttacks();
 
   bool isCellAttacked(

@@ -23,25 +23,6 @@ static constexpr std::int8_t SOUTH = -8;
 static constexpr std::int8_t EAST  = 1;
 static constexpr std::int8_t WEST  = -1;
 
-// Constants for board squares
-static constexpr std::int8_t A1            = 0;
-static constexpr std::int8_t B1            = 1;
-static constexpr std::int8_t C1            = 2;
-static constexpr std::int8_t D1            = 3;
-static constexpr std::int8_t E1            = 4;
-static constexpr std::int8_t F1            = 5;
-static constexpr std::int8_t G1            = 6;
-static constexpr std::int8_t H1            = 7;
-static constexpr std::int8_t A8            = 56;
-static constexpr std::int8_t B8            = 57;
-static constexpr std::int8_t C8            = 58;
-static constexpr std::int8_t D8            = 59;
-static constexpr std::int8_t E8            = 60;
-static constexpr std::int8_t F8            = 61;
-static constexpr std::int8_t G8            = 62;
-static constexpr std::int8_t H8            = 63;
-static constexpr std::int8_t INVALID_INDEX = 64;
-
 // Attack vectors
 static constexpr std::int8_t PAWN_ROW_INCREMENTS[2]        = {+1, +1};
 static constexpr std::int8_t PAWN_COLUMN_INCREMENTS[2]     = {+1, -1};
@@ -53,25 +34,6 @@ static constexpr std::int8_t STRAIGHT_ROW_INCREMENTS[4]    = {+1, -1, +0, +0};
 static constexpr std::int8_t STRAIGHT_COLUMN_INCREMENTS[4] = {+0, +0, +1, -1};
 static constexpr std::int8_t DIAGONAL_ROW_INCREMENTS[4]    = {+1, +1, -1, -1};
 static constexpr std::int8_t DIAGONAL_COLUMN_INCREMENTS[4] = {+1, -1, +1, -1};
-
-// constexpr std::int8_t getIndex(
-//   std::int8_t row,
-//   std::int8_t col)
-// {
-//   return (row << 3) | col;
-// }
-
-// constexpr std::int8_t getRow(
-//   std::int8_t index)
-// {
-//   return (index >> 3);
-// }
-
-// constexpr std::int8_t getCol(
-//   std::int8_t index)
-// {
-//   return (index & 7);
-// }
 
 Board8x8::Board8x8()
 {

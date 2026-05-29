@@ -15,8 +15,8 @@ namespace jmchess
 
 Game::Game()
 {
-  mBoard.reset(new Board8x8);
-  //mBoard.reset(new BitBoard);
+  //mBoard.reset(new Board8x8);
+  mBoard.reset(new BitBoard);
   mEngine.reset(new Engine);
   mSearch.reset(new Search);
 }

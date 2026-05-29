@@ -19,73 +19,6 @@
 namespace jmchess
 {
 
-// Constant for board squares
-static constexpr std::int8_t A1            = 0;
-static constexpr std::int8_t B1            = 1;
-static constexpr std::int8_t C1            = 2;
-static constexpr std::int8_t D1            = 3;
-static constexpr std::int8_t E1            = 4;
-static constexpr std::int8_t F1            = 5;
-static constexpr std::int8_t G1            = 6;
-static constexpr std::int8_t H1            = 7;
-static constexpr std::int8_t A2            = 8;
-static constexpr std::int8_t B2            = 9;
-static constexpr std::int8_t C2            = 10;
-static constexpr std::int8_t D2            = 11;
-static constexpr std::int8_t E2            = 12;
-static constexpr std::int8_t F2            = 13;
-static constexpr std::int8_t G2            = 14;
-static constexpr std::int8_t H2            = 15;
-static constexpr std::int8_t A3            = 16;
-static constexpr std::int8_t B3            = 17;
-static constexpr std::int8_t C3            = 18;
-static constexpr std::int8_t D3            = 19;
-static constexpr std::int8_t E3            = 20;
-static constexpr std::int8_t F3            = 21;
-static constexpr std::int8_t G3            = 22;
-static constexpr std::int8_t H3            = 23;
-static constexpr std::int8_t A4            = 24;
-static constexpr std::int8_t B4            = 25;
-static constexpr std::int8_t C4            = 26;
-static constexpr std::int8_t D4            = 27;
-static constexpr std::int8_t E4            = 28;
-static constexpr std::int8_t F4            = 29;
-static constexpr std::int8_t G4            = 30;
-static constexpr std::int8_t H4            = 31;
-static constexpr std::int8_t A5            = 32;
-static constexpr std::int8_t B5            = 33;
-static constexpr std::int8_t C5            = 34;
-static constexpr std::int8_t D5            = 35;
-static constexpr std::int8_t E5            = 36;
-static constexpr std::int8_t F5            = 37;
-static constexpr std::int8_t G5            = 38;
-static constexpr std::int8_t H5            = 39;
-static constexpr std::int8_t A6            = 40;
-static constexpr std::int8_t B6            = 41;
-static constexpr std::int8_t C6            = 42;
-static constexpr std::int8_t D6            = 43;
-static constexpr std::int8_t E6            = 44;
-static constexpr std::int8_t F6            = 45;
-static constexpr std::int8_t G6            = 46;
-static constexpr std::int8_t H6            = 47;
-static constexpr std::int8_t A7            = 48;
-static constexpr std::int8_t B7            = 49;
-static constexpr std::int8_t C7            = 50;
-static constexpr std::int8_t D7            = 51;
-static constexpr std::int8_t E7            = 52;
-static constexpr std::int8_t F7            = 53;
-static constexpr std::int8_t G7            = 54;
-static constexpr std::int8_t H7            = 55;
-static constexpr std::int8_t A8            = 56;
-static constexpr std::int8_t B8            = 57;
-static constexpr std::int8_t C8            = 58;
-static constexpr std::int8_t D8            = 59;
-static constexpr std::int8_t E8            = 60;
-static constexpr std::int8_t F8            = 61;
-static constexpr std::int8_t G8            = 62;
-static constexpr std::int8_t H8            = 63;
-static constexpr std::int8_t INVALID_INDEX = 64;
-
 // Constants for files and ranks
 static constexpr std::uint64_t RANK_1 = 0x00000000000000ffULL;
 static constexpr std::uint64_t RANK_2 = 0x000000000000ff00ULL;
@@ -176,25 +109,6 @@ int BitBoard::bitScanReverse(
     return index64[(bb * debruijn64) >> 58];
   }
 }
-
-// constexpr std::int8_t BitBoard::getIndex(
-//   std::int8_t row,
-//   std::int8_t col) const
-// {
-//   return (row << 3) | col;
-// }
-
-// constexpr std::int8_t BitBoard::getRow(
-//   std::int8_t index) const
-// {
-//   return (index >> 3);
-// }
-
-// constexpr std::int8_t BitBoard::getCol(
-//   std::int8_t index) const
-// {
-//   return (index & 7);
-// }
 
 template <bool Diagonal>
 void BitBoard::generateSlidingMoves(
