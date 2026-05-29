@@ -1186,7 +1186,7 @@ void BitBoard::pushMove(
   Piece capturePiece,
   MoveList & moveList) const
 {
-  Move move(fromSquare, toSquare, mBoardState, flags, capturePiece);
+  Move move(fromSquare, toSquare, flags, mBoardState, capturePiece);
   moveList.addMove(move);
 }
 

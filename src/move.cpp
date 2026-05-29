@@ -12,8 +12,8 @@ namespace jmchess
 Move::Move(
   std::int8_t sourceIndex,
   std::int8_t destinationIndex,
-  BoardState boardState,
   std::uint8_t flags,
+  BoardState boardState,
   Piece capturePiece)
 {
   mSourceIndex      = sourceIndex;
@@ -120,19 +120,9 @@ bool Move::isPromotion() const
   return (mFlags & 0x08);
 }
 
-bool Move::isPromotionCapture() const
-{
-  return (mFlags & 0x0C);
-}
-
 bool Move::isQuiet() const
 {
   return (mFlags == MOVE_QUIET);
-}
-
-bool Move::isStandardCapture() const
-{
-  return (mFlags == MOVE_CAPTURE);
 }
 
 std::string Move::toSmithNotation() const

@@ -31,8 +31,8 @@ public:
   Move(
     std::int8_t sourceIndex,
     std::int8_t destIndex,
-    BoardState boardState,
     std::uint8_t flags,
+    BoardState boardState,
     Piece capturePiece = Piece::None);
 
   BoardState getBoardState() const;
@@ -65,11 +65,7 @@ public:
 
   bool isPromotion() const;
 
-  bool isPromotionCapture() const;
-
   bool isQuiet() const;
-
-  bool isStandardCapture() const;
   
   std::string toSmithNotation() const;
 
