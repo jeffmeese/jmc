@@ -48,6 +48,13 @@ std::int8_t Move::getDestinationRow() const
   return (mDestinationIndex >> 3);
 }
 
+std::int8_t Move::getIndex(
+  std::int8_t row,
+  std::int8_t col)
+{
+  return (row << 3) | col;
+}
+
 Piece Move::getPromotedPiece() const
 {
   if (mFlags == MOVE_QUEEN_PROMOTION || mFlags == MOVE_QUEEN_PROMOTION_CAPTURE)
@@ -134,8 +141,8 @@ std::string Move::toSmithNotation() const
   std::ostringstream oss;
   std::int8_t sourceRow = getSourceRow();
   std::int8_t sourceCol = getSourceColumn();
-  std::int8_t destRow = getDestinationRow();
-  std::int8_t destCol = getDestinationColumn();
+  std::int8_t destRow   = getDestinationRow();
+  std::int8_t destCol   = getDestinationColumn();
   oss << colLetter[sourceCol] << (sourceRow + 1) << colLetter[destCol] << (destRow + 1);
   return oss.str();
 }

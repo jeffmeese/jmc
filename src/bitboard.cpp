@@ -177,24 +177,24 @@ int BitBoard::bitScanReverse(
   }
 }
 
-constexpr std::int8_t BitBoard::getIndex(
-  std::int8_t row,
-  std::int8_t col) const
-{
-  return (row << 3) | col;
-}
+// constexpr std::int8_t BitBoard::getIndex(
+//   std::int8_t row,
+//   std::int8_t col) const
+// {
+//   return (row << 3) | col;
+// }
 
-constexpr std::int8_t BitBoard::getRow(
-  std::int8_t index) const
-{
-  return (index >> 3);
-}
+// constexpr std::int8_t BitBoard::getRow(
+//   std::int8_t index) const
+// {
+//   return (index >> 3);
+// }
 
-constexpr std::int8_t BitBoard::getCol(
-  std::int8_t index) const
-{
-  return (index & 7);
-}
+// constexpr std::int8_t BitBoard::getCol(
+//   std::int8_t index) const
+// {
+//   return (index & 7);
+// }
 
 template <bool Diagonal>
 void BitBoard::generateSlidingMoves(

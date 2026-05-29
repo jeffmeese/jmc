@@ -37,7 +37,15 @@ public:
   virtual std::int8_t getKingColumn(Color color) const = 0;
 
   virtual std::int8_t getKingRow(Color color) const = 0;
-  
+
+  static std::int8_t getIndex(
+    std::int8_t row,
+    std::int8_t col);
+
+  static std::int8_t getRow(std::int8_t index);
+
+  static std::int8_t getCol(std::int8_t index);
+
   virtual PieceType getPieceType(
     std::int8_t row,
     std::int8_t col) const = 0;

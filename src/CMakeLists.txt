@@ -19,6 +19,7 @@ set(HDR_FILES
 
 set(SRC_FILES
   bitboard.cpp
+  board.cpp
   board8x8.cpp
   engine.cpp
   evaluation.cpp

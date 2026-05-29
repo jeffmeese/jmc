@@ -54,24 +54,24 @@ static constexpr std::int8_t STRAIGHT_COLUMN_INCREMENTS[4] = {+0, +0, +1, -1};
 static constexpr std::int8_t DIAGONAL_ROW_INCREMENTS[4]    = {+1, +1, -1, -1};
 static constexpr std::int8_t DIAGONAL_COLUMN_INCREMENTS[4] = {+1, -1, +1, -1};
 
-constexpr std::int8_t getIndex(
-  std::int8_t row,
-  std::int8_t col)
-{
-  return (row << 3) | col;
-}
+// constexpr std::int8_t getIndex(
+//   std::int8_t row,
+//   std::int8_t col)
+// {
+//   return (row << 3) | col;
+// }
 
-constexpr std::int8_t getRow(
-  std::int8_t index)
-{
-  return (index >> 3);
-}
+// constexpr std::int8_t getRow(
+//   std::int8_t index)
+// {
+//   return (index >> 3);
+// }
 
-constexpr std::int8_t getCol(
-  std::int8_t index)
-{
-  return (index & 7);
-}
+// constexpr std::int8_t getCol(
+//   std::int8_t index)
+// {
+//   return (index & 7);
+// }
 
 Board8x8::Board8x8()
 {

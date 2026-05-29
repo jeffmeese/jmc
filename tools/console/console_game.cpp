@@ -200,15 +200,12 @@ void ConsoleGame::handleMoveCommand(
 
   // Check that the move is valid
   std::int32_t moveIndex = -1;
+  std::int8_t sourceIndex = jmchess::Board::getIndex(sourceRow, sourceColumn);
+  std::int8_t destIndex = jmchess::Board::getIndex(destinationRow, destinationColumn);
   for (uint8_t i = 0; i < moveList.totalMoves(); i++)
   {
     const jmchess::Move & move   = moveList.getMove(i);
-    jmchess::Square sourceSquare = move.getSourceSquare();
-    jmchess::Square destSquare   = move.getDestinationSquare();
-
-    if (
-      sourceSquare.row == sourceRow && destSquare.row == destinationRow && sourceSquare.col == sourceColumn &&
-      destSquare.col == destinationColumn)
+    if (move.getSourceIndex() == sourceIndex && move.getDestinationIndex() == destIndex)
     {
       moveIndex = i;
       break;

@@ -33,26 +33,44 @@ public:
     std::int8_t destIndex,
     BoardState boardState,
     std::uint8_t flags,
-    Piece capturePiece  = Piece::None);
+    Piece capturePiece = Piece::None);
 
   BoardState getBoardState() const;
+
   Piece getCapturedPiece() const;
+
   std::int8_t getDestinationColumn() const;
+
   std::int8_t getDestinationIndex() const;
+
   std::int8_t getDestinationRow() const;
+
+  static std::int8_t getIndex(std::int8_t row, std::int8_t col);
+
   Piece getPromotedPiece() const;
+
   std::int8_t getSourceIndex() const;
+
   std::int8_t getSourceRow() const;
+
   std::int8_t getSourceColumn() const;
 
   bool isCapture() const;
+
   bool isCastle() const;
+
   bool isEnpassantCapture() const;
+
   bool isEnpassantPush() const;
+
   bool isPromotion() const;
+
   bool isPromotionCapture() const;
+
   bool isQuiet() const;
+
   bool isStandardCapture() const;
+  
   std::string toSmithNotation() const;
 
   friend bool operator==(
@@ -64,7 +82,6 @@ private:
   std::int8_t mDestinationIndex = 0;
   std::uint8_t mFlags           = 0;
   Piece mCapturedPiece          = Piece::None;
-  //Piece mPromotedPiece          = Piece::None;
   BoardState mBoardState;
 };
 
