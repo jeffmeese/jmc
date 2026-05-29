@@ -130,7 +130,6 @@ private:
     std::int8_t toIndex,
     std::uint8_t flags,
     Piece capturePiece,
-    Piece promotionPiece,
     MoveList & moveList) const;
 
   void updateAggregateBitboards();

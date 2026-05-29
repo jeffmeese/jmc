@@ -14,14 +14,12 @@ Move::Move(
   std::int8_t destinationIndex,
   BoardState boardState,
   std::uint8_t flags,
-  Piece capturePiece,
-  Piece promotedPiece)
+  Piece capturePiece)
 {
   mSourceIndex      = sourceIndex;
   mDestinationIndex = destinationIndex;
   mBoardState       = boardState;
   mCapturedPiece    = capturePiece;
-  mPromotedPiece    = promotedPiece;
   mFlags            = flags;
 }
 
@@ -35,19 +33,59 @@ Piece Move::getCapturedPiece() const
   return mCapturedPiece;
 }
 
+std::int8_t Move::getDestinationColumn() const
+{
+  return (mDestinationIndex & 7);
+}
+
 std::int8_t Move::getDestinationIndex() const
 {
   return mDestinationIndex;
 }
 
+std::int8_t Move::getDestinationRow() const
+{
+  return (mDestinationIndex >> 3);
+}
+
 Piece Move::getPromotedPiece() const
 {
-  return mPromotedPiece;
+  if (mFlags == MOVE_QUEEN_PROMOTION || mFlags == MOVE_QUEEN_PROMOTION_CAPTURE)
+  {
+    return Piece::Queen;
+  }
+
+  if (mFlags == MOVE_ROOK_PROMOTION || mFlags == MOVE_ROOK_PROMOTION_CAPTURE)
+  {
+    return Piece::Rook;
+  }
+
+  if (mFlags == MOVE_BISHOP_PROMOTION || mFlags == MOVE_BISHOP_PROMOTION_CAPTURE)
+  {
+    return Piece::Bishop;
+  }
+
+  if (mFlags == MOVE_KNIGHT_PROMOTION || mFlags == MOVE_KNIGHT_PROMOTION_CAPTURE)
+  {
+    return Piece::Knight;
+  }
+
+  return Piece::None;
+}
+
+std::int8_t Move::getSourceColumn() const
+{
+  return (mSourceIndex & 7);
 }
 
 std::int8_t Move::getSourceIndex() const
 {
   return mSourceIndex;
+}
+
+std::int8_t Move::getSourceRow() const
+{
+  return (mSourceIndex >> 3);
 }
 
 bool Move::isCapture() const
@@ -94,7 +132,11 @@ std::string Move::toSmithNotation() const
 {
   static const char colLetter[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
   std::ostringstream oss;
-  // oss << colLetter[mSource.col] << (mSource.row + 1) << colLetter[mDestination.col] << (mDestination.row + 1);
+  std::int8_t sourceRow = getSourceRow();
+  std::int8_t sourceCol = getSourceColumn();
+  std::int8_t destRow = getDestinationRow();
+  std::int8_t destCol = getDestinationColumn();
+  oss << colLetter[sourceCol] << (sourceRow + 1) << colLetter[destCol] << (destRow + 1);
   return oss.str();
 }
 
@@ -118,11 +160,6 @@ bool operator==(
   }
 
   if (move1.mCapturedPiece != move2.mCapturedPiece)
-  {
-    return false;
-  }
-
-  if (move1.mPromotedPiece != move2.mPromotedPiece)
   {
     return false;
   }

@@ -158,7 +158,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(F1, attackColor) && !isCellAttacked(G1, attackColor))
         {
-          pushMove(E1, G1, MOVE_KING_CASTLE, Piece::None, Piece::None, moveList);
+          pushMove(E1, G1, MOVE_KING_CASTLE, Piece::None, moveList);
         }
       }
     }
@@ -172,7 +172,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E1, attackColor) && !isCellAttacked(D1, attackColor) && !isCellAttacked(C1, attackColor))
         {
-          pushMove(E1, C1, MOVE_QUEEN_CASTLE, Piece::None, Piece::None, moveList);
+          pushMove(E1, C1, MOVE_QUEEN_CASTLE, Piece::None, moveList);
         }
       }
     }
@@ -188,7 +188,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(F8, attackColor) && !isCellAttacked(G8, attackColor))
         {
-          pushMove(E8, G8, MOVE_KING_CASTLE, Piece::None, Piece::None, moveList);
+          pushMove(E8, G8, MOVE_KING_CASTLE, Piece::None, moveList);
         }
       }
     }
@@ -202,7 +202,7 @@ void Board8x8::generateCastlingMoves(
       {
         if (!isCellAttacked(E8, attackColor) && !isCellAttacked(D8, attackColor) && !isCellAttacked(C8, attackColor))
         {
-          pushMove(E8, C8, MOVE_QUEEN_CASTLE, Piece::None, Piece::None, moveList);
+          pushMove(E8, C8, MOVE_QUEEN_CASTLE, Piece::None, moveList);
         }
       }
     }
@@ -228,11 +228,11 @@ void Board8x8::generateJumpMoves(
 
       if (otherColor == Color::None)
       {
-        pushMove(index, destIndex, MOVE_QUIET, Piece::None, Piece::None, moveList);
+        pushMove(index, destIndex, MOVE_QUIET, Piece::None, moveList);
       }
       else if (isOppositeColor(pieceColor, otherColor))
       {
-        pushMove(index, destIndex, MOVE_CAPTURE, otherPiece, Piece::None, moveList);
+        pushMove(index, destIndex, MOVE_CAPTURE, otherPiece, moveList);
       }
     }
   }
@@ -373,21 +373,21 @@ void Board8x8::generatePawnMoves(
       std::int8_t destRow = getRow(pushSquare);
       if (destRow == WHITE_PROMOTION_ROW || destRow == BLACK_PROMOTION_ROW)
       {
-        pushMove(index, pushSquare, MOVE_BISHOP_PROMOTION, Piece::None, Piece::Bishop, moveList);
-        pushMove(index, pushSquare, MOVE_KNIGHT_PROMOTION, Piece::None, Piece::Knight, moveList);
-        pushMove(index, pushSquare, MOVE_ROOK_PROMOTION, Piece::None, Piece::Rook, moveList);
-        pushMove(index, pushSquare, MOVE_QUEEN_PROMOTION, Piece::None, Piece::Queen, moveList);
+        pushMove(index, pushSquare, MOVE_BISHOP_PROMOTION, Piece::None, moveList);
+        pushMove(index, pushSquare, MOVE_KNIGHT_PROMOTION, Piece::None, moveList);
+        pushMove(index, pushSquare, MOVE_ROOK_PROMOTION, Piece::None, moveList);
+        pushMove(index, pushSquare, MOVE_QUEEN_PROMOTION, Piece::None, moveList);
       }
       else
       {
-        pushMove(index, pushSquare, MOVE_QUIET, Piece::None, Piece::None, moveList);
+        pushMove(index, pushSquare, MOVE_QUIET, Piece::None, moveList);
       }
 
       if (doublePushSquare >= 0 && doublePushSquare <= 63)
       {
         if (sourceRow == startRow && mCells[doublePushSquare].piece == Piece::None)
         {
-          pushMove(index, doublePushSquare, MOVE_DOUBLE_PAWN_PUSH, Piece::None, Piece::None, moveList);
+          pushMove(index, doublePushSquare, MOVE_DOUBLE_PAWN_PUSH, Piece::None, moveList);
         }
       }
     }
@@ -410,21 +410,21 @@ void Board8x8::generatePawnMoves(
         {
           if (pieceColor == Color::White && destRow == WHITE_PROMOTION_ROW)
           {
-            pushMove(index, destIndex, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, Piece::Bishop, moveList);
-            pushMove(index, destIndex, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, Piece::Knight, moveList);
-            pushMove(index, destIndex, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, Piece::Rook, moveList);
-            pushMove(index, destIndex, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, Piece::Queen, moveList);
+            pushMove(index, destIndex, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, moveList);
+            pushMove(index, destIndex, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, moveList);
+            pushMove(index, destIndex, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, moveList);
+            pushMove(index, destIndex, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, moveList);
           }
           else if (pieceColor == Color::Black && destRow == BLACK_PROMOTION_ROW)
           {
-            pushMove(index, destIndex, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, Piece::Bishop, moveList);
-            pushMove(index, destIndex, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, Piece::Knight, moveList);
-            pushMove(index, destIndex, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, Piece::Rook, moveList);
-            pushMove(index, destIndex, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, Piece::Queen, moveList);
+            pushMove(index, destIndex, MOVE_BISHOP_PROMOTION_CAPTURE, capturePiece, moveList);
+            pushMove(index, destIndex, MOVE_KNIGHT_PROMOTION_CAPTURE, capturePiece, moveList);
+            pushMove(index, destIndex, MOVE_ROOK_PROMOTION_CAPTURE, capturePiece, moveList);
+            pushMove(index, destIndex, MOVE_QUEEN_PROMOTION_CAPTURE, capturePiece, moveList);
           }
           else
           {
-            pushMove(index, destIndex, MOVE_CAPTURE, capturePiece, Piece::None, moveList);
+            pushMove(index, destIndex, MOVE_CAPTURE, capturePiece, moveList);
           }
         }
       }
@@ -444,7 +444,7 @@ void Board8x8::generatePawnMoves(
         std::int8_t captureIndex = destIndex - indexIncrement;
         if (mCells[captureIndex].piece == Piece::Pawn && mCells[captureIndex].color == otherColor)
         {
-          pushMove(index, destIndex, MOVE_ENPASSANT_CAPTURE, Piece::Pawn, Piece::None, moveList);
+          pushMove(index, destIndex, MOVE_ENPASSANT_CAPTURE, Piece::Pawn, moveList);
         }
       }
     }
@@ -480,13 +480,13 @@ void Board8x8::generateSlidingMoves(
     // Check for quiet move or capture
     if (otherColor == Color::None)
     {
-      pushMove(index, destIndex, MOVE_QUIET, Piece::None, Piece::None, moveList);
+      pushMove(index, destIndex, MOVE_QUIET, Piece::None, moveList);
     }
     else
     {
       if (isOppositeColor(pieceColor, otherColor))
       {
-        pushMove(index, destIndex, MOVE_CAPTURE, otherPiece, Piece::None, moveList);
+        pushMove(index, destIndex, MOVE_CAPTURE, otherPiece, moveList);
       }
 
       break;
@@ -924,10 +924,9 @@ void Board8x8::pushMove(
   std::int8_t toSquare,
   std::uint8_t flags,
   Piece capturePiece,
-  Piece promotionPiece,
   MoveList & moveList) const
 {
-  Move move(fromSquare, toSquare, mBoardState, flags, capturePiece, promotionPiece);
+  Move move(fromSquare, toSquare, mBoardState, flags, capturePiece);
   moveList.addMove(move);
 }
 

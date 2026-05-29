@@ -33,14 +33,17 @@ public:
     std::int8_t destIndex,
     BoardState boardState,
     std::uint8_t flags,
-    Piece capturePiece  = Piece::None,
-    Piece promotedPiece = Piece::None);
+    Piece capturePiece  = Piece::None);
 
   BoardState getBoardState() const;
   Piece getCapturedPiece() const;
+  std::int8_t getDestinationColumn() const;
   std::int8_t getDestinationIndex() const;
+  std::int8_t getDestinationRow() const;
   Piece getPromotedPiece() const;
   std::int8_t getSourceIndex() const;
+  std::int8_t getSourceRow() const;
+  std::int8_t getSourceColumn() const;
 
   bool isCapture() const;
   bool isCastle() const;
@@ -61,7 +64,7 @@ private:
   std::int8_t mDestinationIndex = 0;
   std::uint8_t mFlags           = 0;
   Piece mCapturedPiece          = Piece::None;
-  Piece mPromotedPiece          = Piece::None;
+  //Piece mPromotedPiece          = Piece::None;
   BoardState mBoardState;
 };
 
