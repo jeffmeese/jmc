@@ -134,6 +134,65 @@ std::string Move::toSmithNotation() const
   std::int8_t destRow   = getDestinationRow();
   std::int8_t destCol   = getDestinationColumn();
   oss << colLetter[sourceCol] << (sourceRow + 1) << colLetter[destCol] << (destRow + 1);
+
+  if (isEnpassantCapture())
+  {
+    oss << "E";
+  }
+  
+  if (mCapturedPiece != Piece::None && mFlags != MOVE_ENPASSANT_CAPTURE)
+  {
+    std::string pieceString;
+    switch (mCapturedPiece)
+    {
+    case Piece::Pawn:
+      pieceString = "p";
+      break;
+    case Piece::Rook:
+      pieceString = "r";
+      break;
+    case Piece::Bishop:
+      pieceString = "b";
+      break;
+    case Piece::Knight:
+      pieceString = "k";
+      break;
+    case Piece::Queen:
+      pieceString = "q";
+      break;
+    default:
+      break;
+    }
+
+    oss << pieceString;
+  }
+
+  if (isCastle())
+  {
+    std::string castleString = (mFlags == MOVE_QUEEN_CASTLE) ? "C" : "c";
+    oss << castleString;
+  }
+
+  if (mFlags == MOVE_KNIGHT_PROMOTION || mFlags == MOVE_KNIGHT_PROMOTION_CAPTURE)
+  {
+    oss << "k";
+  }
+
+  if (mFlags == MOVE_BISHOP_PROMOTION || mFlags == MOVE_BISHOP_PROMOTION_CAPTURE)
+  {
+    oss << "b";
+  }
+
+  if (mFlags == MOVE_ROOK_PROMOTION || mFlags == MOVE_ROOK_PROMOTION_CAPTURE)
+  {
+    oss << "r";
+  }
+
+  if (mFlags == MOVE_QUEEN_PROMOTION || mFlags == MOVE_QUEEN_PROMOTION_CAPTURE)
+  {
+    oss << "q";
+  }
+
   return oss.str();
 }
 
