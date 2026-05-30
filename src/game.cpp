@@ -15,7 +15,7 @@ namespace jmchess
 
 Game::Game()
 {
-  //mBoard.reset(new Board8x8);
+  // mBoard.reset(new Board8x8);
   mBoard.reset(new BitBoard);
   mEngine.reset(new Engine);
   mSearch.reset(new Search);
@@ -89,8 +89,8 @@ void Game::makeMove(
   }
 
   bool kingInCheck = mBoard->isKingInCheck(mBoard->getBoardState().sideToMove);
-  mCheckmate = (legalMoves == 0 && kingInCheck);
-  mStalemate = (legalMoves == 0 && !kingInCheck);
+  mCheckmate       = (legalMoves == 0 && kingInCheck);
+  mStalemate       = (legalMoves == 0 && !kingInCheck);
 }
 
 void Game::performEngineCommand()
@@ -118,8 +118,7 @@ void Game::performEngineCommand()
       {
         legalMoves++;
 
-        double score =
-          -mSearch->alphaBeta(board, sideToMove, alpha, beta, depth - 1, bestMoveIndex);
+        double score = -mSearch->alphaBeta(board, sideToMove, alpha, beta, depth - 1, bestMoveIndex);
         if (score > bestScore)
         {
           bestScore     = score;
@@ -160,8 +159,8 @@ void Game::performEngineCommand()
   if (legalMoves == 0)
   {
     bool kingInCheck = mBoard->isKingInCheck(mBoard->getBoardState().sideToMove);
-    mCheckmate = kingInCheck;
-    mStalemate = !kingInCheck;
+    mCheckmate       = kingInCheck;
+    mStalemate       = !kingInCheck;
     return;
   }
 

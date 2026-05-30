@@ -386,7 +386,7 @@ void ConsoleGame::handleShowCommand()
     {
       totalMoves++;
       board->unmakeMove(move);
-      std::cout << move.toSmithNotation() << "\n";
+      std::cout << move.toAlgebraicNotation(board) << "\n";
     }
   }
 
