@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 
+#include "board.h"
 #include "piece.h"
 #include "square.h"
 
@@ -125,6 +126,116 @@ bool Move::isQuiet() const
   return (mFlags == MOVE_QUIET);
 }
 
+std::string Move::toAlgebraicNotation(
+  Board * board) const
+{
+  static const char colLetter[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
+  std::int32_t sourceRow = static_cast<std::int32_t>(Board::getRow(mSourceIndex));
+  std::int8_t sourceCol = Board::getCol(mSourceIndex);
+  std::int32_t destRow = static_cast<std::int32_t>(Board::getRow(mDestinationIndex));
+  std::int8_t destCol = Board::getCol(mDestinationIndex);
+
+  PieceType pieceType = board->getPieceType(sourceRow, sourceCol);
+
+  std::ostringstream oss;
+
+  if (isCastle())
+  {
+    if (mFlags == MOVE_QUEEN_CASTLE)
+    {
+      oss << "O-O-O";
+    }
+    else if (mFlags == MOVE_KING_CASTLE)
+    {
+      oss << "O-O";
+    }
+  } 
+  else
+  {
+    bool addDestCol = false;
+    bool addSourceCol = true;
+
+    if (pieceType == PieceType::WhiteKnight || pieceType == PieceType::BlackKnight)
+    {
+      oss << "N";
+      addDestCol = true;
+      addSourceCol = false;
+    }
+
+    if (pieceType == PieceType::WhiteBishop || pieceType == PieceType::BlackBishop)
+    {
+      oss << "B";
+      addDestCol = true;
+      addSourceCol = false;
+    }
+
+    if (pieceType == PieceType::WhiteRook || pieceType == PieceType::BlackRook)
+    {
+      oss << "R";
+      addDestCol = true;
+      addSourceCol = false;
+    }
+
+    if (pieceType == PieceType::WhiteQueen || pieceType == PieceType::BlackQueen)
+    {
+      oss << "Q";
+      addDestCol = true;
+      addSourceCol = false;
+    }
+
+    if (pieceType == PieceType::WhiteKing || pieceType == PieceType::BlackKing)
+    {
+      oss << "K";
+      addDestCol = true;
+      addSourceCol = false;
+    }
+
+    if (addSourceCol)
+    {
+      oss << colLetter[sourceCol];
+    }
+
+    if (isCapture())
+    {
+      oss << "x";
+      addDestCol = true;
+    }
+ 
+    if (addDestCol)
+    {
+      oss << colLetter[destCol];
+    }
+
+    oss << destRow + 1;
+
+    if (isPromotion())
+    {
+      oss << "=";
+      if (mFlags == MOVE_BISHOP_PROMOTION || mFlags == MOVE_BISHOP_PROMOTION_CAPTURE)
+      {
+        oss << "B";
+      }
+
+      if (mFlags == MOVE_KNIGHT_PROMOTION || mFlags == MOVE_KNIGHT_PROMOTION_CAPTURE)
+      {
+        oss << "N";
+      }
+
+      if (mFlags == MOVE_ROOK_PROMOTION || mFlags == MOVE_ROOK_PROMOTION_CAPTURE)
+      {
+        oss << "R";
+      }
+
+      if (mFlags == MOVE_QUEEN_PROMOTION || mFlags == MOVE_QUEEN_PROMOTION_CAPTURE)
+      {
+        oss << "Q";
+      }
+    }
+  }
+
+  return oss.str();
+}
+
 std::string Move::toSmithNotation() const
 {
   static const char colLetter[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
@@ -139,7 +250,7 @@ std::string Move::toSmithNotation() const
   {
     oss << "E";
   }
-  
+
   if (mCapturedPiece != Piece::None && mFlags != MOVE_ENPASSANT_CAPTURE)
   {
     std::string pieceString;

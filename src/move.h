@@ -10,6 +10,8 @@
 namespace jmchess
 {
 
+class Board;
+
 constexpr std::uint8_t MOVE_QUIET                    = 0x00;
 constexpr std::uint8_t MOVE_DOUBLE_PAWN_PUSH         = 0x01;
 constexpr std::uint8_t MOVE_KING_CASTLE              = 0x02;
@@ -45,7 +47,9 @@ public:
 
   std::int8_t getDestinationRow() const;
 
-  static std::int8_t getIndex(std::int8_t row, std::int8_t col);
+  static std::int8_t getIndex(
+    std::int8_t row,
+    std::int8_t col);
 
   Piece getPromotedPiece() const;
 
@@ -66,7 +70,9 @@ public:
   bool isPromotion() const;
 
   bool isQuiet() const;
-  
+
+  std::string toAlgebraicNotation(Board * board) const;
+
   std::string toSmithNotation() const;
 
   friend bool operator==(
