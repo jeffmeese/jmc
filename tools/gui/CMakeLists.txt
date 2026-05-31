@@ -8,12 +8,14 @@ set(CMAKE_AUTORCC TRUE)
 
 set(HDR_FILES
   application/application.h
+  application/gui_game.h
   application/mainwindow.h
   view/boardview.h
 )
 
 set(SRC_FILES
   application/application.cpp
+  application/gui_game.cpp
   application/main.cpp
   application/mainwindow.cpp
   view/boardview.cpp
@@ -23,7 +25,11 @@ set(UI_FILES
   application/mainwindow.ui
 )
 
-add_executable(${TARGET_NAME} ${HDR_FILES} ${SRC_FILES})
+set(RES_FILES
+  resources/resources.qrc
+)
+
+add_executable(${TARGET_NAME} ${HDR_FILES} ${SRC_FILES} ${RES_FILES})
 
 target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
