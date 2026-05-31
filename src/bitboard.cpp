@@ -331,12 +331,12 @@ void BitBoard::generateMoves(
 
   if (sideToMove == Color::White)
   {
-    generatePawnPushesWhite(moveList);
+    generatePawnPushesWhite(mBitBoards[PAWN_INDEX], moveList);
     generatePawnCapturesWhite(pawns, enemyPieces, moveList);
   }
   else
   {
-    generatePawnPushesBlack(moveList);
+    generatePawnPushesBlack(mBitBoards[PAWN_INDEX + 6], moveList);
     generatePawnCapturesBlack(pawns, enemyPieces, moveList);
   }
 
@@ -383,20 +383,12 @@ void BitBoard::generateMoves(
 
   if (sideToMove == Color::White)
   {
-    if (pawns & pieceBitboard)
-    {
-      generatePawnPushesWhite(moveList);
-    }
-
+    generatePawnPushesWhite(pawns & pieceBitboard, moveList);
     generatePawnCapturesWhite(pawns & pieceBitboard, enemyPieces, moveList);
   }
   else
   {
-    if (pawns & pieceBitboard)
-    {
-      generatePawnPushesBlack(moveList);
-    }
-
+    generatePawnPushesBlack(pawns & pieceBitboard, moveList);
     generatePawnCapturesBlack(pawns & pieceBitboard, enemyPieces, moveList);
   }
 
@@ -458,10 +450,11 @@ void BitBoard::generatePawnCapturesBlack(
 }
 
 void BitBoard::generatePawnPushesBlack(
+  std::uint64_t pawns,
   MoveList & moveList) const
 {
   std::uint64_t empty          = ~mAllPieces;
-  std::uint64_t pawns          = mBitBoards[PAWN_INDEX + 6];
+  //std::uint64_t pawns          = mBitBoards[PAWN_INDEX + 6];
   std::uint64_t unmovedPawns   = pawns & RANK_7;
   std::uint64_t singlePushes   = ((pawns >> 8) & empty);
   std::uint64_t doublePushes   = (((unmovedPawns >> 8) & empty) >> 8) & empty;
@@ -547,10 +540,11 @@ void BitBoard::generatePawnCapturesWhite(
 }
 
 void BitBoard::generatePawnPushesWhite(
+  std::uint64_t pawns,
   MoveList & moveList) const
 {
   std::uint64_t empty          = ~mAllPieces;
-  std::uint64_t pawns          = mBitBoards[PAWN_INDEX];
+  //std::uint64_t pawns          = mBitBoards[PAWN_INDEX];
   std::uint64_t unmovedPawns   = pawns & RANK_2;
   std::uint64_t singlePushes   = ((pawns << 8) & empty);
   std::uint64_t doublePushes   = (((unmovedPawns << 8) & empty) << 8) & empty;

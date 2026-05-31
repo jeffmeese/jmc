@@ -100,14 +100,18 @@ private:
     std::uint64_t enemyPieces,
     MoveList & moveList) const;
 
-  void generatePawnPushesBlack(MoveList & moveList) const;
+  void generatePawnPushesBlack(
+    std::uint64_t pawns,
+    MoveList & moveList) const;
 
   void generatePawnCapturesWhite(
     std::uint64_t pawns,
     std::uint64_t enemyPieces,
     MoveList & moveList) const;
 
-  void generatePawnPushesWhite(MoveList & moveList) const;
+  void generatePawnPushesWhite(
+    std::uint64_t pawns,
+    MoveList & moveList) const;
 
   Piece getCapturedPiece(std::int8_t square) const;
 
