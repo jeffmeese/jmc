@@ -8,11 +8,12 @@ set(HDR_FILES
   engine.h
   evaluation.h
   fen.h
+  magic_bitboard.h
   game.h
-  search.h
   move.h
   move_list.h
   perft.h
+  search.h
   string_utilities.h
   timer.h
 )
@@ -25,10 +26,11 @@ set(SRC_FILES
   evaluation.cpp
   fen.cpp
   game.cpp
-  search.cpp
+  magic_bitboard.cpp
   move.cpp
   move_list.cpp
   perft.cpp
+  search.cpp
   string_utilities.cpp
   timer.cpp
 )
