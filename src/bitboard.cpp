@@ -381,13 +381,22 @@ void BitBoard::generateMoves(
   std::uint64_t pieceBitboard = (1ULL << index);
   std::uint64_t bis           = bishops & pieceBitboard;
 
+  
   if (sideToMove == Color::White)
   {
+    if (index == E1)
+    {
+      generateCastlingMoves(sideToMove, moveList);
+    }
     generatePawnPushesWhite(pawns & pieceBitboard, moveList);
     generatePawnCapturesWhite(pawns & pieceBitboard, enemyPieces, moveList);
   }
   else
   {
+    if (index == E8)
+    {
+      generateCastlingMoves(sideToMove, moveList);
+    }
     generatePawnPushesBlack(pawns & pieceBitboard, moveList);
     generatePawnCapturesBlack(pawns & pieceBitboard, enemyPieces, moveList);
   }
@@ -976,8 +985,8 @@ bool BitBoard::makeMove(
   BoardState boardState        = move.getBoardState();
   std::int8_t sourceIndex      = move.getSourceIndex();
   std::int8_t destIndex        = move.getDestinationIndex();
+  Piece movedPiece             = move.getPiece();
   Color sideToMove             = boardState.sideToMove;
-  Piece movedPiece             = mCells[sourceIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
   Square & kingSquare          = (sideToMove == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
@@ -1180,7 +1189,8 @@ void BitBoard::pushMove(
   Piece capturePiece,
   MoveList & moveList) const
 {
-  Move move(fromSquare, toSquare, flags, mBoardState, capturePiece);
+  Piece piece = mCells[fromSquare].piece;
+  Move move(fromSquare, toSquare, flags, piece, mBoardState, capturePiece);
   moveList.addMove(move);
 }
 
@@ -1345,8 +1355,8 @@ void BitBoard::unmakeMove(
   BoardState boardState        = move.getBoardState();
   std::int8_t sourceIndex      = move.getSourceIndex();
   std::int8_t destIndex        = move.getDestinationIndex();
+  Piece movedPiece             = move.getPiece();
   Color sideThatMoved          = boardState.sideToMove;
-  Piece movedPiece             = mCells[destIndex].piece;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
   Square & kingSquare          = (sideThatMoved == Color::White) ? mWhiteKingSquare : mBlackKingSquare;

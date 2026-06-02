@@ -14,11 +14,13 @@ Move::Move(
   std::int8_t sourceIndex,
   std::int8_t destinationIndex,
   std::uint8_t flags,
+  Piece piece,
   BoardState boardState,
   Piece capturePiece)
 {
   mSourceIndex      = sourceIndex;
   mDestinationIndex = destinationIndex;
+  mPiece            = piece;
   mBoardState       = boardState;
   mCapturedPiece    = capturePiece;
   mFlags            = flags;
@@ -54,6 +56,11 @@ std::int8_t Move::getIndex(
   std::int8_t col)
 {
   return (row << 3) | col;
+}
+
+Piece Move::getPiece() const
+{
+  return mPiece;
 }
 
 Piece Move::getPromotedPiece() const
@@ -130,10 +137,10 @@ std::string Move::toAlgebraicNotation(
   Board * board) const
 {
   static const char colLetter[] = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
-  std::int32_t sourceRow = static_cast<std::int32_t>(Board::getRow(mSourceIndex));
-  std::int8_t sourceCol = Board::getCol(mSourceIndex);
-  std::int32_t destRow = static_cast<std::int32_t>(Board::getRow(mDestinationIndex));
-  std::int8_t destCol = Board::getCol(mDestinationIndex);
+  std::int32_t sourceRow        = static_cast<std::int32_t>(Board::getRow(mSourceIndex));
+  std::int8_t sourceCol         = Board::getCol(mSourceIndex);
+  std::int32_t destRow          = static_cast<std::int32_t>(Board::getRow(mDestinationIndex));
+  std::int8_t destCol           = Board::getCol(mDestinationIndex);
 
   PieceType pieceType = board->getPieceType(sourceRow, sourceCol);
 
@@ -149,44 +156,44 @@ std::string Move::toAlgebraicNotation(
     {
       oss << "O-O";
     }
-  } 
+  }
   else
   {
-    bool addDestCol = false;
+    bool addDestCol   = false;
     bool addSourceCol = true;
 
-    if (pieceType == PieceType::WhiteKnight || pieceType == PieceType::BlackKnight)
+    if (mPiece == Piece::Knight)
     {
       oss << "N";
-      addDestCol = true;
+      addDestCol   = true;
       addSourceCol = false;
     }
 
-    if (pieceType == PieceType::WhiteBishop || pieceType == PieceType::BlackBishop)
+    if (mPiece == Piece::Bishop)
     {
       oss << "B";
-      addDestCol = true;
+      addDestCol   = true;
       addSourceCol = false;
     }
 
-    if (pieceType == PieceType::WhiteRook || pieceType == PieceType::BlackRook)
+    if (mPiece == Piece::Rook)
     {
       oss << "R";
-      addDestCol = true;
+      addDestCol   = true;
       addSourceCol = false;
     }
 
-    if (pieceType == PieceType::WhiteQueen || pieceType == PieceType::BlackQueen)
+    if (mPiece == Piece::Queen)
     {
       oss << "Q";
-      addDestCol = true;
+      addDestCol   = true;
       addSourceCol = false;
     }
 
-    if (pieceType == PieceType::WhiteKing || pieceType == PieceType::BlackKing)
+    if (mPiece == Piece::King)
     {
       oss << "K";
-      addDestCol = true;
+      addDestCol   = true;
       addSourceCol = false;
     }
 
@@ -200,7 +207,7 @@ std::string Move::toAlgebraicNotation(
       oss << "x";
       addDestCol = true;
     }
- 
+
     if (addDestCol)
     {
       oss << colLetter[destCol];

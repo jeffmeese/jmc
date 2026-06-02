@@ -5,6 +5,7 @@
 #include <QMainWindow>
 
 #include "gui_game.h"
+#include "move_model.h"
 
 namespace Ui
 {
@@ -23,4 +24,5 @@ signals:
 private:
   Ui::MainWindow * mUi = nullptr;
   std::unique_ptr<GuiGame> mGuiGame;
+  std::unique_ptr<MoveModel> mMoveModel;
 };

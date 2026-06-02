@@ -7,191 +7,144 @@
 #include <QGraphicsRectItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QMessageBox>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QPoint>
 #include <QWidget>
 
 BoardView::BoardView(
   QWidget * parent)
-  : QGraphicsView{parent}
+  : QWidget{parent}
 {
-  mScene.reset(new QGraphicsScene);
-  setScene(mScene.get());
-  // setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
-  mSquares.resize(64);
-  mScene->setSceneRect(0, 0, 200, 200);
-
-  QColor lightColor(240, 230, 140);
-  QColor darkColor(139, 69, 19);
-  QPen pen(Qt::black);
-
-  QColor currentColor = lightColor;
-  for (int32_t i = 0; i < 8; i++)
-  {
-    for (std::int32_t j = 0; j < 8; j++)
-    {
-      std::int32_t index = (i * 8) + j;
-
-      QBrush brush(currentColor);
-      QGraphicsRectItem * item = new QGraphicsRectItem;
-      item->setPen(pen);
-      item->setBrush(brush);
-      mSquares[index] = item;
-      mScene->addItem(item);
-
-      currentColor = (currentColor == lightColor) ? darkColor : lightColor;
-    }
-    currentColor = (currentColor == lightColor) ? darkColor : lightColor;
-  }
-
-  std::vector<QString> resourceNames;
-  resourceNames.push_back(":/white-pawn.png");
-  resourceNames.push_back(":/white-knight.png");
-  resourceNames.push_back(":/white-bishop.png");
-  resourceNames.push_back(":/white-rook.png");
-  resourceNames.push_back(":/white-queen.png");
-  resourceNames.push_back(":/white-king.png");
-  resourceNames.push_back(":/black-pawn.png");
-  resourceNames.push_back(":/black-knight.png");
-  resourceNames.push_back(":/black-bishop.png");
-  resourceNames.push_back(":/black-rook.png");
-  resourceNames.push_back(":/black-queen.png");
-  resourceNames.push_back(":/black-king.png");
-
-  mPixmaps.resize(12);
-  for (std::int32_t i = 0; i < 12; i++)
-  {
-    mPixmaps[i] = QPixmap::fromImage(QImage(resourceNames[i]));
-  }
-
-  mPieceToPixmap[jmchess::PieceType::WhitePawn]   = mPixmaps[0];
-  mPieceToPixmap[jmchess::PieceType::WhiteKnight] = mPixmaps[1];
-  mPieceToPixmap[jmchess::PieceType::WhiteBishop] = mPixmaps[2];
-  mPieceToPixmap[jmchess::PieceType::WhiteRook]   = mPixmaps[3];
-  mPieceToPixmap[jmchess::PieceType::WhiteQueen]  = mPixmaps[4];
-  mPieceToPixmap[jmchess::PieceType::WhiteKing]   = mPixmaps[5];
-  mPieceToPixmap[jmchess::PieceType::BlackPawn]   = mPixmaps[6];
-  mPieceToPixmap[jmchess::PieceType::BlackKnight] = mPixmaps[7];
-  mPieceToPixmap[jmchess::PieceType::BlackBishop] = mPixmaps[8];
-  mPieceToPixmap[jmchess::PieceType::BlackRook]   = mPixmaps[9];
-  mPieceToPixmap[jmchess::PieceType::BlackQueen]  = mPixmaps[10];
-  mPieceToPixmap[jmchess::PieceType::BlackKing]   = mPixmaps[11];
-
-  mPixmapItems.resize(64);
-  for (std::int32_t i = 0; i < 64; i++)
-  {
-    mPixmapItems[i] = new QGraphicsPixmapItem;
-    mPixmapItems[i]->setVisible(false);
-    mScene->addItem(mPixmapItems[i]);
-  }
-
-  for (std::int32_t i = 0; i < 8; i++)
-  {
-    mPixmapItems[i]->setPixmap(mPieceToPixmap[jmchess::PieceType::WhitePawn]);
-  }
+  mBoardPixmap       = QPixmap(":/1280px-Chessboard480-wood.svg.png");
+  mWhitePawnPixmap   = QPixmap(":/white-pawn.png");
+  mWhiteKnightPixmap = QPixmap(":/white-knight.png");
+  mWhiteBishopPixmap = QPixmap(":/white-bishop.png");
+  mWhiteRookPixmap   = QPixmap(":/white-rook.png");
+  mWhiteQueenPixmap  = QPixmap(":/white-queen.png");
+  mWhiteKingPixmap   = QPixmap(":/white-king.png");
+  mBlackPawnPixmap   = QPixmap(":/black-pawn.png");
+  mBlackKnightPixmap = QPixmap(":/black-knight.png");
+  mBlackBishopPixmap = QPixmap(":/black-bishop.png");
+  mBlackRookPixmap   = QPixmap(":/black-rook.png");
+  mBlackQueenPixmap  = QPixmap(":/black-queen.png");
+  mBlackKingPixmap   = QPixmap(":/black-king.png");
 }
 
 void BoardView::mousePressEvent(
   QMouseEvent * event)
 {
-  QGraphicsView::mousePressEvent(event);
+  // QGraphicsView::mousePressEvent(event);
 
-  QRect rect = viewport()->rect();
-  QPoint pos = event->pos();
+  if (mGame == nullptr)
+  {
+    return;
+  }
 
-  std::int32_t row = 7 - static_cast<std::int32_t>(static_cast<double>(pos.y()) / mSquareHeight);
-  std::int32_t col = static_cast<std::int32_t>(static_cast<double>(pos.x()) / mSquareWidth);
-  qDebug() << row << " " << col;
+  QRect rect       = this->rect();
+  int width        = rect.width();
+  int height       = rect.height();
+  int squareWidth  = width / 8;
+  int squareHeight = height / 8;
 
-  jmchess::Board * board = mGame->getBoard();
+  QPoint pos       = event->pos();
+  std::int32_t row = 7 - static_cast<std::int32_t>(static_cast<double>(pos.y()) / squareHeight);
+  std::int32_t col = static_cast<std::int32_t>(static_cast<double>(pos.x()) / squareWidth);
+
+  const jmchess::Board * board = mGame->getBoard();
+  jmchess::PieceType pieceType = board->getPieceType(row, col);
+
+  // If the user selected the same piece, deselect it
+  if (row == mSelectedRow && col == mSelectedCol)
+  {
+    mSelectedRow = -1;
+    mSelectedCol = -1;
+    mLegalMoves.clear();
+    update();
+    return;
+  }
+
+  // If the user selects a moveable piece, show the legal moves for that piece
   jmchess::MoveList moveList;
   board->generateMoves(row, col, moveList);
-  qDebug() << moveList.totalMoves();
-}
-
-void BoardView::resizeEvent(
-  QResizeEvent * event)
-{
-  QGraphicsView::resizeEvent(event);
-
-  QRect rect       = viewport()->rect();
-  QRectF sceneRect = rect;
-
-  int width     = rect.width();
-  int height    = rect.height();
-  mSquareWidth  = width / 8;
-  mSquareHeight = height / 8;
-
-  int32_t totalHeight = mSquareHeight * 8;
-  int32_t totalWidth  = mSquareWidth * 8;
-  mScene->setSceneRect(0, 0, totalWidth, totalHeight);
-
-  int32_t imageWidth  = mPixmaps[0].width();
-  int32_t imageHeight = mPixmaps[0].height();
-
-  double scaleWidth  = (static_cast<double>(imageWidth) / mSquareWidth);
-  double scaleHeight = (static_cast<double>(imageHeight) / mSquareHeight);
-  double scale       = scaleHeight;
-  if (scaleWidth > scale)
+  if (moveList.totalMoves() > 0)
   {
-    scale = scaleWidth;
-  }
-
-  int32_t pieceWidth  = static_cast<int32_t>(imageWidth / scale);
-  int32_t pieceHeight = static_cast<int32_t>(imageHeight / scale);
-
-  mPieceToPixmap[jmchess::PieceType::WhitePawn]   = mPixmaps[0].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::WhiteKnight] = mPixmaps[1].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::WhiteBishop] = mPixmaps[2].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::WhiteRook]   = mPixmaps[3].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::WhiteQueen]  = mPixmaps[4].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::WhiteKing]   = mPixmaps[5].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::BlackPawn]   = mPixmaps[6].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::BlackKnight] = mPixmaps[7].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::BlackBishop] = mPixmaps[8].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::BlackRook]   = mPixmaps[9].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::BlackQueen]  = mPixmaps[10].scaled(pieceWidth, pieceHeight);
-  mPieceToPixmap[jmchess::PieceType::BlackKing]   = mPixmaps[11].scaled(pieceWidth, pieceHeight);
-
-  std::int32_t yPiece = height - mSquareHeight;
-  std::int32_t yPos   = 0;
-  for (std::int32_t i = 0; i < 8; i++)
-  {
-    std::int32_t xPos = 0;
-    for (std::int32_t j = 0; j < 8; j++)
+    mSelectedRow = row;
+    mSelectedCol = col;
+    mLegalMoves.clear();
+    for (std::int32_t i = 0; i < moveList.totalMoves(); i++)
     {
-      std::int32_t index = (i * 8) + j;
-
-      QPoint pt = {xPos, yPos};
-      QRectF squareRect;
-      squareRect.setRect(xPos, yPos, mSquareWidth, mSquareHeight);
-      mSquares[index]->setRect(squareRect);
-      mPixmapItems[index]->setPos(xPos, yPiece);
-
-      if (mGame != nullptr)
-      {
-        const jmchess::Board * board = mGame->getBoard();
-        jmchess::PieceType pieceType = board->getPieceType(i, j);
-        mPixmapItems[index]->setPixmap(mPieceToPixmap[pieceType]);
-      }
-
-      xPos += mSquareWidth;
+      const jmchess::Move & move = moveList.getMove(i);
+      mLegalMoves.push_back(move);
     }
-    yPos += mSquareHeight;
-    yPiece -= mSquareHeight;
+    update();
+    return;
+  }
+
+  if (mLegalMoves.size() > 0)
+  {
+    // Check if the user selected a legal move
+    int selectedRow = mSelectedRow;
+    int selectedCol = mSelectedCol;
+    auto it         = std::find_if(
+      mLegalMoves.begin(), mLegalMoves.end(), [selectedRow, selectedCol, row, col](const jmchess::Move & move) {
+        bool source      = move.getSourceRow() == selectedRow && move.getSourceColumn() == selectedCol;
+        bool destination = move.getDestinationRow() == row && move.getDestinationColumn() == col;
+        return source && destination;
+      });
+
+    if (it == mLegalMoves.end())
+    {
+      // Handle illegal move
+      QMessageBox::warning(this, "Illegal Move", "That move is not legal.");
+      mLegalMoves.clear();
+      mSelectedRow = -1;
+      mSelectedCol = -1;
+      update();
+      return;
+    }
+
+    if (it != mLegalMoves.end())
+    {
+      // Handle legal move
+      mGame->makeMove(*it);
+      emit moveMade(*it);
+      mSelectedRow = -1;
+      mSelectedCol = -1;
+      mLegalMoves.clear();
+      update();
+    }
   }
 }
 
-void BoardView::setGame(
-  GuiGame * game)
+void BoardView::paintEvent(
+  QPaintEvent * event)
 {
-  mGame = game;
+  QPainter painter(this);
 
-  for (std::int32_t i = 0; i < 64; i++)
+  QRect rect       = this->rect();
+  int width        = rect.width();
+  int height       = rect.height();
+  int squareWidth  = width / 8;
+  int squareHeight = height / 8;
+
+  for (std::int8_t i = 0; i < 8; i++)
   {
-    mPixmapItems[i]->setVisible(false);
+    for (std::int8_t j = 0; j < 8; j++)
+    {
+      if ((i + j) % 2 == 0)
+      {
+        painter.fillRect(j * squareWidth, i * squareHeight, squareWidth, squareHeight, mLightSquareColor);
+      }
+      else
+      {
+        painter.fillRect(j * squareWidth, i * squareHeight, squareWidth, squareHeight, mDarkSquareColor);
+      }
+    }
   }
+
+  //painter.drawPixmap(0, 0, width, height, mBoardPixmap);
 
   if (mGame != nullptr)
   {
@@ -202,9 +155,89 @@ void BoardView::setGame(
       {
         std::int8_t index            = (i * 8) + j;
         jmchess::PieceType pieceType = board->getPieceType(i, j);
-        mPixmapItems[index]->setPixmap(mPieceToPixmap[pieceType]);
-        mPixmapItems[index]->setVisible(true);
+        switch (pieceType)
+        {
+        case jmchess::PieceType::WhitePawn:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mWhitePawnPixmap);
+          break;
+        case jmchess::PieceType::WhiteKnight:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mWhiteKnightPixmap);
+          break;
+        case jmchess::PieceType::WhiteBishop:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mWhiteBishopPixmap);
+          break;
+        case jmchess::PieceType::WhiteRook:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mWhiteRookPixmap);
+          break;
+        case jmchess::PieceType::WhiteQueen:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mWhiteQueenPixmap);
+          break;
+        case jmchess::PieceType::WhiteKing:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mWhiteKingPixmap);
+          break;
+        case jmchess::PieceType::BlackPawn:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mBlackPawnPixmap);
+          break;
+        case jmchess::PieceType::BlackKnight:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mBlackKnightPixmap);
+          break;
+        case jmchess::PieceType::BlackBishop:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mBlackBishopPixmap);
+          break;
+        case jmchess::PieceType::BlackRook:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mBlackRookPixmap);
+          break;
+        case jmchess::PieceType::BlackQueen:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mBlackQueenPixmap);
+          break;
+        case jmchess::PieceType::BlackKing:
+          painter.drawPixmap(j * squareWidth, (7 - i) * squareHeight, squareWidth, squareHeight, mBlackKingPixmap);
+          break;
+        }
+      }
+    }
+
+    if (mLegalMoves.size() > 0)
+    {
+      QBrush brush(QColor(255, 255, 0, 128));
+      for (const jmchess::Move & move : mLegalMoves)
+      {
+        painter.fillRect(
+          move.getDestinationColumn() * squareWidth, (7 - move.getDestinationRow()) * squareHeight, squareWidth,
+          squareHeight, brush);
       }
     }
   }
+}
+
+void BoardView::resizeEvent(
+  QResizeEvent * event)
+{
+}
+
+void BoardView::setGame(
+  GuiGame * game)
+{
+  mGame = game;
+  update();
+
+  // for (std::int32_t i = 0; i < 64; i++)
+  // {
+  //   mPixmapItems[i]->setVisible(false);
+  // }
+
+  // if (mGame != nullptr)
+  // {
+  //   const jmchess::Board * board = mGame->getBoard();
+  //   for (std::int8_t i = 0; i < 8; i++)
+  //   {
+  //     for (std::int8_t j = 0; j < 8; j++)
+  //     {
+  //       std::int8_t index            = (i * 8) + j;
+  //       jmchess::PieceType pieceType = board->getPieceType(i, j);
+  //       mPixmapItems[index]->setPixmap(mPieceToPixmap[pieceType]);
+  //       mPixmapItems[index]->setVisible(true);
+  //     }
+  //   }
+  // }
 }

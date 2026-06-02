@@ -34,6 +34,7 @@ public:
     std::int8_t sourceIndex,
     std::int8_t destIndex,
     std::uint8_t flags,
+    Piece piece,
     BoardState boardState,
     Piece capturePiece = Piece::None);
 
@@ -51,6 +52,8 @@ public:
     std::int8_t row,
     std::int8_t col);
 
+  Piece getPiece() const;
+  
   Piece getPromotedPiece() const;
 
   std::int8_t getSourceIndex() const;
@@ -83,6 +86,7 @@ private:
   std::int8_t mSourceIndex      = 0;
   std::int8_t mDestinationIndex = 0;
   std::uint8_t mFlags           = 0;
+  Piece mPiece                  = Piece::None;
   Piece mCapturedPiece          = Piece::None;
   BoardState mBoardState;
 };

@@ -10,6 +10,7 @@ set(HDR_FILES
   application/application.h
   application/gui_game.h
   application/mainwindow.h
+  application/move_model.h
   view/boardview.h
 )
 
@@ -18,6 +19,7 @@ set(SRC_FILES
   application/gui_game.cpp
   application/main.cpp
   application/mainwindow.cpp
+  application/move_model.cpp
   view/boardview.cpp
 )
 

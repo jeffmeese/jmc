@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -14,7 +16,7 @@
 
 #include "application/gui_game.h"
 
-class BoardView : public QGraphicsView
+class BoardView : public QWidget
 {
   Q_OBJECT
 
@@ -24,18 +26,33 @@ public:
   void setGame(GuiGame * game);
 
 protected:
+  void paintEvent(QPaintEvent * event) override;
   void mousePressEvent(QMouseEvent * event) override;
   void resizeEvent(QResizeEvent * event) override;
 
 signals:
+  void moveMade(const jmchess::Move & move);
+
+  void moveUndone();
 
 private:
-  std::unique_ptr<QGraphicsScene> mScene;
-  std::vector<QGraphicsRectItem *> mSquares;
-  std::vector<QPixmap> mPixmaps;
-  std::map<jmchess::PieceType, QPixmap> mPieceToPixmap;
-  std::vector<QGraphicsPixmapItem *> mPixmapItems;
-  std::int32_t mSquareWidth = 0;
-  std::int32_t mSquareHeight = 0;
-  GuiGame * mGame = nullptr;
+  QPixmap mBoardPixmap;
+  QPixmap mWhitePawnPixmap;
+  QPixmap mWhiteKnightPixmap;
+  QPixmap mWhiteBishopPixmap;
+  QPixmap mWhiteRookPixmap;
+  QPixmap mWhiteQueenPixmap;
+  QPixmap mWhiteKingPixmap;
+  QPixmap mBlackPawnPixmap;
+  QPixmap mBlackKnightPixmap;
+  QPixmap mBlackBishopPixmap;
+  QPixmap mBlackRookPixmap;
+  QPixmap mBlackQueenPixmap;
+  QPixmap mBlackKingPixmap;
+  std::vector<jmchess::Move> mLegalMoves;
+  GuiGame * mGame           = nullptr;
+  std::int32_t mSelectedRow = -1;
+  std::int32_t mSelectedCol = -1;
+  QColor mLightSquareColor  = QColor(240, 217, 181);
+  QColor mDarkSquareColor   = QColor(181, 136, 99);
 };

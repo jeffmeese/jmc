@@ -731,7 +731,7 @@ bool Board8x8::makeMove(
   Color sideToMove        = boardState.sideToMove;
   std::int8_t sourceIndex = move.getSourceIndex();
   std::int8_t destIndex   = move.getDestinationIndex();
-  Piece movedPiece        = mCells[sourceIndex].piece;
+  Piece movedPiece        = move.getPiece();
   Square & kingSquare     = (sideToMove == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
 
   mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
@@ -888,7 +888,8 @@ void Board8x8::pushMove(
   Piece capturePiece,
   MoveList & moveList) const
 {
-  Move move(fromSquare, toSquare, flags, mBoardState, capturePiece);
+  Piece movedPiece = mCells[fromSquare].piece;
+  Move move(fromSquare, toSquare, flags, movedPiece, mBoardState, capturePiece);
   moveList.addMove(move);
 }
 
@@ -1012,9 +1013,9 @@ void Board8x8::unmakeMove(
   BoardState boardState   = move.getBoardState();
   std::int8_t sourceIndex = move.getSourceIndex();
   std::int8_t destIndex   = move.getDestinationIndex();
+  Piece movedPiece        = move.getPiece();
   Color sideThatMoved     = boardState.sideToMove;
   Color otherSide         = (sideThatMoved == Color::White) ? Color::Black : Color::White;
-  Piece movedPiece        = mCells[destIndex].piece;
   Square & kingSquare     = (sideThatMoved == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
 
   // Do basic update
