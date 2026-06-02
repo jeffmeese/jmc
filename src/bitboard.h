@@ -32,9 +32,9 @@ public:
 
   BoardState getBoardState() const override;
 
-  std::int8_t getKingColumn(Color color) const;
+  std::int8_t getKingColumn(Color color) const override;
 
-  std::int8_t getKingRow(Color color) const;
+  std::int8_t getKingRow(Color color) const override;
 
   PieceType getPieceType(
     std::int8_t row,

@@ -58,6 +58,12 @@ const int index64[64] =
 };
 // clang-format on
 
+BitBoard::BitBoard()
+{
+  reset();
+  initAttacks();
+}
+
 /**
  * bitScanForward
  * @author Kim Walisch (2012)
@@ -171,12 +177,6 @@ void BitBoard::generateSlidingMoves(
 
     pieces &= pieces - 1;
   }
-}
-
-BitBoard::BitBoard()
-{
-  reset();
-  initAttacks();
 }
 
 void BitBoard::generateCastlingMoves(
