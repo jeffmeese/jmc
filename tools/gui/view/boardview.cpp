@@ -52,7 +52,7 @@ void BoardView::mousePressEvent(
   std::int32_t row = 7 - static_cast<std::int32_t>(static_cast<double>(pos.y()) / squareHeight);
   std::int32_t col = static_cast<std::int32_t>(static_cast<double>(pos.x()) / squareWidth);
 
-  const jmchess::Board * board = mGame->getBoard();
+  jmchess::Board * board       = mGame->getBoard();
   jmchess::PieceType pieceType = board->getPieceType(row, col);
 
   // If the user selected the same piece, deselect it
@@ -76,7 +76,11 @@ void BoardView::mousePressEvent(
     for (std::int32_t i = 0; i < moveList.totalMoves(); i++)
     {
       const jmchess::Move & move = moveList.getMove(i);
-      mLegalMoves.push_back(move);
+      if (board->makeMove(move))
+      {
+        mLegalMoves.push_back(move);
+        board->unmakeMove(move);
+      }
     }
     update();
     return;
@@ -144,7 +148,7 @@ void BoardView::paintEvent(
     }
   }
 
-  //painter.drawPixmap(0, 0, width, height, mBoardPixmap);
+  // painter.drawPixmap(0, 0, width, height, mBoardPixmap);
 
   if (mGame != nullptr)
   {

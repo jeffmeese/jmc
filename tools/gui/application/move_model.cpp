@@ -40,7 +40,7 @@ QVariant MoveModel::data(
 int MoveModel::rowCount(
   const QModelIndex & parent) const
 {
-  return mMoves.size() + mMoves.size() % 2;
+  return mMoves.size() / 2 + mMoves.size() % 2;
 }
 
 void MoveModel::setGame(
@@ -57,7 +57,7 @@ void MoveModel::slotMoveMade(
 {
   if (mMoves.size() % 2 == 0)
   {
-    beginInsertRows(QModelIndex(), mMoves.size() / 2, mMoves.size() / 2);
+    //beginInsertRows(QModelIndex(), mMoves.size() / 2, mMoves.size() / 2);
   }
 
   mMoves.push_back(move);
@@ -65,7 +65,7 @@ void MoveModel::slotMoveMade(
 
   if (mMoves.size() % 2 > 0)
   {
-    endInsertRows();
+    //endInsertRows();
   }
 }
 
