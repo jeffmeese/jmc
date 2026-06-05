@@ -987,18 +987,17 @@ bool BitBoard::makeMove(
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
   Square & kingSquare          = (sideToMove == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
-  //std::uint64_t & friendlyPieces = (sideToMove == Color::White) ? mWhitePieces : mBlackPieces;
-  //std::uint64_t & enemyPieces = (sideToMove == Color::White) ? mBlackPieces : mWhitePieces;
+  std::uint64_t & friendlyPieces = (sideToMove == Color::White) ? mWhitePieces : mBlackPieces;
+  std::uint64_t & enemyPieces = (sideToMove == Color::White) ? mBlackPieces : mWhitePieces;
   std::int32_t pieceOffset = (sideToMove == Color::Black) * 6;
   std::int32_t captureOffset = (pieceOffset > 0) ? 0 : 6;
-  //std::int32_t pieceOffset = 0;
 
   // Get the bitboard index for the piece being moved
-  std::int32_t movedPieceIndex = static_cast<std::int32_t>(movedPiece);// + pieceOffset;
-  if (sideToMove == Color::Black)
-  {
-    movedPieceIndex += 6;
-  }
+  std::int32_t movedPieceIndex = static_cast<std::int32_t>(movedPiece) + pieceOffset;
+  //if (sideToMove == Color::Black)
+  //{
+  //  movedPieceIndex += 6;
+  //}
 
   mBoardState.enpassantColumn = INVALID_ENPASSANT_COLUMN;
   mCells[sourceIndex].piece   = Piece::None;
@@ -1022,11 +1021,11 @@ bool BitBoard::makeMove(
   if (move.isPromotion())
   {
     Piece promotedPiece             = move.getPromotedPiece();
-    std::int32_t promotedPieceIndex = static_cast<std::int32_t>(promotedPiece);// + pieceOffset;
-    if (sideToMove == Color::Black)
-    {
-      promotedPieceIndex += 6;
-    }
+    std::int32_t promotedPieceIndex = static_cast<std::int32_t>(promotedPiece) + pieceOffset;
+    //if (sideToMove == Color::Black)
+    //{
+    //  promotedPieceIndex += 6;
+    //}
 
     mBitBoards[movedPieceIndex] ^= destBitBoard;
     mBitBoards[promotedPieceIndex] |= destBitBoard;
@@ -1037,11 +1036,11 @@ bool BitBoard::makeMove(
   if (move.isCapture())
   {
     Piece capturePiece             = move.getCapturedPiece();
-    std::int32_t capturePieceIndex = static_cast<std::int32_t>(capturePiece);// + pieceOffset;
-    if (sideToMove == Color::White)
-    {
-      capturePieceIndex += 6;
-    }
+    std::int32_t capturePieceIndex = static_cast<std::int32_t>(capturePiece) + captureOffset;
+    //if (sideToMove == Color::White)
+    //{
+    //  capturePieceIndex += 6;
+    //}
 
     mBitBoards[capturePieceIndex] ^= destBitBoard;
     //enemyPieces ^= destBitBoard;
