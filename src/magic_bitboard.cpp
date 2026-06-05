@@ -144,20 +144,82 @@ BoardState MagicBitboard::getBoardState() const
 std::int8_t MagicBitboard::getKingColumn(
   Color color) const
 {
-  return 0;
+  return (color == Color::White) ? mWhiteKingSquare.col : mBlackKingSquare.col;
 }
 
 std::int8_t MagicBitboard::getKingRow(
   Color color) const
 {
-  return 0;
+  return (color == Color::White) ? mWhiteKingSquare.row : mBlackKingSquare.row;
 }
 
 PieceType MagicBitboard::getPieceType(
   std::int8_t row,
   std::int8_t col) const
 {
-  return PieceType::None;
+  std::int8_t index = getIndex(row, col);
+
+  Piece piece = mCells[index].piece;
+  Color color = mCells[index].color;
+
+  PieceType pieceType = PieceType::None;
+  if (piece != Piece::None)
+  {
+    if (color == Color::White)
+    {
+      switch (piece)
+      {
+      case Piece::Pawn:
+        pieceType = PieceType::WhitePawn;
+        break;
+      case Piece::Rook:
+        pieceType = PieceType::WhiteRook;
+        break;
+      case Piece::Knight:
+        pieceType = PieceType::WhiteKnight;
+        break;
+      case Piece::Bishop:
+        pieceType = PieceType::WhiteBishop;
+        break;
+      case Piece::Queen:
+        pieceType = PieceType::WhiteQueen;
+        break;
+      case Piece::King:
+        pieceType = PieceType::WhiteKing;
+        break;
+      default:
+        break;
+      }
+    }
+    else
+    {
+      switch (piece)
+      {
+      case Piece::Pawn:
+        pieceType = PieceType::BlackPawn;
+        break;
+      case Piece::Rook:
+        pieceType = PieceType::BlackRook;
+        break;
+      case Piece::Knight:
+        pieceType = PieceType::BlackKnight;
+        break;
+      case Piece::Bishop:
+        pieceType = PieceType::BlackBishop;
+        break;
+      case Piece::Queen:
+        pieceType = PieceType::BlackQueen;
+        break;
+      case Piece::King:
+        pieceType = PieceType::BlackKing;
+        break;
+      default:
+        break;
+      }
+    }
+  }
+
+  return pieceType;
 }
 
 void MagicBitboard::initAttacks()

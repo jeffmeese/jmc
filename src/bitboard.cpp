@@ -45,18 +45,18 @@ static constexpr std::int32_t QUEEN_INDEX  = 4;
 static constexpr std::int32_t KING_INDEX   = 5;
 
 // clang-format off
-const int index64[64] = 
-{
-    0, 47,  1, 56, 48, 27,  2, 60,
-   57, 49, 41, 37, 28, 16,  3, 61,
-   54, 58, 35, 52, 50, 42, 21, 44,
-   38, 32, 29, 23, 17, 11,  4, 62,
-   46, 55, 26, 59, 40, 36, 15, 53,
-   34, 51, 20, 43, 31, 22, 10, 45,
-   25, 39, 14, 33, 19, 30,  9, 24,
-   13, 18,  8, 12,  7,  6,  5, 63
-};
-// clang-format on
+// const int index64[64] = 
+// {
+//     0, 47,  1, 56, 48, 27,  2, 60,
+//    57, 49, 41, 37, 28, 16,  3, 61,
+//    54, 58, 35, 52, 50, 42, 21, 44,
+//    38, 32, 29, 23, 17, 11,  4, 62,
+//    46, 55, 26, 59, 40, 36, 15, 53,
+//    34, 51, 20, 43, 31, 22, 10, 45,
+//    25, 39, 14, 33, 19, 30,  9, 24,
+//    13, 18,  8, 12,  7,  6,  5, 63
+// };
+// // clang-format on
 
 BitBoard::BitBoard()
 {
@@ -64,57 +64,57 @@ BitBoard::BitBoard()
   initAttacks();
 }
 
-/**
- * bitScanForward
- * @author Kim Walisch (2012)
- * @param bb bitboard to scan
- * @precondition bb != 0
- * @return index (0..63) of least significant one bit
- */
-int BitBoard::bitScanForward(
-  std::uint64_t bb) const
-{
-  if (__cplusplus >= 202002L)
-  {
-    assert(bb != 0);
-    return std::countr_zero(bb);
-  }
-  else
-  {
-    const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
-    assert(bb != 0);
-    return index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
-  }
-}
+// /**
+//  * bitScanForward
+//  * @author Kim Walisch (2012)
+//  * @param bb bitboard to scan
+//  * @precondition bb != 0
+//  * @return index (0..63) of least significant one bit
+//  */
+// inline int BitBoard::bitScanForward(
+//   std::uint64_t bb) const
+// {
+//   if (__cplusplus >= 202002L)
+//   {
+//     assert(bb != 0);
+//     return std::countr_zero(bb);
+//   }
+//   else
+//   {
+//     const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
+//     assert(bb != 0);
+//     return index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
+//   }
+// }
 
-/**
- * bitScanReverse
- * @authors Kim Walisch, Mark Dickinson
- * @param bb bitboard to scan
- * @precondition bb != 0
- * @return index (0..63) of most significant one bit
- */
-int BitBoard::bitScanReverse(
-  std::uint64_t bb) const
-{
-  if (__cplusplus >= 202002L)
-  {
-    assert(bb);
-    return 63 - std::countl_zero(bb);
-  }
-  else
-  {
-    const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
-    assert(bb != 0);
-    bb |= bb >> 1;
-    bb |= bb >> 2;
-    bb |= bb >> 4;
-    bb |= bb >> 8;
-    bb |= bb >> 16;
-    bb |= bb >> 32;
-    return index64[(bb * debruijn64) >> 58];
-  }
-}
+// /**
+//  * bitScanReverse
+//  * @authors Kim Walisch, Mark Dickinson
+//  * @param bb bitboard to scan
+//  * @precondition bb != 0
+//  * @return index (0..63) of most significant one bit
+//  */
+// inline int BitBoard::bitScanReverse(
+//   std::uint64_t bb) const
+// {
+//   if (__cplusplus >= 202002L)
+//   {
+//     assert(bb);
+//     return 63 - std::countl_zero(bb);
+//   }
+//   else
+//   {
+//     const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
+//     assert(bb != 0);
+//     bb |= bb >> 1;
+//     bb |= bb >> 2;
+//     bb |= bb >> 4;
+//     bb |= bb >> 8;
+//     bb |= bb >> 16;
+//     bb |= bb >> 32;
+//     return index64[(bb * debruijn64) >> 58];
+//   }
+// }
 
 template <bool Diagonal>
 void BitBoard::generateSlidingMoves(
@@ -990,9 +990,14 @@ bool BitBoard::makeMove(
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
   Square & kingSquare          = (sideToMove == Color::White) ? mWhiteKingSquare : mBlackKingSquare;
+  //std::uint64_t & friendlyPieces = (sideToMove == Color::White) ? mWhitePieces : mBlackPieces;
+  //std::uint64_t & enemyPieces = (sideToMove == Color::White) ? mBlackPieces : mWhitePieces;
+  std::int32_t pieceOffset = (sideToMove == Color::Black) * 6;
+  std::int32_t captureOffset = (pieceOffset > 0) ? 0 : 6;
+  //std::int32_t pieceOffset = 0;
 
   // Get the bitboard index for the piece being moved
-  std::int32_t movedPieceIndex = static_cast<std::int32_t>(movedPiece);
+  std::int32_t movedPieceIndex = static_cast<std::int32_t>(movedPiece);// + pieceOffset;
   if (sideToMove == Color::Black)
   {
     movedPieceIndex += 6;
@@ -1005,6 +1010,8 @@ bool BitBoard::makeMove(
   mCells[destIndex].color     = sideToMove;
   mBitBoards[movedPieceIndex] ^= sourceBitBoard;
   mBitBoards[movedPieceIndex] |= destBitBoard;
+  //friendlyPieces ^= sourceBitBoard;
+  //friendlyPieces |= destBitBoard;
 
   // Handle double pushes
   if (move.isEnpassantPush())
@@ -1018,7 +1025,7 @@ bool BitBoard::makeMove(
   if (move.isPromotion())
   {
     Piece promotedPiece             = move.getPromotedPiece();
-    std::int32_t promotedPieceIndex = static_cast<std::int32_t>(promotedPiece);
+    std::int32_t promotedPieceIndex = static_cast<std::int32_t>(promotedPiece);// + pieceOffset;
     if (sideToMove == Color::Black)
     {
       promotedPieceIndex += 6;
@@ -1033,20 +1040,20 @@ bool BitBoard::makeMove(
   if (move.isCapture())
   {
     Piece capturePiece             = move.getCapturedPiece();
-    std::int32_t capturePieceIndex = static_cast<std::int32_t>(capturePiece);
+    std::int32_t capturePieceIndex = static_cast<std::int32_t>(capturePiece);// + pieceOffset;
     if (sideToMove == Color::White)
     {
       capturePieceIndex += 6;
     }
 
     mBitBoards[capturePieceIndex] ^= destBitBoard;
+    //enemyPieces ^= destBitBoard;
 
     if (move.isEnpassantCapture())
     {
       std::int8_t row            = getRow(destIndex);
       std::int8_t dir            = (sideToMove == Color::White ? -1 : +1);
       std::int8_t enPassantIndex = getIndex(row + dir, boardState.enpassantColumn);
-      // std::int8_t enPassantIndex = getIndex(destSquare.row + dir, boardState.enpassantColumn);
       std::uint64_t epBitBoard = (1ULL << enPassantIndex);
 
       mBitBoards[capturePieceIndex] ^= destBitBoard;
@@ -1064,6 +1071,8 @@ bool BitBoard::makeMove(
     case C1:
       mBitBoards[ROOK_INDEX] ^= (1ULL << A1);
       mBitBoards[ROOK_INDEX] |= (1ULL << D1);
+      //friendlyPieces ^= (1ULL << A1);
+      //friendlyPieces |= (1ULL << D1);
       mCells[A1].piece = Piece::None;
       mCells[A1].color = Color::None;
       mCells[D1].piece = Piece::Rook;
@@ -1072,6 +1081,8 @@ bool BitBoard::makeMove(
     case G1:
       mBitBoards[ROOK_INDEX] ^= (1ULL << H1);
       mBitBoards[ROOK_INDEX] |= (1ULL << F1);
+      //friendlyPieces ^= (1ULL << H1);
+      //friendlyPieces |= (1ULL << F1);
       mCells[F1].piece = Piece::Rook;
       mCells[F1].color = sideToMove;
       mCells[H1].piece = Piece::None;
@@ -1080,6 +1091,8 @@ bool BitBoard::makeMove(
     case C8:
       mBitBoards[ROOK_INDEX + 6] ^= (1ULL << A8);
       mBitBoards[ROOK_INDEX + 6] |= (1ULL << D8);
+      //friendlyPieces ^= (1ULL << A8);
+      //friendlyPieces |= (1ULL << D8);
       mCells[A8].piece = Piece::None;
       mCells[A8].color = Color::None;
       mCells[D8].piece = Piece::Rook;
@@ -1088,6 +1101,8 @@ bool BitBoard::makeMove(
     case G8:
       mBitBoards[ROOK_INDEX + 6] ^= (1ULL << H8);
       mBitBoards[ROOK_INDEX + 6] |= (1ULL << F8);
+      //friendlyPieces ^= (1ULL << H8);
+      //friendlyPieces |= (1ULL << F8);
       mCells[F8].piece = Piece::Rook;
       mCells[F8].color = sideToMove;
       mCells[H8].piece = Piece::None;
@@ -1169,6 +1184,7 @@ bool BitBoard::makeMove(
 
   // Update the aggregated bitboards
   updateAggregateBitboards();
+  //mAllPieces = mWhitePieces | mBlackPieces;
 
   // Check if the king is in check. If it is
   // this is not a legal move. Unmake it right away
@@ -1182,7 +1198,7 @@ bool BitBoard::makeMove(
   return true;
 }
 
-void BitBoard::pushMove(
+inline void BitBoard::pushMove(
   std::int8_t fromSquare,
   std::int8_t toSquare,
   std::uint8_t flags,
