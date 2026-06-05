@@ -43,6 +43,9 @@ static constexpr std::int32_t BISHOP_INDEX = 2;
 static constexpr std::int32_t ROOK_INDEX   = 3;
 static constexpr std::int32_t QUEEN_INDEX  = 4;
 static constexpr std::int32_t KING_INDEX   = 5;
+static constexpr std::int32_t WHITE_INDEX  = 12;
+static constexpr std::int32_t BLACK_INDEX  = 13;
+static constexpr std::int32_t ALL_INDEX    = 14;
 
 // clang-format off
 // const int index64[64] = 
@@ -314,13 +317,9 @@ void BitBoard::generateMoves(
 {
   Color sideToMove = mBoardState.sideToMove;
 
-  std::int32_t indexIncrement = 0;
-  std::uint64_t enemyPieces   = mBlackPieces;
-  if (sideToMove == Color::Black)
-  {
-    indexIncrement = 6;
-    enemyPieces    = mWhitePieces;
-  }
+  std::int32_t indexIncrement = (sideToMove == Color::Black) * 6;
+  std::int32_t bitBoardIncrement = (sideToMove == Color::Black);
+  std::uint64_t enemyPieces = mBitBoards[BLACK_INDEX - bitBoardIncrement];
 
   std::uint64_t pawns   = mBitBoards[PAWN_INDEX + indexIncrement];
   std::uint64_t knights = mBitBoards[KNIGHT_INDEX + indexIncrement];
@@ -363,13 +362,9 @@ void BitBoard::generateMoves(
 {
   Color sideToMove = mBoardState.sideToMove;
 
-  std::int32_t indexIncrement = 0;
-  std::uint64_t enemyPieces   = mBlackPieces;
-  if (sideToMove == Color::Black)
-  {
-    enemyPieces    = mWhitePieces;
-    indexIncrement = 6;
-  }
+  std::int32_t indexIncrement = (sideToMove == Color::Black) * 6;
+  std::int32_t bitBoardIncrement = (sideToMove == Color::Black);
+  std::uint64_t enemyPieces = mBitBoards[BLACK_INDEX - bitBoardIncrement];
 
   std::uint64_t knights = mBitBoards[KNIGHT_INDEX + indexIncrement];
   std::uint64_t kings   = mBitBoards[KING_INDEX + indexIncrement];
@@ -1503,12 +1498,16 @@ void BitBoard::updateAggregateBitboards()
 {
   mWhitePieces = 0;
   mBlackPieces = 0;
+  mBitBoards[12] = mBitBoards[13] = mBitBoards[14] = 0;
   for (std::int32_t i = PAWN_INDEX; i <= KING_INDEX; i++)
   {
     mWhitePieces |= mBitBoards[i];
     mBlackPieces |= mBitBoards[i + 6];
+    mBitBoards[12] |= mBitBoards[i];
+    mBitBoards[13] |= mBitBoards[i + 6];
   }
   mAllPieces = mWhitePieces | mBlackPieces;
+  mBitBoards[14] = mBitBoards[12] | mBitBoards[13];
 }
 
 void BitBoard::writeBitBoard(

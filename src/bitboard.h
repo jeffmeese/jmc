@@ -141,7 +141,7 @@ private:
   std::uint64_t mWhitePieces;
   std::uint64_t mBlackPieces;
   std::uint64_t mAllPieces;
-  std::uint64_t mBitBoards[12];
+  std::uint64_t mBitBoards[15];
   Attacks mAttacks[64];
   Cell mCells[64];
 };
