@@ -119,7 +119,7 @@ BitBoard::BitBoard()
 template <bool Diagonal>
 void BitBoard::generateSlidingMoves(
   std::uint64_t pieces,
-  Piece pieceType,
+  Piece piece,
   std::uint64_t enemyPieces,
   MoveList & moveList) const
 {
@@ -381,7 +381,6 @@ void BitBoard::generateMoves(
   std::uint64_t pieceBitboard = (1ULL << index);
   std::uint64_t bis           = bishops & pieceBitboard;
 
-  
   if (sideToMove == Color::White)
   {
     if (index == E1)
@@ -463,7 +462,6 @@ void BitBoard::generatePawnPushesBlack(
   MoveList & moveList) const
 {
   std::uint64_t empty          = ~mAllPieces;
-  //std::uint64_t pawns          = mBitBoards[PAWN_INDEX + 6];
   std::uint64_t unmovedPawns   = pawns & RANK_7;
   std::uint64_t singlePushes   = ((pawns >> 8) & empty);
   std::uint64_t doublePushes   = (((unmovedPawns >> 8) & empty) >> 8) & empty;
@@ -553,7 +551,6 @@ void BitBoard::generatePawnPushesWhite(
   MoveList & moveList) const
 {
   std::uint64_t empty          = ~mAllPieces;
-  //std::uint64_t pawns          = mBitBoards[PAWN_INDEX];
   std::uint64_t unmovedPawns   = pawns & RANK_2;
   std::uint64_t singlePushes   = ((pawns << 8) & empty);
   std::uint64_t doublePushes   = (((unmovedPawns << 8) & empty) << 8) & empty;
@@ -985,7 +982,7 @@ bool BitBoard::makeMove(
   BoardState boardState        = move.getBoardState();
   std::int8_t sourceIndex      = move.getSourceIndex();
   std::int8_t destIndex        = move.getDestinationIndex();
-  Piece movedPiece             = move.getPiece();
+  Piece movedPiece             = mCells[sourceIndex].piece;
   Color sideToMove             = boardState.sideToMove;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
@@ -1205,8 +1202,8 @@ inline void BitBoard::pushMove(
   Piece capturePiece,
   MoveList & moveList) const
 {
-  Piece piece = mCells[fromSquare].piece;
-  Move move(fromSquare, toSquare, flags, piece, mBoardState, capturePiece);
+  Piece movedPiece = mCells[fromSquare].piece;
+  Move move(fromSquare, toSquare, flags, movedPiece, mBoardState, capturePiece);
   moveList.addMove(move);
 }
 
@@ -1371,7 +1368,7 @@ void BitBoard::unmakeMove(
   BoardState boardState        = move.getBoardState();
   std::int8_t sourceIndex      = move.getSourceIndex();
   std::int8_t destIndex        = move.getDestinationIndex();
-  Piece movedPiece             = move.getPiece();
+  Piece movedPiece             = mCells[destIndex].piece;
   Color sideThatMoved          = boardState.sideToMove;
   std::uint64_t sourceBitBoard = (1ULL << sourceIndex);
   std::uint64_t destBitBoard   = (1ULL << destIndex);
