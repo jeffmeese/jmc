@@ -3,7 +3,7 @@
 namespace jmchess
 {
 
-// inline std::int8_t Board::getIndex(
+// std::int8_t Board::getIndex(
 //   std::int8_t row,
 //   std::int8_t col)
 // {

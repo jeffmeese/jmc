@@ -38,3 +38,5 @@ set(SRC_FILES
 add_library(${TARGET_NAME} STATIC ${HDR_FILES} ${SRC_FILES})
 
 target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_compile_features(${TARGET_NAME} PUBLIC cxx_std_20)
