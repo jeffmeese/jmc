@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bit>
+#include <bitset>
 #include <cstdint>
 #include <map>
 #include <ostream>
@@ -144,5 +146,28 @@ private:
   Attacks mAttacks[64];
   Cell mCells[64];
 };
+
+inline int BitBoard::bitScanForward(std::uint64_t bb) const
+{
+  return std::countr_zero(bb);
+}
+
+inline int BitBoard::bitScanReverse(
+  std::uint64_t bb) const
+{
+  // #if __cplusplus >= 202002L
+  return 63 - std::countl_zero(bb);
+  // #else
+  //   const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
+  //   assert(bb != 0);
+  //   bb |= bb >> 1;
+  //   bb |= bb >> 2;
+  //   bb |= bb >> 4;
+  //   bb |= bb >> 8;
+  //   bb |= bb >> 16;
+  //   bb |= bb >> 32;
+  //   return index64[(bb * debruijn64) >> 58];
+  // #endif
+}
 
 } // namespace jmchess
