@@ -137,18 +137,15 @@ private:
     std::ostream & output) const;
 
   BoardState mBoardState;
-  Square mBlackKingSquare;
-  Square mWhiteKingSquare;
-  std::uint64_t mWhitePieces;
-  std::uint64_t mBlackPieces;
-  std::uint64_t mAllPieces;
-  std::uint64_t mBitBoards[15];
+  std::uint8_t mKingSquares[2];
+  std::uint64_t mBitBoards[16];
   Attacks mAttacks[64];
+  //std::uint64_t knightAttacks[64];
   Cell mCells[64];
 };
 
 // // clang-format off
-// static const int index64[64] = 
+// static const int index64[64] =
 // {
 //     0, 47,  1, 56, 48, 27,  2, 60,
 //    57, 49, 41, 37, 28, 16,  3, 61,
@@ -171,11 +168,11 @@ private:
 inline int BitBoard::bitScanForward(
   std::uint64_t bb) const
 {
-  //if (__cplusplus >= 202002L)
+  // if (__cplusplus >= 202002L)
   //{
-    return std::countr_zero(bb);
+  return std::countr_zero(bb);
   //}
-  //else
+  // else
   //{
   //  const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
   //  return index64[((bb ^ (bb - 1)) * debruijn64) >> 58];
@@ -192,11 +189,11 @@ inline int BitBoard::bitScanForward(
 inline int BitBoard::bitScanReverse(
   std::uint64_t bb) const
 {
-  //if (__cplusplus >= 202002L)
+  // if (__cplusplus >= 202002L)
   //{
-    return 63 - std::countl_zero(bb);
+  return 63 - std::countl_zero(bb);
   //}
-  //else
+  // else
   //{
   //  const std::uint64_t debruijn64 = std::uint64_t(0x03f79d71b4cb0a89);
   //  bb |= bb >> 1;
